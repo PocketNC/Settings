@@ -33,8 +33,8 @@ try:
 
       i2c.write16(64, combined)
       lastSpeed = speed
+    time.sleep(.1)
 
-  time.sleep(1)
 except KeyboardInterrupt:
   raise SystemExit
 
