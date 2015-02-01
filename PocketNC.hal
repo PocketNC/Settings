@@ -409,4 +409,8 @@ net spindlePwm => spindleLimit.in
 net spindleScaleLimiter <= spindleLimit.out
 net spindleScaleLimiter => hal_pru_generic.pwmgen.00.out.00.value
 
+setp hal_pru_generic.pwmgen.00.pwm_period       1000000
+setp hal_pru_generic.pwmgen.00.out.00.pin       0x37
+setp hal_pru_generic.pwmgen.00.out.00.enable    1
+
 
