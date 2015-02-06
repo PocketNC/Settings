@@ -1,0 +1,3 @@
+#!/bin/bash
+echo Loading....
+linuxcnc ~/machinekit-dev/configs/ARM/BeagleBone/PocketNC/PocketNC.ini
