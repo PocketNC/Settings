@@ -25,7 +25,7 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 #loadrt hal_bb_gpio output_pins=107,126,217,218,224,226 input_pins=108,110,114,117,118
 #loadrt hal_bb_gpio output_pins=107,126,211,212,218,224,226 input_pins=108,109,110,114,117,118,218,222
 loadrt hal_bb_gpio output_pins=117,211,212,218,224,226 input_pins=118,107,108,109,110,114,119,126,213,216,217,222,241,242,225,231
-loadrt [PRUCONF](DRIVER) prucode=$(HAL_RTMOD_DIR)/[PRUCONF](PRUBIN) [PRUCONF](CONFIG)
+loadrt [PRUCONF](DRIVER) prucode=/usr/lib/linuxcnc/xenomai/pru_generic.bin  [PRUCONF](CONFIG)
 loadrt pid num_chan=2
 loadrt limit1 count=3
 
@@ -42,7 +42,7 @@ loadrt not count=8
 # Python user-mode HAL module to read ADC value and generate a thermostat output for PWM
 # t = Thermistor table (only epcos_B57560G1104 or 1 supported for now)
 # a = analog input channel
-loadusr -Wn Therm /home/machinekit/machinekit-dev/configs/ARM/BeagleBone/BeBoPr-Bridge/ReadTemp.py -n Therm --num_chan 2 -t 1 1 -a 4 5
+loadusr -Wn Therm /home/machinekit/linuxcnc/configs/ARM.BeagleBone.PocketNC/ReadTemp.py -n Therm --num_chan 2 -t 1 1 -a 4 5
 
 # ################################################
 # THREADS
@@ -344,9 +344,9 @@ setp bb_gpio.p9.in-16.invert 1
 
 
 # A Axis Index
-net Aindex <= bb_gpio.p9.in-42
-net Aindex => axis.3.index-enable
-setp bb_gpio.p9.in-42.
+#net Aindex <= bb_gpio.p9.in-42
+#net Aindex => axis.3.index-enable
+#setp bb_gpio.p9.in-42.
 
 
 # B axis
