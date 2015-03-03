@@ -8,7 +8,7 @@
 
 # Launch the setup script to make sure hardware setup looks good
 loadusr -w ./setup.bridge.sh
-
+#git test
 
 # ###################################
 # Core EMC/HAL Loads
