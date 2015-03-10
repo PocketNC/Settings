@@ -3,12 +3,10 @@
 # HAL file for BeagleBone PocketNC cape with 5 steppers
 # 
 # Derived from example hm2-stepper config
-# test Michelle
 # ########################################
 
 # Launch the setup script to make sure hardware setup looks good
 loadusr -w ./setup.bridge.sh
-#git test
 
 # ###################################
 # Core EMC/HAL Loads
