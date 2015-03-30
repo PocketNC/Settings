@@ -398,7 +398,7 @@ net progPause halui.program.pause <= bb_gpio.p9.in-17
 #net powerOff not.1.out => halui.machine.off
 
 # Program stop
-net programStop halui.program.stop <= bb_gpio.p9.in-41
+#net programStop halui.program.stop <= bb_gpio.p9.in-41
 #setp toggle.1.debounce 2
 #setp bb_gpio.p8.in-26.invert 0
 #net powerOn toggle.1.out => halui.machine.on => not.1.in
