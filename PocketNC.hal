@@ -356,7 +356,7 @@ setp bb_gpio.p8.in-19.invert 1
 ### Control Panel Buttons ###
 # eStop
 net estop-loop iocontrol.0.user-enable-out => iocontrol.0.emc-enable-in
-net eStopToggle toggle.0.in <= bb_gpio.p8.in-07
+#net eStopToggle toggle.0.in <= bb_gpio.p8.in-07
 setp toggle.0.debounce 2
 #setp bb_gpio.p8.in-07.invert 1
 net eStopOn toggle.0.out => halui.estop.activate => not.0.in
