@@ -1,0 +1,14 @@
+# This is the shutdown hal script of things to do to clean up apon exiting the AXiS gui.
+
+## unlink and disable LEDs. ##
+#eStopLed
+unlinkp bb_gpio.p8.out-17 
+setp bb_gpio.p8.out-17 false
+
+#mPwrLed
+unlinkp bb_gpio.p9.out-14 
+setp bb_gpio.p9.out-14 false
+
+#probeLed
+unlinkp bb_gpio.p9.out-25
+setp bb_gpio.p9.out-25 true

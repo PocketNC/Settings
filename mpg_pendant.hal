@@ -1,0 +1,115 @@
+### MPG pendant code.
+### Notes:	You may want to add --> TWOPASS = on <-- to your .ini file.
+### 		That will allow halcmd to compile a list of loadrt components without conflicts.
+###			(Provided components are called by 'names' instead of by counts.)
+###
+###
+###			Replace the 'SELECT_A_PIN' entries with your own physical connections.
+
+loadrt mux4 names=mpgLogic-mux.0
+loadrt scale names=mpgLogic-scale.0,mpgLogic-scale.1
+loadrt or2 names=mpgLogic-or.0,mpgLogic-or.1,mpgLogic-or.2,mpgLogic-or.3
+loadrt not names=mpgLogic-not.0
+loadrt conv_s32_float names=mpgLogic-s32ToFloat.feedOverride
+loadrt conv_float_s32 names=mpgLogic-float-to-s32.feedOverride
+loadrt encoder names=mpgLogic-encoder
+
+addf mpgLogic-scale.0							servo-thread
+addf mpgLogic-scale.1							servo-thread
+addf mpgLogic-mux.0								servo-thread
+addf mpgLogic-or.0								servo-thread
+addf mpgLogic-or.1								servo-thread
+addf mpgLogic-or.2								servo-thread
+addf mpgLogic-or.3								servo-thread
+addf mpgLogic-not.0								servo-thread
+addf mpgLogic-s32ToFloat.feedOverride			servo-thread
+addf mpgLogic-float-to-s32.feedOverride			servo-thread
+addf mpgLogic-encoder.update-counters			servo-thread
+addf mpgLogic-encoder.capture-position			servo-thread
+
+############# BEGIN MPG stuff #############
+# --- JOINT-SELECT-A --- (X axis)
+net joint-select-a	<=	SELECT_A_PIN.input-28
+net joint-select-a	=>	mpgLogic-or.2.in0
+net joint-select-a	=>	axis.0.jog-enable
+
+# --- JOINT-SELECT-B --- (Y axis)
+net joint-select-b	<=	SELECT_A_PIN.input-29
+net joint-select-b	=>	mpgLogic-or.2.in1
+net joint-select-b	=>	axis.1.jog-enable
+
+# --- JOINT-SELECT-C --- (Z axis)
+net joint-select-c	<=	SELECT_A_PIN.input-30
+net joint-select-c	=>	mpgLogic-or.3.in0
+net joint-select-c	=>	axis.2.jog-enable
+
+net feedOverride	<=	SELECT_A_PIN.input-31
+net feedOverride	=>	halui.feed-override.count-enable
+
+# --- JOG SPEED SELECT ---
+setp mpgLogic-mux.0.in1 .0025
+setp mpgLogic-mux.0.in2 .025
+setp mpgLogic-mux.0.in3 .00025
+
+net mpgSpeed001	<= SELECT_A_PIN.input-24
+net mpgSpeed001 => mpgLogic-or.0.in0
+net mpgSpeed001	=> mpgLogic-or.1.in0
+#net mpgSpeed001	=> mpgLogic-or.2.in0
+
+net mpgSpeed010 	<= SELECT_A_PIN.input-25
+net mpgSpeed010 	=> mpgLogic-or.0.in1
+#net mpgSpeed010	=> mpgLogic-or.2.in1
+
+net mpgSpeed100 	<= SELECT_A_PIN.input-26
+net mpgSpeed100 	=> mpgLogic-or.1.in1
+#net mpgSpeed100	=> mpgLogic-or.3.in0
+
+net mpgSpeedMux0	<= mpgLogic-or.0.out
+net mpgSpeedMux0	=> mpgLogic-mux.0.sel0
+
+net mpgSpeedMux1	<= mpgLogic-or.1.out
+net mpgSpeedMux1	=> mpgLogic-mux.0.sel1
+
+net mpg-speed <= mpgLogic-mux.0.out
+net mpg-speed => axis.0.jog-scale
+net mpg-speed => axis.1.jog-scale
+net mpg-speed => axis.2.jog-scale
+
+# --- MPG indicator LED --- (The logic here.= IF .1 -or- .01 -or- .001 is selected THEN enable jog mode AND turn on pendant indicator led.)
+net MPGled			<= mpgLogic-or.2.out
+net MPGled			=> mpgLogic-or.3.in1
+net MPGledOutput	<= mpgLogic-or.3.out
+net MPGledOutput	=> halui.mode.joint
+net MPGledOutput	=> SELECT_A_PIN.output-08
+net MPGledOutput	=> mpgLogic-not.0.in
+net MPGpgmResume	<= mpgLogic-not.0.out
+net MPGpgmResume	=> halui.mode.manual
+
+# ---jogwheel signals to mesa encoder - shared MPG---
+
+### If you have external MPG decoder.
+#net mpg-encoder-count-s32			<=	SELECT_A_PIN.encoder.0.count
+### otherwise...
+net mpg-encoder-inputA				<=	SELECT_A_PIN-encoder.phase-A
+net mpg-encoder-inputB				<=	SELECT_A_PIN-encoder.phase-B
+
+net mpg-encoder-count-s32			<=	mpgLogic-encoder.count
+net mpg-encoder-inputA				=>	mpgLogic-encoder.phase-A
+net mpg-encoder-inputB				=>	mpgLogic-encoder.phase-B
+net mpg-encoder-count-s32			=>	mpgLogic-s32ToFloat.feedOverride.in
+net mpg-encoder-count-floated		<=	mpgLogic-s32ToFloat.feedOverride.out
+net mpg-encoder-count-floated		=>	mpgLogic-scale.1.in
+net mpg-encoder-count-return_s32	<=	mpgLogic-scale.1.out
+net mpg-encoder-count-return_s32	=>	mpgLogic-float-to-s32.feedOverride.in
+net mpg-encoder-count-final			<=	mpgLogic-float-to-s32.feedOverride.out
+net mpg-encoder-count-final			=>	halui.feed-override.counts
+net mpg-encoder-count-s32			=>	axis.0.jog-counts
+net mpg-encoder-count-s32			=>	axis.1.jog-counts
+net mpg-encoder-count-s32			=>	axis.2.jog-counts
+
+# Set jog wheel to velocity mode so motion stops as soon as the mpg stops, no matter the final commanded coordinate.
+#setp axis.0.jog-vel-mode TRUE
+#setp axis.1.jog-vel-mode TRUE
+#setp axis.2.jog-vel-mode TRUE
+
+############# END MPG stuff #############
