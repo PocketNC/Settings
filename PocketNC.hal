@@ -384,8 +384,9 @@ net progPauseLogic => halui.program.pause
 # Probe
 net toolProbe <= bb_gpio.p9.in-22
 net toolProbe => motion.probe-input
-setp bb_gpio.p9.out-25.invert 0
 net toolProbe => bb_gpio.p9.out-25
+setp bb_gpio.p9.in-22.invert 1
+setp bb_gpio.p9.out-25.invert 0
 
 ### Spindle ###
 setp spindleScale.gain -0.000052
