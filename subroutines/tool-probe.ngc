@@ -1,0 +1,83 @@
+O<tool-probe> SUB
+( Filename: tool-probe.ngc )
+( LinuxCNC Tool Probe Routine - modification of Tool-Change subroutine version 1.1 - https://forum.linuxcnc.org/10-advanced-configuration/5596-manual-tool-change-tool-lengh-touch-off?limit=6&start=38 )
+( In the LinuxCNC .ini config file, under the [RS274NGC] section add: )
+(    # change/add/use SUBROUTINE_PATH to point to the location where these tool-change subroutines are located: )
+(    SUBROUTINE_PATH = /home/pocketnc/linuxcnc/nc_files/subroutines )
+(    REMAP=M654  modalgroup=6 ngc=tool-probe )
+( In the LinuxCNC .hal config file, map some input pin to be the probe input, e.g.: )
+(    net toolProbe => motion.probe-input )
+(    net toolProbe <= bb_gpio.p9.in-22 )
+(  )
+( Usage: M654 <tool number> will probe the current tool and store the measured tool offset to the provided tool number )
+(  )
+( General theory of operation: Moves tool to safe position to swap out the tool. Press start button to move the )
+( loaded tool over the probe sensor and then touch off against it. Using the Z value when the probe sensor is triggered, )
+( the tool offset is calculated and saved to the tool offset of the provided tool number. )
+( The distance from the B plate to the origin must be stored in the OriginOffset variable below. The ProbeSensor123Offset )
+( variable must be set to Zprobe - Z123, where Zprobe is the Z value when the probe sensor is triggered using an arbitrary tool )
+( and Z123 is the Z value of that same tool just touching a 123 block with the 3 inch side is against the B plate rotated 90 )
+( degrees in A. )
+(  )
+
+(------------------------------- CONFIGURATION PARAMETERS ----------------------------------------------)
+#<_UseInches> =           1     ( set to 1 to use inches here, or 0 to use millimeters; should match units on tool.tbl dimensions )
+#<_TravelZ> =            0.0   ( machine Z coordinate for travelling, typically near max Z to avoid ever hitting the work )
+#<_TravelFeed> =         40.0   ( feedrate used for general Z moves when avoiding G0 )
+#<_ProbeSensor123Offset> =  .1777  ( distance from probe sensor trigger to 123 block, Zprobe - Z123)
+#<_OriginOffset> =        .839   ( distance from B plate to origin, aka the center of rotation )
+#<_ProbeX> =             1.4414  ( machine X coordinate of switch/touch-off plate )
+#<_ProbeY> =             -2.049   ( machine Y coordinate of switch/touch-off plate )
+#<_ProbeA> =            -10.752   ( machine A coordinate of switch/touch-off plate )
+#<_ProbeFastZ> =          0.0  ( machine Z coord to move to before starting probe, longest tool should not touch switch at this Z )
+#<_ProbeMinZ> =          -3.25  ( machine Z coord to stop probe, shortest tool must touch switch at this Z, must be > min Z )
+#<_ProbeRetract> =        0.1   ( small distance to retract before approaching switch/touch-off plate second time )
+#<_ProbeFastFeed> =       40.0  ( feed rate for moving to _ProbeFastZ )
+#<_ProbeFeed1> =          20.0  ( feed rate for touching switch/touch-off plate first time )
+#<_ProbeFeed2> =           2.0  ( feed rate for touching switch/touch-off plate second time )
+#<_ToolChangeX> =         -1.7  ( machine X coordinate to pause at for manual tool changing )
+#<_ToolChangeY> =          0.0  ( machine Y coordinate to pause at for manual tool changing )
+#<_ToolChangeA> =          0.0  ( machine A coordinate to pause at for manual tool changing )
+(-------------------------------------------------------------------------------------------------------)
+
+M70                                            ( save current modal state )
+
+M5                                             ( turn off spindle, cannot be on during the probe )
+G[21 - #<_UseInches>]                          ( use inches or millimeters as required here, units will be restored on return )
+G30.1                                          ( save current position in #5181-#5185... )
+G49                                            ( clear tool length compensation )
+G90                                            ( use absolute positioning here )
+G94                                            ( use feedrate in units/min )
+G40                                            ( turn cutter radius compensation off here )
+
+G53 G1 F[#<_TravelFeed>] Z[#<_TravelZ>]      ( go to high travel level on Z )
+G53 G0 X[#<_ToolChangeX>]                         ( to tool change location )
+
+(debug, Load tool, then press cycle/start.)
+
+T[#<T>]
+M0
+
+G53 G0 X[#<_ProbeX>]                         ( to tool probe location )
+G53 G0 Y[#<_ProbeY>]
+G53 G0 A[#<_ProbeA>]
+
+G53 G1 F[#<_ProbeFastFeed>] Z[#<_ProbeFastZ>]( move tool closer to switch -- we shouldn't hit it )
+G54 G1 F[#<_ProbeFeed1>] G91                 ( use relative positioning )
+
+G38.2 Z[#<_ProbeMinZ> - #<_ProbeFastZ>] F[#<_ProbeFeed1>]    ( trip switch slowly )
+G0 Z[#<_ProbeRetract>]                       ( go up slightly )
+G38.2 Z[#<_ProbeRetract>*-1.25] F[#<_ProbeFeed2>]   ( trip switch very slowly )
+G90                                          ( use absolute positioning )
+#<_ToolZProbe> = #5063                         ( save trip point )
+
+G10 L1 P[#<T>] Z[-3+#<_OriginOffset>+#<_ToolZProbe>-#<_ProbeSensor123Offset>]
+
+G53 G1 F[#<_TravelFeed>] Z[#<_TravelZ>]      ( return to safe level )
+G53 G0 A[#5184]
+G53 G0 Y[#5182]                     ( return to where we were in X Y A)
+G53 G0 X[#5181]                      ( return to where we were in X Y A)
+G53 G1 F[#<_TravelFeed>] Z[#5183]            ( return to where we were in Z )
+M72                                          ( restore modal state )
+
+O<tool-change> ENDSUB
