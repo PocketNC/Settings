@@ -284,15 +284,11 @@ net tool-change-loop	=> iocontrol.0.tool-changed
 # X axis
 net XmaxAndHome	<= bb_gpio.p8.in-09
 net XmaxAndHome	=> axis.0.home-sw-in
-net Xmin		<= bb_gpio.p8.in-08
-net Xmin		=> axis.0.neg-lim-sw-in
 setp bb_gpio.p8.in-09.invert 1
 
 # Y axis
 net YmaxAndHome	<= bb_gpio.p8.in-14
 net YmaxAndHome	=> axis.1.home-sw-in
-net Ymin		<= bb_gpio.p8.in-10
-net Ymin		=> axis.1.neg-lim-sw-in
 setp bb_gpio.p8.in-14.invert 1
 
 # Z axis
