@@ -29,6 +29,7 @@
 		"P9.14",
 		"P9.15",
 		"P9.16",
+		"P9.17",
 		"P9.22",
 		"P9.23",
 		"P9.24",
@@ -54,14 +55,14 @@
 					0x038   0x3f /* P8.16   14      Y Step */
 					0x02c   0x3f /* P8.17   11      E-Stop LED */
 					0x08c   0x3f /* P8.18   35      Z Max */
-					0x020   0x27 /* P8.19   8       B Limit */
+					0x020   0x3f /* P8.19   8       B Limit */
 					0x07c   0x37 /* P8.26   31      Start sig */
 					0x070   0x37 /* P9.11   28      Spindle Dir */
 					0x078   0x37 /* P9.12   30      Enable */
 					0x048   0x27 /* P9.14   18      Start LED */
 					0x040   0x27 /* P9.15   16      Z Step */
-					0x04C   0x27 /* P9.16   19      A Limit */
-					0x14C   0x37 /* P9.17   87      E-Stop sig */
+					0x04C   0x3f /* P9.16   19      A Limit */
+					0x15C   0x37 /* P9.17   87      E-Stop sig */
 					0x150   0x37 /* P9.22   84      Probe sig */
 					0x044   0x27 /* P9.23   17      Z Dir */
 					0x184   0x37 /* P9.24   97      Spindle On */
