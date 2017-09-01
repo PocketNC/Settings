@@ -136,10 +136,8 @@ setp [PRUCONF](DRIVER).stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
 setp [PRUCONF](DRIVER).stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
 
 #setp [PRUCONF](DRIVER).stepgen.00.step_type       0
-# P8.43 PRU1.out2
-setp [PRUCONF](DRIVER).stepgen.00.steppin         0x4C
-# P8.44 PRU1.out4
-setp [PRUCONF](DRIVER).stepgen.00.dirpin          0x4D
+setp [PRUCONF](DRIVER).stepgen.00.steppin         147 # = 0x93 - should be 927
+setp [PRUCONF](DRIVER).stepgen.00.dirpin          143 # = 0x8F - should be 929
 
 
 # ################
@@ -168,10 +166,8 @@ setp [PRUCONF](DRIVER).stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
 setp [PRUCONF](DRIVER).stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
 
 #setp [PRUCONF](DRIVER).stepgen.01.step_type       0
-# P8.42 PRU1.out5
-setp [PRUCONF](DRIVER).stepgen.01.steppin         0x4E
-# P8.39 PRU1.out6
-setp [PRUCONF](DRIVER).stepgen.01.dirpin          0x4F
+setp [PRUCONF](DRIVER).stepgen.01.steppin         81 # = 0x51 - should be 923
+setp [PRUCONF](DRIVER).stepgen.01.dirpin          149 # = 0x95 - should be 925
 
 
 # ################
@@ -200,10 +196,8 @@ setp [PRUCONF](DRIVER).stepgen.02.maxvel          [AXIS_2]STEPGEN_MAX_VEL
 setp [PRUCONF](DRIVER).stepgen.02.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
 
 #setp [PRUCONF](DRIVER).stepgen.02.step_type       0
-# P8.27 PRU1.out8
-setp [PRUCONF](DRIVER).stepgen.02.steppin         0x50
-# P8.29 PRU1.out9
-setp [PRUCONF](DRIVER).stepgen.02.dirpin          0x51
+setp [PRUCONF](DRIVER).stepgen.02.steppin         78 # = 0x4E - should be 816
+setp [PRUCONF](DRIVER).stepgen.02.dirpin          79 # = 0x4F should be 815
 
 
 # ################
@@ -231,10 +225,8 @@ setp [PRUCONF](DRIVER).stepgen.03.position-scale  [AXIS_3]SCALE
 setp [PRUCONF](DRIVER).stepgen.03.maxvel          [AXIS_3]STEPGEN_MAX_VEL
 setp [PRUCONF](DRIVER).stepgen.03.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 
-# P9.27 GPIO3.19
-setp [PRUCONF](DRIVER).stepgen.03.steppin         0x93
-# P9.28 GPIO3.17
-setp [PRUCONF](DRIVER).stepgen.03.dirpin          0x91
+setp [PRUCONF](DRIVER).stepgen.03.steppin         144 # = 0x90 - should be 930
+setp [PRUCONF](DRIVER).stepgen.03.dirpin          145 # = 0x91 - should be 928
 
 
 
@@ -264,10 +256,8 @@ setp [PRUCONF](DRIVER).stepgen.04.position-scale  [AXIS_4]SCALE
 setp [PRUCONF](DRIVER).stepgen.04.maxvel          [AXIS_4]STEPGEN_MAX_VEL
 setp [PRUCONF](DRIVER).stepgen.04.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
 
-# P9.29 GPIO3.15
-setp [PRUCONF](DRIVER).stepgen.04.steppin         0x8f
-# P9.30 GPIO3.16
-setp [PRUCONF](DRIVER).stepgen.04.dirpin          0x90
+setp [PRUCONF](DRIVER).stepgen.04.steppin         76 # = 0x4C - should be 812
+setp [PRUCONF](DRIVER).stepgen.04.dirpin          77 # = 0x4D - should be 811
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -311,10 +301,10 @@ setp bb_gpio.p8.in-19.invert 1
 ### Control Panel Buttons ###
 # eStop
 setp eStopButton.toggle.debounce 2
-setp bb_gpio.p9.in-31.invert 0
+setp bb_gpio.p8.in-10.invert 0
 net estop-loop			<= iocontrol.0.user-enable-out
 net estop-loop			=> iocontrol.0.emc-enable-in
-net eStopToggle			<= bb_gpio.p9.in-31
+net eStopToggle			<= bb_gpio.p8.in-10
 net eStopToggle			=> eStopButton.toggle.in
 net eStopOn				<= eStopButton.toggle.out
 net eStopOn				=> halui.estop.activate
