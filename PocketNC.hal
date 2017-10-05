@@ -77,7 +77,6 @@ addf spindleMath	servo-thread
 addf runningIntoPause.and	servo-thread
 
 # Setup pins and signals
-setp bb_gpio.p9.out-25 TRUE
 setp ledBlinkSignal.offset 1
 
 
@@ -101,7 +100,6 @@ net mPwrLed				<= ledBlink.mPwr.or.out
 net pauseBlink			<= ledBlink.pause.and.out 
 net pauseBlink			=> ledBlink.pause.or.in0
 net pauseLed			<= ledBlink.pause.or.out
-#net pauseLed			=> bb_gpio.p9.out-25
 net pauseLed			=> bb_gpio.p9.out-14
 
 # ######################################################
@@ -166,7 +164,7 @@ setp [PRUCONF](DRIVER).stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
 setp [PRUCONF](DRIVER).stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
 
 #setp [PRUCONF](DRIVER).stepgen.01.step_type       0
-setp [PRUCONF](DRIVER).stepgen.01.steppin         81 # = 0x51 - should be 923
+setp [PRUCONF](DRIVER).stepgen.01.steppin         81 # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
 setp [PRUCONF](DRIVER).stepgen.01.dirpin          149 # = 0x95 - should be 925
 
 
@@ -359,20 +357,10 @@ net moreLedLogic		=> ledBlink.mPwr.or.in1
 net progPauseLogic <= runningIntoPause.and.out
 net progPauseLogic => halui.program.pause
 
-# Program pause (input re-assigned to probe input, output to probe LED)
-#setp bb_gpio.p9.in-22.invert 1
-#setp programPause.oneshot.width 0.1
-#net progPauseButton	<= bb_gpio.p9.in-22
-#net progPauseButton	=> programPause.oneshot.in
-#net progPause		<= programPause.oneshot.out
-#net progPause		=> halui.program.pause
-
 # Probe
 net toolProbe <= bb_gpio.p9.in-22
 net toolProbe => motion.probe-input
-net toolProbe => bb_gpio.p9.out-25
 setp bb_gpio.p9.in-22.invert 1
-setp bb_gpio.p9.out-25.invert 0
 
 ### Spindle ###
 setp spindleScale.gain -0.000052
