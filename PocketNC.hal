@@ -21,7 +21,7 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 
 
 # load low-level drivers
-loadrt hal_bb_gpio output_pins=117,211,212,214,218,224,225,226 input_pins=108,109,110,114,118,119,126,213,216,217,222,241,242,231
+loadrt hal_bb_gpio output_pins=117,211,212,214,224 input_pins=109,110,114,118,119,126,216,222
 loadrt [PRUCONF](DRIVER) prucode=/usr/lib/linuxcnc/xenomai/pru_generic.bin  [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
@@ -96,7 +96,6 @@ net eStopLed			=> bb_gpio.p8.out-17
 net mPwrBlink			<= ledBlink.mPwr.and.out
 net mPwrBlink			=> ledBlink.mPwr.or.in0
 net mPwrLed				<= ledBlink.mPwr.or.out
-#net mPwrLed				=> bb_gpio.p9.out-14
 net pauseBlink			<= ledBlink.pause.and.out 
 net pauseBlink			=> ledBlink.pause.or.in0
 net pauseLed			<= ledBlink.pause.or.out
@@ -165,7 +164,7 @@ setp [PRUCONF](DRIVER).stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
 
 #setp [PRUCONF](DRIVER).stepgen.01.step_type       0
 setp [PRUCONF](DRIVER).stepgen.01.steppin         81 # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
-setp [PRUCONF](DRIVER).stepgen.01.dirpin          149 # = 0x95 - should be 925
+setp [PRUCONF](DRIVER).stepgen.01.dirpin          80 # should be 915
 
 
 # ################
@@ -310,7 +309,6 @@ net eStopOn				=> eStopState.not.in
 net eStopOff			<= eStopState.not.out
 net eStopOff			=> halui.estop.reset
 net eStopDriversEnable	<= halui.estop.is-activated
-net eStopDriversEnable	=> bb_gpio.p9.out-26
 net eStopDriversEnable	=> ledBlink.eStop.and.in1
 net eStopDriversEnable	=>  eStopDrivers.not.in
 
