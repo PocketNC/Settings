@@ -28,7 +28,7 @@ O<tool-probe> SUB
 #<_OriginOffset> =        .839   ( distance from B plate to origin, aka the center of rotation )
 #<_ProbeX> =             1.4414  ( machine X coordinate of switch/touch-off plate )
 #<_ProbeY> =             -2.049   ( machine Y coordinate of switch/touch-off plate )
-#<_ProbeA> =            -10.752   ( machine A coordinate of switch/touch-off plate )
+#<_ProbeA> =                0   ( machine A coordinate of switch/touch-off plate )
 #<_ProbeFastZ> =          0.0  ( machine Z coord to move to before starting probe, longest tool should not touch switch at this Z )
 #<_ProbeMinZ> =          -3.25  ( machine Z coord to stop probe, shortest tool must touch switch at this Z, must be > min Z )
 #<_ProbeRetract> =        0.1   ( small distance to retract before approaching switch/touch-off plate second time )
