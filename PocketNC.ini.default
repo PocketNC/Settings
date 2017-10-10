@@ -203,16 +203,6 @@ COMM_WAIT=0.010
 SERVO_PERIOD=1000000
 
 
-#PYVCP = BeBoPr.panel.xml
-[FILTER]
-PROGRAM_EXTENSION=.png,.gif,.jpg Grayscale Depth Image
-PROGRAM_EXTENSION=.py Python Script
-png=image-to-gcode
-gif=image-to-gcode
-jpg=image-to-gcode
-py=python
-
-
 [HAL]
 # The run script first uses halcmd to execute any HALFILE
 # files, and then to execute any individual HALCMD commands.
@@ -236,6 +226,7 @@ SUBROUTINE_PATH=/home/pocketnc/pocketnc/Settings/subroutines
 REMAP=M654 modalgroup=6 ngc=tool-probe argspec=T
 # File containing interpreter variables
 PARAMETER_FILE=pru-stepper.var
+FEATURES=4
 
 
 [TASK]
@@ -244,6 +235,13 @@ PARAMETER_FILE=pru-stepper.var
 TASK=milltask
 # Cycle time, in seconds, that task controller will sleep between polls
 CYCLE_TIME=0.010
+
+
+[TOOL_PROBE]
+PROBE_A=0
+PROBE_Y=-2.049
+PROBE_X=1.4414
+PROBE_SENSOR_123_OFFSET=.1777
 
 
 [TRAJ]

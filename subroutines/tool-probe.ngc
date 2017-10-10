@@ -1,3 +1,4 @@
+%
 O<tool-probe> SUB
 ( Filename: tool-probe.ngc )
 ( LinuxCNC Tool Probe Routine - modification of Tool-Change subroutine version 1.1 - https://forum.linuxcnc.org/10-advanced-configuration/5596-manual-tool-change-tool-lengh-touch-off?limit=6&start=38 )
@@ -24,11 +25,11 @@ O<tool-probe> SUB
 #<_UseInches> =           1     ( set to 1 to use inches here, or 0 to use millimeters; should match units on tool.tbl dimensions )
 #<_TravelZ> =            0.0   ( machine Z coordinate for travelling, typically near max Z to avoid ever hitting the work )
 #<_TravelFeed> =         40.0   ( feedrate used for general Z moves when avoiding G0 )
-#<_ProbeSensor123Offset> =  .1777  ( distance from probe sensor trigger to 123 block, Zprobe - Z123)
+#<_ProbeSensor123Offset> =  #<_ini[TOOL_PROBE]PROBE_SENSOR_123_OFFSET>  ( distance from probe sensor trigger to 123 block, Zprobe - Z123)
 #<_OriginOffset> =        .839   ( distance from B plate to origin, aka the center of rotation )
-#<_ProbeX> =             1.4414  ( machine X coordinate of switch/touch-off plate )
-#<_ProbeY> =             -2.049   ( machine Y coordinate of switch/touch-off plate )
-#<_ProbeA> =                0   ( machine A coordinate of switch/touch-off plate )
+#<_ProbeX> =             #<_ini[TOOL_PROBE]PROBE_X>  ( machine X coordinate of switch/touch-off plate )
+#<_ProbeY> =             #<_ini[TOOL_PROBE]PROBE_Y>  ( machine Y coordinate of switch/touch-off plate )
+#<_ProbeA> =             #<_ini[TOOL_PROBE]PROBE_A>   ( machine A coordinate of switch/touch-off plate )
 #<_ProbeFastZ> =          0.0  ( machine Z coord to move to before starting probe, longest tool should not touch switch at this Z )
 #<_ProbeMinZ> =          -3.25  ( machine Z coord to stop probe, shortest tool must touch switch at this Z, must be > min Z )
 #<_ProbeRetract> =        0.1   ( small distance to retract before approaching switch/touch-off plate second time )
@@ -81,3 +82,4 @@ G53 G1 F[#<_TravelFeed>] Z[#5183]            ( return to where we were in Z )
 M72                                          ( restore modal state )
 
 O<tool-change> ENDSUB
+%
