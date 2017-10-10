@@ -238,9 +238,13 @@ CYCLE_TIME=0.010
 
 
 [TOOL_PROBE]
+# A position when probing
 PROBE_A=0
+# Y position of tool probe button
 PROBE_Y=-2.049
+# X position of tool probe button
 PROBE_X=1.4414
+# Zprobe-Z123 = Take the Z reading when the probe is triggered and subtract the Z reading when just touching the 123 block (the 3 side)
 PROBE_SENSOR_123_OFFSET=.1777
 
 

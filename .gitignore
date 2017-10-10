@@ -3,6 +3,7 @@ pru-stepper.var
 pru-stepper.var.bak
 tool.tbl
 CalibrationOverlay.inc
+PocketNC.ini
 
 # Swap
 [._]*.s[a-v][a-z]
