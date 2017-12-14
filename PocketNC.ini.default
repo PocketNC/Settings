@@ -218,7 +218,7 @@ POSTGUI_HALFILE=PocketNC.postgui.hal
 
 [PRUCONF]
 DRIVER=hal_pru_generic
-CONFIG=prucode=/usr/lib/linuxcnc/xenomai/pru_generic.bin pru=1 num_stepgens=5 num_pwmgens=4
+CONFIG=prucode=/usr/lib/linuxcnc/prubin/pru_generic.bin pru=1 num_stepgens=5 num_pwmgens=4 halname=hpg
 
 
 [RS274NGC]
