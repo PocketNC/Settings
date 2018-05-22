@@ -4,6 +4,8 @@ pru-stepper.var.bak
 tool.tbl
 CalibrationOverlay.inc
 PocketNC.ini
+a.comp
+b.comp
 
 # Swap
 [._]*.s[a-v][a-z]
