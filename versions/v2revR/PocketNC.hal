@@ -6,7 +6,7 @@
 # ########################################
 
 # Launch the setup script to make sure hardware setup looks good
-loadusr -w ./setup.bridge.sh
+loadusr -w ./versions/v2revR/setup.bridge.sh
 loadusr -W ./spindle_voltage.py
 
 # ###################################
