@@ -1,0 +1,366 @@
+# #######################################
+#
+# HAL file for BeagleBone PocketNC cape with 5 steppers
+# 
+# Derived from example hm2-stepper config
+# ########################################
+
+# Launch the setup script to make sure hardware setup looks good
+loadusr -w ./setup.bridge.sh
+loadusr -W ./spindle_voltage.py
+
+# ###################################
+# Core EMC/HAL Loads
+# ###################################
+
+# kinematics
+loadrt trivkins
+loadrt tp
+
+# motion controller, get name and thread periods from ini file
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES tp=tp kins=trivkins
+
+
+# load low-level drivers
+loadrt hal_bb_gpio output_pins=117,211,212,214,224 input_pins=109,110,114,118,119,126,216,222
+loadrt [PRUCONF](DRIVER) prucode=/usr/lib/linuxcnc/xenomai/pru_generic.bin  [PRUCONF](CONFIG)
+loadrt siggen names=ledBlinkSignal
+loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
+loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
+loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
+loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or
+loadrt toggle names=eStopButton.toggle
+loadrt not names=eStopState.not,eStopDrivers.not
+loadrt timedelay names=mPwr.timedelay
+loadrt oneshot names=programStart.oneshot,programPause.oneshot
+
+
+# ################################################
+# THREADS
+# ################################################
+addf [PRUCONF](DRIVER).capture-position	servo-thread
+addf bb_gpio.read						servo-thread
+addf motion-command-handler				servo-thread
+addf motion-controller					servo-thread
+addf [PRUCONF](DRIVER).update			servo-thread
+addf bb_gpio.write						servo-thread
+
+
+######################
+# Testing
+######################
+# LED logic - make blink signals.
+addf ledBlink.eStop.or					servo-thread
+addf ledBlink.mPwr.or					servo-thread
+addf ledBlink.pause.or					servo-thread
+addf ledBlinkSignal.update				servo-thread
+addf ledBlinkSignal.floatToS32			servo-thread
+addf ledBlinkSignal.s32toBit			servo-thread
+addf ledBlink.eStop.and					servo-thread
+addf ledBlink.mPwr.and					servo-thread
+addf ledBlink.pause.and					servo-thread
+addf eStopState.not			servo-thread
+addf eStopButton.toggle		servo-thread
+addf eStopDrivers.not		servo-thread
+addf mPwr.timedelay		servo-thread
+addf mPwr.and			servo-thread
+addf programStart.oneshot	servo-thread
+addf programStartFromPaused.or		servo-thread
+addf programStartFromIdle.and		servo-thread
+addf programStartFromPaused.and		servo-thread
+addf programPause.oneshot	servo-thread
+addf runningIntoPause.and	servo-thread
+
+# Setup pins and signals
+setp ledBlinkSignal.offset 1
+
+
+net convertSignal		<= ledBlinkSignal.square
+net convertSignal		=> ledBlinkSignal.floatToS32.in
+net convertSignalMore	<= ledBlinkSignal.floatToS32.out
+net convertSignalMore	=> ledBlinkSignal.s32toBit.in
+net  tickTock			<= ledBlinkSignal.s32toBit.out
+net  tickTock			=> ledBlink.eStop.and.in0
+net  tickTock			=> ledBlink.mPwr.and.in0
+net  tickTock			=> ledBlink.pause.and.in0
+net eStopBlink			<= ledBlink.eStop.and.out
+net eStopBlink			=> ledBlink.eStop.or.in0
+net driversEnable		=> ledBlink.eStop.or.in1
+net eStopLed			<= ledBlink.eStop.or.out
+net eStopLed			=> bb_gpio.p8.out-17 
+net mPwrBlink			<= ledBlink.mPwr.and.out
+net mPwrBlink			=> ledBlink.mPwr.or.in0
+net mPwrLed				<= ledBlink.mPwr.or.out
+net pauseBlink			<= ledBlink.pause.and.out 
+net pauseBlink			=> ledBlink.pause.or.in0
+net pauseLed			<= ledBlink.pause.or.out
+net pauseLed			=> bb_gpio.p9.out-14
+
+# ######################################################
+# Axis-of-motion Specific Configs (not the GUI)
+# ######################################################
+
+
+# ################
+# X [0] Axis
+# ################
+
+# axis enable chain
+newsig emcmot.00.enable bit
+sets emcmot.00.enable FALSE
+net emcmot.00.enable <= axis.0.amp-enable-out 
+net emcmot.00.enable => [PRUCONF](DRIVER).stepgen.00.enable
+
+# position command and feedback
+net emcmot.00.pos-cmd <= axis.0.motor-pos-cmd
+net emcmot.00.pos-cmd => [PRUCONF](DRIVER).stepgen.00.position-cmd
+net motor.00.pos-fb <= [PRUCONF](DRIVER).stepgen.00.position-fb
+net motor.00.pos-fb => axis.0.motor-pos-fb
+
+
+# timing parameters
+setp [PRUCONF](DRIVER).stepgen.00.dirsetup        [AXIS_0]DIRSETUP
+setp [PRUCONF](DRIVER).stepgen.00.dirhold         [AXIS_0]DIRHOLD
+setp [PRUCONF](DRIVER).stepgen.00.steplen         [AXIS_0]STEPLEN
+setp [PRUCONF](DRIVER).stepgen.00.stepspace       [AXIS_0]STEPSPACE
+setp [PRUCONF](DRIVER).stepgen.00.position-scale  [AXIS_0]SCALE
+setp [PRUCONF](DRIVER).stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
+setp [PRUCONF](DRIVER).stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
+
+#setp [PRUCONF](DRIVER).stepgen.00.step_type       0
+setp [PRUCONF](DRIVER).stepgen.00.steppin         147 # = 0x93 - should be 927
+setp [PRUCONF](DRIVER).stepgen.00.dirpin          143 # = 0x8F - should be 929
+
+
+# ################
+# Y [1] Axis
+# ################
+
+# axis enable chain
+newsig emcmot.01.enable bit
+sets emcmot.01.enable FALSE
+net emcmot.01.enable <= axis.1.amp-enable-out 
+net emcmot.01.enable => [PRUCONF](DRIVER).stepgen.01.enable
+
+# position command and feedback
+net emcmot.01.pos-cmd <= axis.1.motor-pos-cmd
+net emcmot.01.pos-cmd => [PRUCONF](DRIVER).stepgen.01.position-cmd
+net motor.01.pos-fb <= [PRUCONF](DRIVER).stepgen.01.position-fb
+net motor.01.pos-fb => axis.1.motor-pos-fb
+
+# timing parameters
+setp [PRUCONF](DRIVER).stepgen.01.dirsetup        [AXIS_1]DIRSETUP
+setp [PRUCONF](DRIVER).stepgen.01.dirhold         [AXIS_1]DIRHOLD
+setp [PRUCONF](DRIVER).stepgen.01.steplen         [AXIS_1]STEPLEN
+setp [PRUCONF](DRIVER).stepgen.01.stepspace       [AXIS_1]STEPSPACE
+setp [PRUCONF](DRIVER).stepgen.01.position-scale  [AXIS_1]SCALE
+setp [PRUCONF](DRIVER).stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
+setp [PRUCONF](DRIVER).stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
+
+#setp [PRUCONF](DRIVER).stepgen.01.step_type       0
+setp [PRUCONF](DRIVER).stepgen.01.steppin         81 # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
+setp [PRUCONF](DRIVER).stepgen.01.dirpin          80 # should be 915
+
+
+# ################
+# Z [2] Axis
+# ################
+
+# axis enable chain
+newsig emcmot.02.enable bit
+sets emcmot.02.enable FALSE
+net emcmot.02.enable <= axis.2.amp-enable-out 
+net emcmot.02.enable => [PRUCONF](DRIVER).stepgen.02.enable
+
+# position command and feedback
+net emcmot.02.pos-cmd <= axis.2.motor-pos-cmd
+net emcmot.02.pos-cmd => [PRUCONF](DRIVER).stepgen.02.position-cmd
+net motor.02.pos-fb <= [PRUCONF](DRIVER).stepgen.02.position-fb
+net motor.02.pos-fb => axis.2.motor-pos-fb
+
+# timing parameters
+setp [PRUCONF](DRIVER).stepgen.02.dirsetup        [AXIS_2]DIRSETUP
+setp [PRUCONF](DRIVER).stepgen.02.dirhold         [AXIS_2]DIRHOLD
+setp [PRUCONF](DRIVER).stepgen.02.steplen         [AXIS_2]STEPLEN
+setp [PRUCONF](DRIVER).stepgen.02.stepspace       [AXIS_2]STEPSPACE
+setp [PRUCONF](DRIVER).stepgen.02.position-scale  [AXIS_2]SCALE
+setp [PRUCONF](DRIVER).stepgen.02.maxvel          [AXIS_2]STEPGEN_MAX_VEL
+setp [PRUCONF](DRIVER).stepgen.02.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
+
+#setp [PRUCONF](DRIVER).stepgen.02.step_type       0
+setp [PRUCONF](DRIVER).stepgen.02.steppin         78 # = 0x4E - should be 816
+setp [PRUCONF](DRIVER).stepgen.02.dirpin          79 # = 0x4F should be 815
+
+
+# ################
+# A [3] Axis
+# ################
+
+# axis enable chain
+newsig emcmot.03.enable bit
+sets emcmot.03.enable FALSE
+net emcmot.03.enable <= axis.3.amp-enable-out 
+net emcmot.03.enable => [PRUCONF](DRIVER).stepgen.03.enable
+
+# position command and feedback
+net emcmot.03.pos-cmd <= axis.3.motor-pos-cmd
+net emcmot.03.pos-cmd => [PRUCONF](DRIVER).stepgen.03.position-cmd
+net motor.03.pos-fb <= [PRUCONF](DRIVER).stepgen.03.position-fb
+net motor.03.pos-fb => axis.3.motor-pos-fb
+
+# timing parameters
+setp [PRUCONF](DRIVER).stepgen.03.dirsetup        [AXIS_3]DIRSETUP
+setp [PRUCONF](DRIVER).stepgen.03.dirhold         [AXIS_3]DIRHOLD
+setp [PRUCONF](DRIVER).stepgen.03.steplen         [AXIS_3]STEPLEN
+setp [PRUCONF](DRIVER).stepgen.03.stepspace       [AXIS_3]STEPSPACE
+setp [PRUCONF](DRIVER).stepgen.03.position-scale  [AXIS_3]SCALE
+setp [PRUCONF](DRIVER).stepgen.03.maxvel          [AXIS_3]STEPGEN_MAX_VEL
+setp [PRUCONF](DRIVER).stepgen.03.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
+
+setp [PRUCONF](DRIVER).stepgen.03.steppin         144 # = 0x90 - should be 930
+setp [PRUCONF](DRIVER).stepgen.03.dirpin          145 # = 0x91 - should be 928
+
+
+
+
+# ################
+# B [4] Axis
+# ################
+
+# axis enable chain
+newsig emcmot.04.enable bit
+sets emcmot.04.enable FALSE
+net emcmot.04.enable <= axis.4.amp-enable-out 
+net emcmot.04.enable => [PRUCONF](DRIVER).stepgen.04.enable
+
+# position command and feedback
+net emcmot.04.pos-cmd <= axis.4.motor-pos-cmd
+net emcmot.04.pos-cmd => [PRUCONF](DRIVER).stepgen.04.position-cmd
+net motor.04.pos-fb <= [PRUCONF](DRIVER).stepgen.04.position-fb
+net motor.04.pos-fb => axis.4.motor-pos-fb
+
+# timing parameters
+setp [PRUCONF](DRIVER).stepgen.04.dirsetup        [AXIS_4]DIRSETUP
+setp [PRUCONF](DRIVER).stepgen.04.dirhold         [AXIS_4]DIRHOLD
+setp [PRUCONF](DRIVER).stepgen.04.steplen         [AXIS_4]STEPLEN
+setp [PRUCONF](DRIVER).stepgen.04.stepspace       [AXIS_4]STEPSPACE
+setp [PRUCONF](DRIVER).stepgen.04.position-scale  [AXIS_4]SCALE
+setp [PRUCONF](DRIVER).stepgen.04.maxvel          [AXIS_4]STEPGEN_MAX_VEL
+setp [PRUCONF](DRIVER).stepgen.04.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
+
+setp [PRUCONF](DRIVER).stepgen.04.steppin         76 # = 0x4C - should be 812
+setp [PRUCONF](DRIVER).stepgen.04.dirpin          77 # = 0x4D - should be 811
+
+# ##################################################
+# Standard I/O - EStop, Enables, Limit Switches, Etc
+# ##################################################
+
+# create signals for tool loading loopback
+net tool-prep-loop		<= iocontrol.0.tool-prepare
+net tool-prep-loop		=> iocontrol.0.tool-prepared
+net tool-change-loop	<= iocontrol.0.tool-change
+net tool-change-loop	=> iocontrol.0.tool-changed
+
+
+### Home and Limit switches ###
+# X axis
+net XmaxAndHome	<= bb_gpio.p8.in-09
+net XmaxAndHome	=> axis.0.home-sw-in
+setp bb_gpio.p8.in-09.invert 1
+
+# Y axis
+net YmaxAndHome	<= bb_gpio.p8.in-14
+net YmaxAndHome	=> axis.1.home-sw-in
+setp bb_gpio.p8.in-14.invert 1
+
+# Z axis
+net ZmaxAndHome <= bb_gpio.p8.in-18
+net ZmaxAndHome => axis.2.home-sw-in
+setp bb_gpio.p8.in-18.invert 1
+
+
+# A Axis Limit
+net AmaxAndHome <= bb_gpio.p9.in-16
+net AmaxAndHome => axis.3.home-sw-in
+setp bb_gpio.p9.in-16.invert 1
+
+
+# B axis
+net BhomeAndIndex <= bb_gpio.p8.in-19
+net BhomeAndIndex => axis.4.home-sw-in
+setp bb_gpio.p8.in-19.invert 1
+
+### Control Panel Buttons ###
+# eStop
+setp eStopButton.toggle.debounce 2
+setp bb_gpio.p8.in-10.invert 0
+net estop-loop			<= iocontrol.0.user-enable-out
+net estop-loop			=> iocontrol.0.emc-enable-in
+net eStopToggle			<= bb_gpio.p8.in-10
+net eStopToggle			=> eStopButton.toggle.in
+net eStopOn				<= eStopButton.toggle.out
+net eStopOn				=> halui.estop.activate
+net eStopOn				=> eStopState.not.in
+net eStopOff			<= eStopState.not.out
+net eStopOff			=> halui.estop.reset
+net eStopDriversEnable	<= halui.estop.is-activated
+net eStopDriversEnable	=> ledBlink.eStop.and.in1
+net eStopDriversEnable	=>  eStopDrivers.not.in
+
+
+# Machine power
+net driversEnable <= eStopDrivers.not.out
+net driversEnable => mPwr.timedelay.in
+net delayedEnable <= mPwr.timedelay.out
+net delayedEnable <= halui.machine.on
+net delayedEnable => bb_gpio.p9.out-12
+net delayedEnable => ledBlink.mPwr.and.in1
+net delayedEnable => mPwr.and.in0
+
+
+# Program start/run
+setp bb_gpio.p8.in-26.invert 1
+setp programStart.oneshot.width 0.1
+net progStartButton		<= bb_gpio.p8.in-26
+net progStartButton		=> programStart.oneshot.in
+net progStart			<= programStart.oneshot.out
+net progStart			=> programStartFromIdle.and.in0
+net progStart			=> programStartFromPaused.and.in0
+net progStart			=> runningIntoPause.and.in0
+net progStartIdle		<= halui.program.is-idle
+net progStartIdle		=> programStartFromIdle.and.in1
+net progStartIdle		=> mPwr.and.in1
+net progStartFromIdle	<= programStartFromIdle.and.out
+net progStartFromIdle	=> halui.mode.auto
+net progStartFromIdle	=> halui.program.run
+net progStartPaused		<= halui.program.is-paused
+net progStartPaused		=> programStartFromPaused.and.in1
+net progStartPaused		=> ledBlink.pause.and.in1
+net progStartPaused		=> programStartFromPaused.or.in1
+net progStartFromPaused	<= programStartFromPaused.and.out
+net progStartFromPaused	=> halui.program.resume
+net progStarted			<= halui.program.is-running
+net progStarted			=> ledBlink.pause.or.in1
+net progStarted			=> runningIntoPause.and.in1
+net runLedLogic			<= mPwr.and.out
+net runLedLogic			=>  programStartFromPaused.or.in0
+net moreLedLogic		<= programStartFromPaused.or.out
+net moreLedLogic		=> ledBlink.mPwr.or.in1
+
+net progPauseLogic <= runningIntoPause.and.out
+net progPauseLogic => halui.program.pause
+
+# Probe
+net toolProbe <= bb_gpio.p9.in-22
+net toolProbe => motion.probe-input
+setp bb_gpio.p9.in-22.invert 1
+
+### Spindle ###
+net spindleEnable				<= motion.spindle-on
+net spindleEnable				=> bb_gpio.p9.out-24
+net spindleDirection			<= motion.spindle-forward
+net spindleDirection			=> bb_gpio.p9.out-11
+net displaySpindleReverseButton	<= motion.spindle-reverse
+net spindleSpeedDummy motion.spindle-speed-out
+net spindleSpeed motion.spindle-speed-out-abs
+net spindleSpeed spindle_voltage.speed_in

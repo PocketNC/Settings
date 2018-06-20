@@ -12,6 +12,7 @@
 	/* state the resources this cape uses */
 
 	exclusive-use =
+		"P8.8",
 		"P8.9",
 		"P8.11",
 		"P8.12",
@@ -44,31 +45,32 @@
 
 			foo_pins: foo_pins {
 				pinctrl-single,pins = <
+					0x094   0x37 /* P8.8    37      Spindle Clock */
 					0x09C   0x37 /* P8.9    39      X max */
 					0x098   0x37 /* P8.10   38      E Stop Sig */
-					0x034   0x3f /* P8.11   13      B Dir */
-					0x030   0x27 /* P8.12   12      B Step */
-					0x024   0x3f /* P8.13   9       Spindle PWM */
+					0x034   0x1f /* P8.11   13      B Dir */
+					0x030   0x07 /* P8.12   12      B Step */
+					0x024   0x1f /* P8.13   9       Spindle PWM */
 					0x028   0x37 /* P8.14   10      Y Max */
-					0x03c   0x27 /* P8.15   15      Z Dir */
-					0x038   0x27 /* P8.16   14      Z Step */
-					0x02c   0x3f /* P8.17   11      E-Stop LED */
+					0x03c   0x07 /* P8.15   15      Z Dir */
+					0x038   0x07 /* P8.16   14      Z Step */
+					0x02c   0x1f /* P8.17   11      E-Stop LED */
 					0x08c   0x37 /* P8.18   35      Z Max */
 					0x020   0x37 /* P8.19   8       B Limit */
 					0x07c   0x37 /* P8.26   31      Start sig */
-					0x070   0x37 /* P9.11   28      Spindle Dir */
-					0x078   0x37 /* P9.12   30      Enable */
-					0x048   0x27 /* P9.14   18      Start LED */
-					0x040   0x27 /* P9.15   16      Y Dir */
+					0x070   0x17 /* P9.11   28      Spindle Dir */
+					0x078   0x17 /* P9.12   30      Enable */
+					0x048   0x07 /* P9.14   18      Start LED */
+					0x040   0x07 /* P9.15   16      Y Dir */
 					0x04C   0x37 /* P9.16   19      A Limit */
 					0x15C   0x37 /* P9.17   87      */
 					0x150   0x37 /* P9.22   84      Probe sig */
-					0x044   0x27 /* P9.23   17      Y Step */
-					0x184   0x37 /* P9.24   97      Spindle On */
-					0x1a4   0x27 /* P9.27   105     X Step  */
-					0x19c   0x27 /* P9.28   103     A Dir */
-					0x194   0x27 /* P9.29   101     X Dir */
-					0x198   0x27 /* P9.30   102     A Step */
+					0x044   0x07 /* P9.23   17      Y Step */
+					0x184   0x17 /* P9.24   97      Spindle On */
+					0x1a4   0x07 /* P9.27   105     X Step  */
+					0x19c   0x07 /* P9.28   103     A Dir */
+					0x194   0x07 /* P9.29   101     X Dir */
+					0x198   0x07 /* P9.30   102     A Step */
 				>;
 			};
 		};

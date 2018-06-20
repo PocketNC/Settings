@@ -21,3 +21,6 @@ Session.vim
 *~
 # Auto-generated tag files
 tags
+
+# compiled python files
+*.pyc

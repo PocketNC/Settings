@@ -69,31 +69,30 @@ while read PIN DIR JUNK ; do
         esac
 
 done <<- EOF
-	66	out	# P8.7		gpio2.2		Enable_n (ECO location)
-#	67	out	# P8.8		gpio2.3		X_Min
-#	69	out	# P8.9		gpio2.5		X_Max
-#	68	out	# P8.10		gpio2.4		Y_Min
-	45	out	# P8.11		gpio1.13	X_Dir
-	44	out	# P8.12		gpio1.12	X_Step
-	23	out	# P8.13		gpio0.23	PWM0
-#	26	out	# P8.14		gpio0.26	Y_Max
-	47	out	# P8.15		gpio1.15	Y_Dir
-	46	out	# P8.16		gpio1.14	Y_Step
-#	27	out	# P8.17		gpio0.27	Z_Min
-#	65	out	# P8.18		gpio2.1		Z_Max
-	22	out	# P8.19		gpio0.22	PWM1
-#	61	out	# p8.26		gpio1.29	Status
-	50	out	# p9.14		gpio1.18	PWM2
-	48	out	# p9.15		gpio1.16	Z_Step
-#	5	out	# p9.17		gpio0.5		B_Dir
-#	4	out	# p9.18		gpio0.4		B_Step
-#	3	out	# p9.21		gpio0.3		A_Dir
-#	2	out	# p9.22		gpio0.2		A_Step
-	112	out	# p9.30		gpio3.16		B_Dir
-	111	out	# p9.29		gpio3.15		B_Step
-	113	out	# p9.21		gpio0.3		A_Dir
-	115	out	# p9.22		gpio0.2		A_Step
-	49	out	# P9.23		gpio1.17	Z_Dir
-#	15	out	# P9.24		gpio0.15	Spindle
-#	14	out	# P9.26		gpio0.14	Mtr_Ena
+	67	in	# P8.8		gpio2.3		Spindle Clock
+	69	in	# P8.9		gpio2.5		X Limit
+	68	in	# P8.10		gpio2.4		E-Stop Signal
+	45	out	# P8.11		gpio1.13	B Dir
+	44	out	# P8.12		gpio1.12	B Step
+	23	out	# P8.13		gpio0.23	Spindle PWM
+	26	in	# P8.14		gpio0.26	Y Limit
+	47	out	# P8.15		gpio1.15	Z Dir
+	46	out	# P8.16		gpio1.14	Z Step
+	27	out	# P8.17		gpio0.27	E-Stop LED
+	65	in	# P8.18		gpio2.1		Z Limit
+	22	in	# P8.19		gpio0.22	B Limit
+	61	in	# p8.26		gpio1.29	Start Signal
+	30	out	# p9.11		gpio0.30	Spindle Dir
+	60	out	# p9.12		gpio1.28	Enable
+	50	out	# p9.14		gpio1.18	Start LED
+	48	out	# p9.15		gpio1.16	Y Dir
+	51	in	# p9.16		gpio1.19	A Limit
+	5	in	# p9.17		gpio0.5		Unused
+	2	in	# p9.22		gpio0.2		Probe Signal
+	49	out	# p9.23		gpio1.17	Y Step
+	15	out	# P9.24		gpio0.15	Spindle On
+	115	out	# P9.27		gpio3.19	X Step
+	113	out	# P9.28		gpio3.17	A Dir
+	111	out	# p9.29		gpio3.15        X Dir
+	112	out	# p9.30		gpio3.16	A Step
 EOF
