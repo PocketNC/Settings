@@ -15,15 +15,14 @@
 #    our boards as capes (in which case a hardware change would be necessary), but we may do our own versioning using
 #    the EEPROM chip at address 0x50, which was installed on v2revR.
 
+import os
+POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+
 def getVersion():
-  import os
-
-  POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
-
   version = "v2revP" # default version if we don't find another using the version file or i2c
 
   try:
-    with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version")) as versionFile:
+    with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
       version = versionFile.read().strip();
   except:
     # Adafruit's I2C calls output text to stdout when an error occurs.
@@ -60,6 +59,21 @@ def getVersion():
       version = "v2revR"
 
   return version
+
+def writeVersionFile(version):
+  with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'w') as versionFile:
+    versionFile.write(version)
+    versionFile.write("\n")
+
+def hasVersionFile():
+  try:
+    with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
+      return true
+  except:
+    return false
+
+def clearVersionFile():
+  os.remove(os.path.join(POCKETNC_DIRECTORY, "Settings/version"))
 
 if __name__ == "__main__":
   print getVersion()
