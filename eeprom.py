@@ -4,6 +4,10 @@ from smbus import SMBus
 import subprocess
 import time
 import collections
+import os
+
+POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc/"
+eepromReadWPRExecutable = os.path.join(POCKETNC_DIRECTORY, "Settings/eepromReadWPR")
 
 Version = collections.namedtuple("Version", ["major", "minor", "patch"])
 
@@ -128,6 +132,24 @@ class EEPROM:
     b.write_i2c_block_data(self._addr, 0b10000000, [0, 0b01101111])
     b.close()
 
+  def isWriteProtected(self):
+    try:
+      wpr = int(subprocess.check_output([ eepromReadWPRExecutable ]))
+
+      return (wpr & 0b1110) == 0b1110
+    except:
+      return False
+   
+# Returns whether the EEPROM configuration registers have been locked
+  def isLocked(self):
+    try:
+      wpr = int(subprocess.check_output([ eepromReadWPRExecutable ]))
+
+      return (wpr & 0b00000001) == 1
+    except:
+      return False
+    
+
 # During board assembly, the EEPROM is programed with the board revision using semantic versioning
 # First two bytes are the major version
 # Next two bytes are the minor version
@@ -140,13 +162,16 @@ class EEPROM:
     return Version(bytes[0] << 8 | bytes[1],
                    bytes[2] << 8 | bytes[3],
                    bytes[4] << 8 | bytes[5])
-    
+
 
 if __name__ == "__main__":
   eeprom = EEPROM()
   print eeprom.ReadBoardRevision()
-#  eeprom.EnableWriteProtection();
-#  eeprom.ClearWriteProtection();
+#  eeprom.EnableWriteProtection()
+#  eeprom.EnableWriteProtectionAndLockConfigurationRegisters()
+#  print eeprom.isLocked()
+#  print eeprom.isWriteProtected()
+#  eeprom.ClearWriteProtection()
 #  time.sleep(.1)
 #  eeprom.WriteBytes(1016, [ ord(c) for c in "This is a string" ])
 #  time.sleep(.1)
