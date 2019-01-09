@@ -1,10 +1,15 @@
 #!/usr/bin/python
 
-from Adafruit_I2C import Adafruit_I2C
+try:
+  from Adafruit_GPIO.I2C import Device
+  i2c = Device(0x60, 0)
+except:
+  from Adafruit_I2C import Adafruit_I2C
+  i2c = Adafruit_I2C(0x60)
+
 import hal
 import time
 
-i2c = Adafruit_I2C(0x60)
 
 h = hal.component("spindle_voltage")
 h.newpin("speed_in", hal.HAL_FLOAT, hal.HAL_IN)
