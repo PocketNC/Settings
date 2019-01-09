@@ -25,7 +25,7 @@ def getVersion():
     with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
       version = versionFile.read().strip();
   except:
-    # Adafruit's I2C calls output text to stdout when an error occurs.
+    # Adafruit_I2C calls output text to stdout when an error occurs.
     # We only want to know that there was an error. We don't want the error output
     # to stdout as this script outputs only the version of this machine.
     # So, we need to capture stdout when running i2c calls.
@@ -45,18 +45,32 @@ def getVersion():
         del self._stringio    # free up some memory
         sys.stdout = self._stdout
 
-    from Adafruit_I2C import Adafruit_I2C
-    i2c = Adafruit_I2C(0x50)
+    try:
+      from Adafruit_GPIO.I2C import Device
 
-# TODO put version information on EEPROM chip.
-# An EEPRROM chip is included on the v2revR board at i2c address (0x50)
-# but we aren't currently using it. For now, just checking if we can
-# read from it.
-    with Capturing() as output:
-      test = i2c.readU8(0)
+      i2c = Device(0x50, 0)
+      try:
+        test = i2c.readU8(0)
+        # TODO put version information on EEPROM chip.
+        version = "v2revR"
+      except:
+        pass
+    except:
+      # Older machines have an old version of Adafruit_I2C.
+      # Adafruit_I2C was replaced by Adafruit_GPIO on newer
+      # machines.
+      from Adafruit_I2C import Adafruit_I2C
+      i2c = Adafruit_I2C(0x50)
 
-    if test != -1:
-      version = "v2revR"
+      # TODO put version information on EEPROM chip.
+      # An EEPRROM chip is included on the v2revR board at i2c address (0x50)
+      # but we aren't currently using it. For now, just checking if we can
+      # read from it.
+      with Capturing() as output:
+        test = i2c.readU8(0)
+
+      if test != -1:
+        version = "v2revR"
 
   return version
 
