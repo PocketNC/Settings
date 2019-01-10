@@ -6,12 +6,13 @@ import re
 import pprint
 import sys
 from version import getVersion
+import subprocess
 
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
 VERSION = getVersion()
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
-from ini import read_ini_data, merge_ini_data, write_ini_data
+from ini import read_ini_data, merge_ini_data, write_ini_data, append_ini_data
 
 INI_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/PocketNC.ini")
 INI_DEFAULT_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/versions/%s/PocketNC.ini" % VERSION)
@@ -38,10 +39,18 @@ if __name__ == "__main__":
       dir = os.path.join(FEATURES_DIR, name.lower())
 
       feature_overlay_path = os.path.join(dir, "overlay.inc")
+      feature_append_path = os.path.join(dir, "append.inc")
+      feature_startup_path = os.path.join(dir, "startup.sh")
 
       if os.path.isfile(feature_overlay_path):
-          feature_overlay = read_ini_data(feature_overlay_path)
-          merged = merge_ini_data(merged, feature_overlay)
-    
+        feature_overlay = read_ini_data(feature_overlay_path)
+        merged = merge_ini_data(merged, feature_overlay)
+
+      if os.path.isfile(feature_append_path):
+        feature_append = read_ini_data(feature_append_path)
+        merged = append_ini_data(merged, feature_append)
+
+      if os.path.isfile(feature_startup_path):
+        subprocess.check_output(feature_startup_path);
 
   write_ini_data(merged, INI_FILE);

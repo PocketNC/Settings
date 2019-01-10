@@ -15,11 +15,11 @@ loadusr -W ./spindle_voltage.py
 # ###################################
 
 # kinematics
-loadrt trivkins
+loadrt [POCKETNC]KINEMATICS
 loadrt tp
 
 # motion controller, get name and thread periods from ini file
-loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES tp=tp kins=trivkins
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES tp=tp kins=[POCKETNC]KINEMATICS
 
 
 # load low-level drivers
