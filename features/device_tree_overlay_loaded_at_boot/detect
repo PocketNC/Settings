@@ -1,0 +1,10 @@
+#!/usr/bin/python 
+
+import subprocess
+
+dogtag = subprocess.check_output(['cat', '/etc/dogtag'])
+
+if dogtag != "BeagleBoard.org Debian Image 2015-02-01":
+  print "1"
+else:
+  print "0"
