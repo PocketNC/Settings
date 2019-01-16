@@ -1,13 +1,9 @@
-# #######################################
-#
-# HAL file for BeagleBone PocketNC cape with 5 steppers
-# 
-# Derived from example hm2-stepper config
-# ########################################
-
-# Launch the setup script to make sure hardware setup looks good
-loadusr -w [POCKETNC](LOAD_DEVICE_TREE_OVERLAY_SCRIPT)
+# Configure the pins with config-pin
 loadusr -w [POCKETNC](CONFIGURE_PINS_SCRIPT)
+
+# Start script to monitor spindle speed commands
+# so that it can issue i2c commands to change the
+# voltage.
 loadusr -W ./spindle_voltage.py
 
 # ###################################
@@ -23,7 +19,7 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 
 
 # load low-level drivers
-loadrt hal_bb_gpio output_pins=117,211,212,214,224 input_pins=109,110,114,118,119,126,216,222
+loadrt hal_bb_gpio output_pins=117,211,212,214,224 input_pins=108,109,110,114,118,119,126,216,222
 loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32

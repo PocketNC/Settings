@@ -48,7 +48,7 @@ def getVersion():
     try:
       from Adafruit_GPIO.I2C import Device
 
-      i2c = Device(0x50, 0)
+      i2c = Device(0x50, 2)
       try:
         test = i2c.readU8(0)
         # TODO put version information on EEPROM chip.

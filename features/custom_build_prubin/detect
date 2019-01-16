@@ -1,10 +1,7 @@
-#!/usr/bin/python 
+#!/bin/bash
 
-import subprocess
-
-dogtag = subprocess.check_output(['cat', '/etc/dogtag'])
-
-if dogtag.find("Custom") > -1:
-  print "1"
-else:
-  print "0"
+if [ -f /home/pocketnc/machinekit/rtlib/prubin/pru_generic.bin ]; then
+  echo 1
+else
+  echo 0
+fi

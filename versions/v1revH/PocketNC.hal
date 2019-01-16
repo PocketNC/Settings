@@ -6,7 +6,6 @@
 # ########################################
 
 # Launch the setup script to make sure hardware setup looks good
-loadusr -w [POCKETNC](LOAD_DEVICE_TREE_OVERLAY_SCRIPT)
 loadusr -w [POCKETNC](CONFIGURE_PINS_SCRIPT)
 
 # ###################################

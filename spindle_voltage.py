@@ -2,7 +2,7 @@
 
 try:
   from Adafruit_GPIO.I2C import Device
-  i2c = Device(0x60, 0)
+  i2c = Device(0x60, 2)
 except:
   from Adafruit_I2C import Adafruit_I2C
   i2c = Adafruit_I2C(0x60)
