@@ -82,7 +82,7 @@ net eStopBlink			=> ledBlink.eStop.or.in0
 net driversEnable		=> ledBlink.eStop.or.in1
 
 net eStopLed ledBlink.eStop.or.out
-net eStopLed [POCKETNC_PINS]ESTOP_SIGNAL_LONG
+net eStopLed [POCKETNC_PINS]ESTOP_LED_LONG
 
 net mPwrBlink			<= ledBlink.mPwr.and.out
 net mPwrBlink			=> ledBlink.mPwr.or.in0
