@@ -11,7 +11,7 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 
 
 # load low-level drivers
-loadrt hal_bb_gpio output_pins=[POCKETNC_PINS]SPINDLE_DIR_SHORT,[POCKETNC_PINS]ENABLE_SHORT,[POCKETNC_PINS]SPINDLE_ON_SHORT input_pins=[POCKETNC_PINS]X_LIMIT_SHORT,[POCKETNC_PINS]Y_LIMIT_SHORT,[POCKETNC_PINS]Z_LIMIT_SHORT,[POCKETNC_PINS]B_LIMIT_SHORT,[POCKETNC_PINS]A_LIMIT_SHORT,[POCKETNC_PINS]START_SIGNAL_SHORT
+loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
 loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt and2 names=mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
 loadrt or2 names=programStartFromPaused.or

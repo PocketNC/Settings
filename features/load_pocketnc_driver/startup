@@ -21,4 +21,4 @@ for DTBO in PocketNCdriver ; do
 done;
 
 ./features/load_pocketnc_driver/configure_pins.sh
-cp ./features/load_pocketnc_driver/versions/$VERSION/overlay.inc ./features/load_pocketnc_driver/overlay.inc
+./generate_bb_gpio_config.py ./features/load_pocketnc_driver/versions/$VERSION/overlay.inc ./features/load_pocketnc_driver/overlay.inc
