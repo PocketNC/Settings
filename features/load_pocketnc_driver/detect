@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -f /sys/devices/bone_capemgr.*/slots ]; then
+  echo 1
+else
+  echo 0
+fi

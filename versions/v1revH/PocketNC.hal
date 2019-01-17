@@ -1,13 +1,3 @@
-# #######################################
-#
-# HAL file for BeagleBone PocketNC cape with 5 steppers
-# 
-# Derived from example hm2-stepper config
-# ########################################
-
-# Launch the setup script to make sure hardware setup looks good
-loadusr -w [POCKETNC](CONFIGURE_PINS_SCRIPT)
-
 # ###################################
 # Core EMC/HAL Loads
 # ###################################
@@ -21,7 +11,7 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 
 
 # load low-level drivers
-loadrt hal_bb_gpio output_pins=211,212,224 input_pins=109,114,118,119,216,222
+loadrt hal_bb_gpio output_pins=[POCKETNC_PINS]SPINDLE_DIR_SHORT,[POCKETNC_PINS]ENABLE_SHORT,[POCKETNC_PINS]SPINDLE_ON_SHORT input_pins=[POCKETNC_PINS]X_LIMIT_SHORT,[POCKETNC_PINS]Y_LIMIT_SHORT,[POCKETNC_PINS]Z_LIMIT_SHORT,[POCKETNC_PINS]B_LIMIT_SHORT,[POCKETNC_PINS]A_LIMIT_SHORT,[POCKETNC_PINS]START_SIGNAL_SHORT
 loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt and2 names=mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
 loadrt or2 names=programStartFromPaused.or
@@ -226,31 +216,31 @@ net tool-change-loop	=> iocontrol.0.tool-changed
 
 ### Home and Limit switches ###
 # X axis
-net XmaxAndHome	<= bb_gpio.p8.in-09
-net XmaxAndHome	=> axis.0.home-sw-in
-setp bb_gpio.p8.in-09.invert 1
+net XmaxAndHome [POCKETNC_PINS]X_LIMIT_LONG
+net XmaxAndHome	axis.0.home-sw-in
+setp [POCKETNC_PINS]X_LIMIT_INVERT
 
 # Y axis
-net YmaxAndHome	<= bb_gpio.p8.in-14
-net YmaxAndHome	=> axis.1.home-sw-in
-setp bb_gpio.p8.in-14.invert 1
+net YmaxAndHome [POCKETNC_PINS]Y_LIMIT_LONG
+net YmaxAndHome axis.1.home-sw-in
+setp [POCKETNC_PINS]Y_LIMIT_INVERT
 
 # Z axis
-net ZmaxAndHome <= bb_gpio.p8.in-18
-net ZmaxAndHome => axis.2.home-sw-in
-setp bb_gpio.p8.in-18.invert 1
+net ZmaxAndHome [POCKETNC_PINS]Z_LIMIT_LONG
+net ZmaxAndHome axis.2.home-sw-in
+setp [POCKETNC_PINS]Z_LIMIT_INVERT
 
 
 # A Axis Limit
-net AmaxAndHome <= bb_gpio.p9.in-16
-net AmaxAndHome => axis.3.home-sw-in
-setp bb_gpio.p9.in-16.invert 1
+net AmaxAndHome [POCKETNC_PINS]A_LIMIT_LONG
+net AmaxAndHome axis.3.home-sw-in
+setp [POCKETNC_PINS]A_LIMIT_INVERT
 
 
 # B axis
-net BhomeAndIndex <= bb_gpio.p8.in-19
-net BhomeAndIndex => axis.4.home-sw-in
-setp bb_gpio.p8.in-19.invert 1
+net BhomeAndIndex [POCKETNC_PINS]B_LIMIT_LONG
+net BhomeAndIndex axis.4.home-sw-in
+setp [POCKETNC_PINS]B_LIMIT_INVERT
 
 ### Control Panel Buttons ###
 # eStop
@@ -258,14 +248,15 @@ net estop-loop			<= iocontrol.0.user-enable-out
 net estop-loop			=> iocontrol.0.emc-enable-in
 
 # Machine power
+setp [POCKETNC_PINS]ENABLE_INVERT
 setp halui.machine.on 1
 setp halui.estop.reset 1
-net driversEnable halui.machine.is-on => bb_gpio.p9.out-12
+net driversEnable halui.machine.is-on => [POCKETNC_PINS]ENABLE_LONG
 
 # Program start/run
-setp bb_gpio.p9.in-22.invert 1
+setp [POCKETNC_PINS]START_SIGNAL_INVERT
 setp programStart.oneshot.width 0.1
-net progStartButton		<= bb_gpio.p9.in-22
+net progStartButton [POCKETNC_PINS]START_SIGNAL_LONG
 net progStartButton		=> programStart.oneshot.in
 net progStart			<= programStart.oneshot.out
 net progStart			=> programStartFromIdle.and.in0
@@ -294,10 +285,15 @@ setp spindleScale.offset .63
 setp spindleLimit.min 0
 setp spindleLimit.max 100
 setp spindleMath.in0 -2048
-net spindleEnable				<= motion.spindle-on
-net spindleEnable				=> bb_gpio.p9.out-24
-net spindleDirection			<= motion.spindle-forward
-net spindleDirection			=> bb_gpio.p9.out-11
+
+setp [POCKETNC_PINS]SPINDLE_ON_INVERT
+net spindleEnable motion.spindle-on
+net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
+
+setp [POCKETNC_PINS]SPINDLE_DIR_INVERT
+net spindleDirection motion.spindle-forward
+net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
+
 net displaySpindleReverseButton	<= motion.spindle-reverse
 net spindleSpeedDummy motion.spindle-speed-out
 net spindleSpeed <= motion.spindle-speed-out-abs
