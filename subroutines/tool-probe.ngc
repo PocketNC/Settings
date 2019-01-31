@@ -51,12 +51,14 @@ G94                                            ( use feedrate in units/min )
 G40                                            ( turn cutter radius compensation off here )
 
 G53 G1 F[#<_TravelFeed>] Z[#<_TravelZ>]      ( go to high travel level on Z )
+O1 IF [ #<_ini[POCKETNC]PAUSE_ON_TOOL_PROBE> NE 0 ]
 G53 G0 X[#<_ToolChangeX>]                         ( to tool change location )
 
 (debug, Load tool, then press cycle/start.)
 
 T[#<T>]
 M0
+O1 ENDIF
 
 G53 G0 X[#<_ProbeX>]                         ( to tool probe location )
 G53 G0 Y[#<_ProbeY>]
