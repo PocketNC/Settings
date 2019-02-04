@@ -10,6 +10,11 @@ dir_err () {
   exit 1
 }
 
+interrupt_err () {
+  echo "Error setting interrupt" >&2
+  exit 1
+}
+
 # Export GPIO pins:
 # One pin needs to be exported to enable the low-level clocks for the GPIO
 # modules (there is probably a better way to do this)
@@ -67,3 +72,5 @@ done <<- EOF
 	111	out	# p9.29		gpio3.15        X Dir
 	112	out	# p9.30		gpio3.16	A Step
 EOF
+
+sudo -A su -c "echo rising > /sys/class/gpio/gpio67/edge" || interrupt_err # set interrupt on p8.8 
