@@ -1,6 +1,6 @@
 # Create a dummy spindle_voltage component so we can assume it's there on 
 # old machines that don't actually use it.
-loadusr -W ./spindle_voltage_dummy.py
+loadusr -Wn spindle_voltage ./spindle_voltage_dummy.py
 
 # ###################################
 # Core EMC/HAL Loads
