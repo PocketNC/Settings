@@ -1,0 +1,6 @@
+loadusr -Wn hss_warmup ./features/high_speed_spindle/hss_warmup.py
+
+net spindleEnable hss_warmup.spindle_on
+
+net eStopOrInput1 estopOr.in1
+net eStopOrInput1 hss_warmup.abort

@@ -2,9 +2,11 @@
 
 import os
 import sys
+import datetime
 
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
 INI_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/PocketNC.ini")
+LAST_SPINDLE_OFF_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/last-spindle-off-time.txt")
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
 from ini import read_ini_data, get_parameter
@@ -42,6 +44,7 @@ if spindleClockPinParam:
 
 h = hal.component("spindle_voltage")
 h.newpin("speed_in", hal.HAL_FLOAT, hal.HAL_IN)
+h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("speed_measured", hal.HAL_FLOAT, hal.HAL_OUT)
 h.ready()
 
@@ -61,9 +64,15 @@ hiVoltage = float(hiVoltageParam["values"]["value"]) if hiVoltageParam else 2.49
 hiRPM = float(hiRPMParam["values"]["value"]) if hiRPMParam else 10000.0
 
 lastRPM = 0
+lastSpindleOn = False
 
 try:
   while True:
+    if lastSpindleOn and not h['spindle_on']:
+      f = open(LAST_SPINDLE_OFF_FILE, 'w');
+      f.write(datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ\n"))
+      f.close()
+
     if h['speed_in'] != lastRPM:
       currentRPM = h['speed_in']
       t = (currentRPM-loRPM)/(hiRPM-loRPM)
@@ -79,6 +88,7 @@ try:
 
       i2c.write16(64, combined)
       lastRPM = currentRPM
+      lastSpindleOn = h['spindle_on']
     time.sleep(.1)
 
     now = time.time()

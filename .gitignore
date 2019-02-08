@@ -2,6 +2,7 @@
 PocketNCdriver-00A0.dtbo
 pru-stepper.var
 pru-stepper.var.bak
+last-spindle-off-time.txt
 /PocketNC.ini
 
 # Data specific to a machine - Calibration data, tool table and board rev version file
