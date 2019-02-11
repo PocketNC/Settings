@@ -21,12 +21,12 @@ loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
-loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
-loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,estopOr
+loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and,doEstop.and,doEstopReset.and
+loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,triggerEstop.or
 loadrt toggle names=eStopButton.toggle
-loadrt not names=eStopState.not,eStopDrivers.not
+loadrt not names=estopNotActivated.not,eStopDrivers.not
 loadrt timedelay names=mPwr.timedelay
-loadrt oneshot names=programStart.oneshot,programPause.oneshot
+loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPressed.oneshot
 
 
 # ################################################
@@ -53,17 +53,21 @@ addf ledBlinkSignal.s32toBit			servo-thread
 addf ledBlink.eStop.and					servo-thread
 addf ledBlink.mPwr.and					servo-thread
 addf ledBlink.pause.and					servo-thread
-addf eStopState.not			servo-thread
+addf estopNotActivated.not			servo-thread
 addf eStopButton.toggle		servo-thread
 addf eStopDrivers.not		servo-thread
 addf mPwr.timedelay		servo-thread
 addf mPwr.and			servo-thread
 addf programStart.oneshot	servo-thread
 addf programStartFromPaused.or		servo-thread
+addf triggerEstop.or		servo-thread
 addf programStartFromIdle.and		servo-thread
 addf programStartFromPaused.and		servo-thread
 addf programPause.oneshot	servo-thread
 addf runningIntoPause.and	servo-thread
+addf doEstop.and	servo-thread
+addf doEstopReset.and	servo-thread
+addf estopButtonPressed.oneshot servo-thread
 
 # Setup pins and signals
 setp ledBlinkSignal.offset 1
@@ -292,31 +296,50 @@ setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
 net estop-loop iocontrol.0.user-enable-out
 net estop-loop iocontrol.0.emc-enable-in
 
-net eStopToggle	[POCKETNC_PINS]ESTOP_SIGNAL_LONG
-net eStopToggle	eStopButton.toggle.in
+# high speed spindle feature binds triggerEstop.or.in1 to a warm up check
+# to avoid turning on the spindle when it hasn't run for 
+# a while. For other machines, simply initialize to 0.
+setp triggerEstop.or.in1 0
 
-net eStopOrInput0 estopOr.in0
-net eStopOrInput0 eStopButton.toggle.out
+net estopPulse [POCKETNC_PINS]ESTOP_SIGNAL_LONG
+net estopPulse estopButtonPressed.oneshot.in
 
-net eStopOn estopOr.out
-net eStopOn halui.estop.activate
-net eStopOn eStopState.not.in
-net eStopOff eStopState.not.out
-net eStopOff halui.estop.reset
-net eStopDriversEnable halui.estop.is-activated
-net eStopDriversEnable ledBlink.eStop.and.in1
-net eStopDriversEnable eStopDrivers.not.in
+setp estopButtonPressed.oneshot.width .1
+
+net estopButtonPushed estopButtonPressed.oneshot.out
+net estopButtonPushed triggerEstop.or.in0
+net estopButtonPushed doEstopReset.and.in0
+
+net estopTriggered triggerEstop.or.out
+net estopTriggered doEstop.and.in0
+
+net estopNotActivated estopNotActivated.not.out
+net estopNotActivated doEstop.and.in1
+
+net estopIsActivated halui.estop.is-activated
+net estopIsActivated estopNotActivated.not.in
+net estopIsActivated doEstopReset.and.in1
+
+net resetEstop doEstopReset.and.out
+net resetEstop halui.estop.reset
+
+net activateEstop doEstop.and.out
+net activateEstop halui.estop.activate
+
+net estopIsActivated halui.estop.is-activated
+net estopIsActivated ledBlink.eStop.and.in1
+net estopIsActivated eStopDrivers.not.in
 
 
 # Machine power
 setp [POCKETNC_PINS]ENABLE_INVERT
-net driversEnable <= eStopDrivers.not.out
-net driversEnable => mPwr.timedelay.in
-net delayedEnable <= mPwr.timedelay.out
-net delayedEnable <= halui.machine.on
+net driversEnable eStopDrivers.not.out
+net driversEnable mPwr.timedelay.in
+net delayedEnable mPwr.timedelay.out
+net delayedEnable halui.machine.on
 net delayedEnable [POCKETNC_PINS]ENABLE_LONG
-net delayedEnable => ledBlink.mPwr.and.in1
-net delayedEnable => mPwr.and.in0
+net delayedEnable ledBlink.mPwr.and.in1
+net delayedEnable mPwr.and.in0
 
 
 # Program start/run
@@ -362,7 +385,6 @@ setp [POCKETNC_PINS]SPINDLE_ON_INVERT
 
 net spindleEnable motion.spindle-on
 net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
-net spindleEnable spindle_voltage.spindle_on
 
 net spindleDirection motion.spindle-forward
 net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
