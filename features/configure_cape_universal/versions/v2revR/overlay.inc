@@ -20,7 +20,7 @@ X_LIMIT_INVERT=bb_gpio.p8.in-09.invert 1
 
 ESTOP_SIGNAL_SHORT=810
 ESTOP_SIGNAL_LONG=bb_gpio.p8.in-10
-ESTOP_SIGNAL_INVERT=bb_gpio.p8.in-10.invert 0
+ESTOP_SIGNAL_INVERT=bb_gpio.p8.in-10.invert 1
 
 Y_LIMIT_SHORT=814
 Y_LIMIT_LONG=bb_gpio.p8.in-14
