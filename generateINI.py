@@ -76,4 +76,22 @@ if __name__ == "__main__":
       feature_append = read_ini_data(feature_append_path)
       merged = append_ini_data(merged, feature_append)
 
+    merged = merge_ini_data(merged, {
+      'parameters': [
+        {
+            'values': {
+                'section': 'POCKETNC_FEATURES',
+                'name': feature.upper(),
+                'value': "1",
+                'comment': '',
+                'help': '',
+                'default': ''
+            }
+        }
+      ],
+      'sections': {
+          'POCKETNC_FEATURES': { 'comment': '', 'help': '' }
+      }
+    });
+
   write_ini_data(merged, INI_FILE);
