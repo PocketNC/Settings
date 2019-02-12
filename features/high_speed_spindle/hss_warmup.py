@@ -8,12 +8,51 @@ import time
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
 LAST_SPINDLE_OFF_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/last-spindle-off-time.txt")
 
+def readLastSpindleOffFromDisk():
+  try:
+    f = open(LAST_SPINDLE_OFF_FILE, 'r');
+    dateString = f.readline().strip()
+    f.close();
+  except:
+    dateString = "2019-01-01T00:00:00.000000Z"
+
+  return dateString
+
+def recordSpindleOff():
+  global lastSpindleOff
+
+
+  now = datetime.datetime.utcnow()
+  lastSpindleOff = now
+
+  f = open(LAST_SPINDLE_OFF_FILE, 'w');
+  f.write(now.strftime("%Y-%m-%dT%H:%M:%S.%fZ\n"))
+  f.close()
+
+def checkWarmupNeeded():
+  now = datetime.datetime.utcnow()
+
+  totalTime = (now-lastSpindleOff).total_seconds()
+
+# 3 days is 259200 seconds
+# 12 hours is  43200 seconds
+  return totalTime > 43200
+#  return totalTime > 10
+
+lastSpindleOn = False
+abort = False
+
 print "Initializing hss_warmup!"
 h = hal.component("hss_warmup")
+
+lastSpindleOff = datetime.datetime.strptime(readLastSpindleOffFromDisk(), "%Y-%m-%dT%H:%M:%S.%fZ")
 
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("program_running", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("performing_warmup", hal.HAL_BIT, hal.HAL_IO)
+
+# set to true when a warm up is needed
+h.newpin("warmup_needed", hal.HAL_BIT, hal.HAL_OUT)
 
 # set to true when an E Stop should occur
 h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
@@ -24,28 +63,10 @@ h.newpin("aborted", hal.HAL_BIT, hal.HAL_OUT)
 
 h['abort'] = False
 h['aborted'] = False
+h['warmup_needed'] = checkWarmupNeeded()
 
 h.ready()
 
-def checkSpindleActivity():
-  try:
-    f = open(LAST_SPINDLE_OFF_FILE, 'r');
-    dateString = f.readline().strip()
-    f.close();
-  except:
-    dateString = "2019-01-01T00:00:00.000000Z"
-
-  now = datetime.datetime.utcnow()
-  lastSpindleActivity = datetime.datetime.strptime(dateString, "%Y-%m-%dT%H:%M:%S.%fZ")
-
-  totalTime = (now-lastSpindleActivity).total_seconds()
-
-# three days is 259200 seconds
-#  return not h['performing_warmup'] and totalTime > 259200
-  return not h['performing_warmup'] and totalTime > 10
-
-lastSpindleOn = False
-abort = False
 
 try:
   while True:
@@ -53,14 +74,13 @@ try:
       # if we turned the spindle off, record the current time
       # unless we cancelled the warm up sequence or someone tried to turn on the
       # spindle without warming up
-      print "recording last time spindle was turned off"
-      f = open(LAST_SPINDLE_OFF_FILE, 'w');
-      f.write(datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ\n"))
-      f.close()
+      recordSpindleOff();
+
+    h['warmup_needed'] = checkWarmupNeeded()
 
     if h['spindle_on'] and not lastSpindleOn:
       # if the spindle is being turned on, check whether we should abort
-      abort = checkSpindleActivity()
+      abort = h['warmup_needed'] and not h['performing_warmup']
       if abort:
         h['aborted'] = True
     else:
