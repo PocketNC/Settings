@@ -21,7 +21,7 @@ loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
 loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
-loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or
+loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,triggerEstop.or
 loadrt toggle names=eStopButton.toggle
 loadrt not names=eStopState.not,eStopDrivers.not
 loadrt timedelay names=mPwr.timedelay
@@ -390,4 +390,4 @@ setp hpg.pwmgen.00.pwm_period       1000000
 setp hpg.pwmgen.00.out.00.pin       0x37
 setp hpg.pwmgen.00.out.00.enable    1
 
-
+net spindleSpeedMeasured spindle_voltage.speed_measured

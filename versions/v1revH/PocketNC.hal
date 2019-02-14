@@ -18,7 +18,7 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
 loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt and2 names=mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
-loadrt or2 names=programStartFromPaused.or
+loadrt or2 names=programStartFromPaused.or,triggerEstop.or
 loadrt timedelay names=mPwr.timedelay
 loadrt oneshot names=programStart.oneshot,programPause.oneshot
 loadrt sum2 names=spindleMath
@@ -313,4 +313,4 @@ setp hpg.pwmgen.00.pwm_period       1000000
 setp hpg.pwmgen.00.out.00.pin       0x37
 setp hpg.pwmgen.00.out.00.enable    1
 
-
+net spindleSpeedMeasured spindle_voltage.speed_measured

@@ -393,3 +393,5 @@ net displaySpindleReverseButton	motion.spindle-reverse
 net spindleSpeedDummy motion.spindle-speed-out
 net spindleSpeed motion.spindle-speed-out-abs
 net spindleSpeed spindle_voltage.speed_in
+
+net spindleSpeedMeasured spindle_voltage.speed_measured
