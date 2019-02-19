@@ -49,6 +49,7 @@ lastSpindleOff = datetime.datetime.strptime(readLastSpindleOffFromDisk(), "%Y-%m
 
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("program_running", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("program_paused", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("performing_warmup", hal.HAL_BIT, hal.HAL_IO)
 
 # set to true when a warm up is needed
@@ -87,9 +88,9 @@ try:
       abort = False
 
     h['abort'] = abort
-    if not h['program_running']:
+    if not h['program_running'] and not h['program_paused']:
       # if the warm up sequence is canceled, then the performing_warmup
-      # pin won't properly be turned off, so if a program isn't running
+      # pin won't properly be turned off, so if a program isn't running (and it isn't paused)
       # turn it off here
       h['performing_warmup'] = False
 
