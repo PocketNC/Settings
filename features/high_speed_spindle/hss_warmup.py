@@ -29,15 +29,22 @@ def recordSpindleOff():
   f.write(now.strftime("%Y-%m-%dT%H:%M:%S.%fZ\n"))
   f.close()
 
+def checkFullWarmupNeeded():
+  now = datetime.datetime.utcnow()
+
+  totalTime = (now-lastSpindleOff).total_seconds()
+
+# 7 days is 604800 seconds
+  return totalTime > 604800
+
 def checkWarmupNeeded():
   now = datetime.datetime.utcnow()
 
   totalTime = (now-lastSpindleOff).total_seconds()
 
-# 3 days is 259200 seconds
 # 12 hours is  43200 seconds
   return totalTime > 43200
-#  return totalTime > 10
+
 
 lastSpindleOn = False
 abort = False
@@ -51,12 +58,16 @@ h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("program_running", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("program_paused", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("performing_warmup", hal.HAL_BIT, hal.HAL_IO)
+h.newpin("performing_full_warmup", hal.HAL_BIT, hal.HAL_IO)
 
-# set to true when a warm up is needed
+# set to true when at least the short warm up is needed
 h.newpin("warmup_needed", hal.HAL_BIT, hal.HAL_OUT)
 
+# set to true when a full length warm up is needed
+h.newpin("full_warmup_needed", hal.HAL_BIT, hal.HAL_OUT)
+
 # set to true when an E Stop should occur
-h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
+h.newpin("abort", hal.HAL_BIT, hal.HAL_IO)
 
 # set to true when aborted and reset by rockhopper after
 # the error has been reported
@@ -65,6 +76,7 @@ h.newpin("aborted", hal.HAL_BIT, hal.HAL_OUT)
 h['abort'] = False
 h['aborted'] = False
 h['warmup_needed'] = checkWarmupNeeded()
+h['full_warmup_needed'] = checkFullWarmupNeeded()
 
 h.ready()
 
@@ -78,10 +90,14 @@ try:
       recordSpindleOff();
 
     h['warmup_needed'] = checkWarmupNeeded()
+    h['full_warmup_needed'] = checkFullWarmupNeeded()
 
     if h['spindle_on'] and not lastSpindleOn:
       # if the spindle is being turned on, check whether we should abort
-      abort = h['warmup_needed'] and not h['performing_warmup']
+      needs_warmup = h['warmup_needed']
+      needs_full_warmup = h['full_warmup_needed']
+      abort = needs_warmup and not h['performing_warmup']
+      abort = abort or ( needs_full_warmup and not h['performing_full_warmup'] )
       if abort:
         h['aborted'] = True
     else:
@@ -93,6 +109,7 @@ try:
       # pin won't properly be turned off, so if a program isn't running (and it isn't paused)
       # turn it off here
       h['performing_warmup'] = False
+      h['performing_full_warmup'] = False
 
     lastSpindleOn = h['spindle_on']
     time.sleep(.1)
