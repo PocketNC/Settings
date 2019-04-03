@@ -40,7 +40,9 @@ def readPressure():
     time.sleep(0.1)
     
     # Command to take pressure reading
-    i2c.writeList(0xAA, [0x0, 0x0]) 
+    result = i2c.writeList(0xAA, [0x0, 0x0]) 
+    if result is not None:
+      return -999
     
     time.sleep(0.1)
     
@@ -65,7 +67,9 @@ def readTemperature():
       i2c = Adafruit_I2C(MCP9808_I2CADDR, 1)
     
     # Begin
-    i2c.write16(MCP9808_REG_CONFIG, 0x0)
+    result = i2c.write16(MCP9808_REG_CONFIG, 0x0)
+    if result is not None:
+      return -999
   
     # Set resolution
     i2c.write8(MCP9808_REG_RESOLUTION, 0x03)
@@ -95,7 +99,7 @@ print "Initializing hss_sensors!"
 h = hal.component("hss_sensors")
 
 h.newpin("detected", hal.HAL_BIT, hal.HAL_OUT)
-h['detected'] = os.system(DETECT_SCRIPT)
+h['detected'] = (readPressure() != -999)
 
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 
@@ -135,10 +139,10 @@ try:
       
       h['abort'] = abort
 
-      time.sleep(.1)
+      time.sleep(1)
     else:
       time.sleep(10)
-      h['detected'] = os.system(DETECT_SCRIPT)
+      h['detected'] = (readPressure() != -999)
 
 except KeyboardInterrupt:
   raise SystemExit
