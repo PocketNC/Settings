@@ -12,8 +12,8 @@ DETECT_SCRIPT = os.path.join(POCKETNC_DIRECTORY, "Settings/features/high_speed_s
 MPRLS_I2CADDR = 0x18
 # Upper end of the sensors scale in MPA (25 PSI)
 MPRLS_SCALE_MAX = 0.172369
-# Minimum pressure in MPA below which machine will E-Stop (equals 20 PSI)
-LOW_PRESSURE_CUTOFF = 0.137895
+# Minimum pressure in MPA below which machine will E-Stop (equals 16 PSI)
+LOW_PRESSURE_CUTOFF = 0.110316
 
 # The MCP9808 has a default I2C address of 0x18, we set the address to 0x19 using the A0 address pin
 MCP9808_I2CADDR = 0x19
