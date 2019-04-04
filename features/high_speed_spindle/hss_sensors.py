@@ -26,6 +26,9 @@ LOW_TEMP_CUTOFF = 1
 # Spindle max operating temp is 40C, put cutoff at 39
 HIGH_TEMP_CUTOFF = 39
 
+#Value returned by sensor read methods if the read fails
+SENSOR_READ_FAIL_VALUE = -999
+
 # Reads pressure in MPa
 def readPressure():
   try:
@@ -42,7 +45,7 @@ def readPressure():
     # Command to take pressure reading
     result = i2c.writeList(0xAA, [0x0, 0x0]) 
     if result is not None:
-      return -999
+      return SENSOR_READ_FAIL_VALUE 
     
     time.sleep(0.1)
     
@@ -53,7 +56,7 @@ def readPressure():
     mpa = psi * 0.0068947572932
     return mpa
   except:
-    return -999
+    return SENSOR_READ_FAIL_VALUE
 
 #Returns temperature reading in degrees Celsius
 def readTemperature():
@@ -69,7 +72,7 @@ def readTemperature():
     # Begin
     result = i2c.write16(MCP9808_REG_CONFIG, 0x0)
     if result is not None:
-      return -999
+      return SENSOR_READ_FAIL_VALUE
   
     # Set resolution
     i2c.write8(MCP9808_REG_RESOLUTION, 0x03)
@@ -93,13 +96,13 @@ def readTemperature():
     i2c.write16(MCP9808_REG_CONFIG, conf_shutdown)
     return temp
   except:
-    return -999
+    return SENSOR_READ_FAIL_VALUE
 
 print "Initializing hss_sensors!"
 h = hal.component("hss_sensors")
 
 h.newpin("detected", hal.HAL_BIT, hal.HAL_OUT)
-h['detected'] = (readPressure() != -999)
+h['detected'] = (readPressure() != SENSOR_READ_FAIL_VALUE)
 
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 
@@ -142,7 +145,7 @@ try:
       time.sleep(1)
     else:
       time.sleep(10)
-      h['detected'] = (readPressure() != -999)
+      h['detected'] = (readPressure() != SENSOR_READ_FAIL_VALUE)
 
 except KeyboardInterrupt:
   raise SystemExit
