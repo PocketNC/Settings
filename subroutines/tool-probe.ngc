@@ -56,7 +56,7 @@ G53 G0 X[#<_ToolChangeX>]                         ( to tool change location )
 
 (debug, Load tool, then press cycle/start.)
 
-T[#<T>]M6
+T[#<T>]
 M0
 O1 ENDIF
 
@@ -71,7 +71,7 @@ G38.2 Z[#<_ProbeMinZ> - #<_ProbeFastZ>] F[#<_ProbeFeed1>]    ( trip switch slowl
 G0 Z[#<_ProbeRetract>]                       ( go up slightly )
 G38.2 Z[#<_ProbeRetract>*-1.25] F[#<_ProbeFeed2>]   ( trip switch very slowly )
 G90                                          ( use absolute positioning )
-#<_ToolZProbe> = #5063                         ( save trip point )
+#<_ToolZProbe> = [#5063 + #5223]                         ( save trip point )
 
 G10 L1 P[#<T>] Z[-3+#<_OriginOffset>+#<_ToolZProbe>-#<_ProbeSensor123Offset>]
 
