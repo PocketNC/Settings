@@ -24,7 +24,8 @@ MCP9808_REG_RESOLUTION = 0x08
 # Spindle min operating temp is 0C, lets put out cutoff at 1 to err on safe side
 LOW_TEMP_CUTOFF = 1
 # Spindle max operating temp is 40C, put cutoff at 39
-HIGH_TEMP_CUTOFF = 39
+# Update: after some testing, have decided to move it to 48C.
+HIGH_TEMP_CUTOFF = 48
 
 #Value returned by sensor read methods if the read fails
 SENSOR_READ_FAIL_VALUE = -999
