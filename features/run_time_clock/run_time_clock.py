@@ -18,6 +18,7 @@ try:
         lastTime = nowTime
         nowTime = time.time()
 
+        #If the program is manually stopped or a new program file is opened, the UI will send a command to Rockhopper to set the reset pin to True
         if h['reset']:
             h['seconds'] = 0
             h['reset'] = False
