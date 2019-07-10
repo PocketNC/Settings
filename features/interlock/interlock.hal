@@ -1,0 +1,22 @@
+loadusr -Wn interlock ./features/interlock/interlock.py
+
+net interlockClosed => interlock.closed
+
+net interlockPause <= interlock.pause-prog 
+net interlockPause => pause.or.in1
+
+net inhibitSpindle <= interlock.spindle-inhibit
+net inhibitSpindle => motion.spindle-inhibit
+
+net progStarted => interlock.prog-running
+net progStartPaused => interlock.program-is-paused
+
+net isSpindleOn <= halui.spindle.is-on
+net isSpindleOn => interlock.spindle-is-on
+
+net isModeMdi <= halui.mode.is-mdi
+net isModeMdi => interlock.mode-is-mdi
+
+#this needs to be tested still
+net interlockException <= interlock.exception
+net interlockException => triggerEstopFromUserspace.or.in1
