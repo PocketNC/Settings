@@ -1,5 +1,8 @@
 loadusr -Wn interlock ./features/interlock/interlock.py
 
+net interlockEnabled <= interlock.feature-enabled
+net interlockEnabled => interlockOpenAndEnabled.and.in1
+
 net interlockClosed => interlock.closed
 
 net interlockPause <= interlock.pause-prog 

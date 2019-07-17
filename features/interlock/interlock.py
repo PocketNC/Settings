@@ -13,6 +13,7 @@ h.newpin('program-is-paused', hal.HAL_BIT, hal.HAL_IN)
 h.newpin('spindle-is-on', hal.HAL_BIT, hal.HAL_IN)
 h.newpin('mode-is-mdi', hal.HAL_BIT, hal.HAL_IN)
 
+h.newpin('feature-enabled', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('pause-prog', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('spindle-inhibit', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('spindle-resume', hal.HAL_BIT, hal.HAL_OUT)
@@ -22,6 +23,7 @@ h.newpin('prog-alert', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('exception-alert', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('spindle-alert', hal.HAL_BIT, hal.HAL_OUT)
 
+h['feature-enabled'] = True
 h['pause-prog'] = False
 h['spindle-inhibit'] = False
 h['spindle-resume'] = False
