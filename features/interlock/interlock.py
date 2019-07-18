@@ -5,6 +5,11 @@ import os
 import time
 import logging
 
+logging.basicConfig(filename='/var/log/hal.log',format='%(asctime)sZ pid:%(process)s module:%(module)s %(message)s', level=logging.ERROR)
+
+progAlertIssued = False
+spindleAlertIssued = False
+
 h = hal.component('interlock')
 
 h.newpin('closed', hal.HAL_BIT, hal.HAL_IN)
@@ -35,21 +40,17 @@ h['spindle-alert'] = False
 
 h.ready()
 
-logging.basicConfig(filename='/var/log/hal.log',format='%(asctime)sZ pid:%(process)s module:%(module)s %(message)s', level=logging.ERROR)
-
-
-progAlertIssued = False
-spindleAlertIssued = False
-
 try:
   while True:
     try:
+      h['exception'] = False
       if not ( h['program-is-paused'] or (h['mode-is-mdi'] and h['spindle-is-on']) ):
           h['spindle-paused-by-interlock'] = False
 
       if h['closed']:
         if not h['spindle-paused-by-interlock']:
           h['spindle-inhibit'] = False
+          spindleAlertIssued = False
 
         if h['spindle-resume']:
           h['spindle-paused-by-interlock'] = False
@@ -57,9 +58,7 @@ try:
           h['spindle-resume'] = False
 
         h['pause-prog'] = False
-        spindleAlertIssued = False
         progAlertIssued = False
-
       else:
         if h['spindle-is-on']:
           h['spindle-paused-by-interlock'] = True
@@ -68,22 +67,21 @@ try:
             h['spindle-alert'] = True
         h['spindle-inhibit'] = True
         if h['prog-running']:
-          # the pause-prog pin must go from low to high to trigger a pause, and seems to take some time to switch statesd
-          h['pause-prog'] = False
-          while h['pause-prog']:
-            time.sleep(0.001)
           h['pause-prog'] = True
           if not progAlertIssued:
             progAlertIssued = True
             h['prog-alert'] = True
+        elif h['program-is-paused']:
+          #set pause-prog pin False so it is ready next time it is needed (it's effect occurs when changing state from False to True)
+          h['pause-prog'] = False
+          #once Rockhopper has issued alerts, be ready to issue alert again in case an attempt is made to start a program without first closing the interlock
+          progAlertIssued = h['prog-alert']
 
     except Exception as e:
       print 'Exception in interlock component: %s' % (e)
       logging.error(e)
       h['exception'] = True
       h['exception-alert'] = True
-      #Sleep for a second so only one exception alert is issued
-      time.sleep(1)
     time.sleep(.01)
 
 except KeyboardInterrupt:

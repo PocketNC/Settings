@@ -20,6 +20,5 @@ net isSpindleOn => interlock.spindle-is-on
 net isModeMdi <= halui.mode.is-mdi
 net isModeMdi => interlock.mode-is-mdi
 
-#this needs to be tested still
 net interlockException <= interlock.exception
 net interlockException => triggerEstopFromUserspace.or.in1

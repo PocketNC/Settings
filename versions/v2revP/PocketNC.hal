@@ -20,10 +20,10 @@ loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
-loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
-loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,triggerEstop.or
+loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and,interlockOpenAndEnabled.and
+loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,triggerEstop.or,triggerEstopFromUserspace.or,pause.or
 loadrt toggle names=eStopButton.toggle
-loadrt not names=eStopState.not,eStopDrivers.not
+loadrt not names=eStopState.not,eStopDrivers.not,interlockOpen.not
 loadrt timedelay names=mPwr.timedelay
 loadrt oneshot names=programStart.oneshot,programPause.oneshot
 loadrt sum2 names=spindleMath
@@ -69,6 +69,10 @@ addf spindleScale	servo-thread
 addf spindleLimit	servo-thread
 addf spindleMath	servo-thread
 addf runningIntoPause.and	servo-thread
+addf triggerEstop.or servo-thread
+addf triggerEstopFromUserspace.or servo-thread
+addf pause.or servo-thread
+
 
 # Setup pins and signals
 setp ledBlinkSignal.offset 1
@@ -352,7 +356,9 @@ net moreLedLogic		<= programStartFromPaused.or.out
 net moreLedLogic		=> ledBlink.mPwr.or.in1
 
 net progPauseLogic <= runningIntoPause.and.out
-net progPauseLogic => halui.program.pause
+net progPauseLogic => pause.or.in0
+net pauseSig <= pause.or.out
+net pauseSig => halui.program.pause
 
 # Probe
 net toolProbe [POCKETNC_PINS]PROBE_SIGNAL_LONG
@@ -391,3 +397,31 @@ setp hpg.pwmgen.00.out.00.pin       0x37
 setp hpg.pwmgen.00.out.00.enable    1
 
 net spindleSpeedMeasured spindle_voltage.speed_measured
+
+# ##################################################
+# Features
+# ##################################################
+
+net estopTriggeredFromUserspace triggerEstopFromUserspace.or.out 
+net estopTriggeredFromUserspace triggerEstop.or.in1
+
+### High Speed Spindle ###
+
+# high speed spindle feature binds triggerEstopFromUserspace.or.in0 to a warm up check
+# to avoid turning on the spindle when it hasn't run for 
+# a while. For other machines, simply initialize to 0.
+setp triggerEstopFromUserspace.or.in0 0
+
+### Interlock ###
+
+net interlockInput [POCKETNC_PINS]INTERLOCK_OPEN_LONG
+net interlockInput interlockOpenAndEnabled.and.in0
+
+net interlockOpen interlockOpenAndEnabled.and.out
+net interlockOpen interlockOpen.not.in
+net interlockClosed interlockOpen.not.out
+
+# interlock feature binds triggerEstopFromUserspace.or.in0
+# and sets it to True if an exception occurs in the userspace component
+# For other machines, initialize to 0
+setp triggerEstopFromUserspace.or.in1 0

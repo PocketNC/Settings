@@ -413,6 +413,15 @@ net estopTriggeredFromUserspace triggerEstop.or.in1
 setp triggerEstopFromUserspace.or.in0 0
 
 ### Interlock ###
+# Due to the hardware configuration chosen for the interlock feature, the logic value of the selected GPIO pin necessarily has opposite values between the following conditions:
+# - A machine without interlock hardware
+# - A machine with interlock hardware, with the interlock closed
+# Ideally they would be the same so that:
+# - The operation of machines without an interlock is not broken
+# - Implementation of logic elsewhere in the software is kept as simple as possible
+# To resolve this, the raw pin input is fed to an AND component. The second input pin of the AND is set to False unless the interlock component is loaded.
+# The output of this AND gate is then consistent between the two listed conditions.
+# (The hardware set up was chosen because it minimizes the number of components used)
 
 net interlockInput [POCKETNC_PINS]INTERLOCK_OPEN_LONG
 net interlockInput interlockOpenAndEnabled.and.in0
@@ -421,7 +430,11 @@ net interlockOpen interlockOpenAndEnabled.and.out
 net interlockOpen interlockOpen.not.in
 net interlockClosed interlockOpen.not.out
 
-# interlock feature binds triggerEstopFromUserspace.or.in0
-# and sets it to True if an exception occurs in the userspace component
+# interlock feature binds the pins triggerEstopFromUserspace.or.in0 and interlockOpenAndEnabled.and.in1
+# triggerEstopFromUserspace.or.in1 is set to True if an exception occurs in the userspace component
 # For other machines, initialize to 0
 setp triggerEstopFromUserspace.or.in1 0
+
+# interlockOpenAndEnabled.and.in1 is set to True if the interlock feature is loaded
+# For other machines, initialize to 0
+setp interlockOpenAndEnabled.and.in1 0
