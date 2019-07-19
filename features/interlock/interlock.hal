@@ -4,6 +4,7 @@ net interlockEnabled <= interlock.feature-enabled
 net interlockEnabled => interlockOpenAndEnabled.and.in1
 
 net interlockClosed => interlock.closed
+net interlockClosed => programStartInterlockCheck.and.in1
 
 net interlockPause <= interlock.pause-prog 
 net interlockPause => pause.or.in1
