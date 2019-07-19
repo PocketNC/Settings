@@ -56,20 +56,20 @@ addf ledBlink.pause.and					servo-thread
 addf estopNotActivated.not			servo-thread
 addf eStopButton.toggle		servo-thread
 addf eStopDrivers.not		servo-thread
+addf doEstop.and	servo-thread
+addf doEstopReset.and	servo-thread
+addf estopButtonPressed.oneshot servo-thread
 addf mPwr.timedelay		servo-thread
 addf mPwr.and			servo-thread
 addf programStart.oneshot	servo-thread
 addf programStartFromPaused.or		servo-thread
-addf triggerEstop.or		servo-thread
-addf triggerEstopFromUserspace.or		servo-thread
 addf programStartFromIdle.and		servo-thread
 addf programStartFromPaused.and		servo-thread
 addf programPause.oneshot	servo-thread
 addf runningIntoPause.and	servo-thread
-addf doEstop.and	servo-thread
-addf doEstopReset.and	servo-thread
-addf estopButtonPressed.oneshot servo-thread
 addf pause.or		servo-thread
+addf triggerEstop.or		servo-thread
+addf triggerEstopFromUserspace.or		servo-thread
 addf interlockOpenAndEnabled.and servo-thread
 addf interlockOpen.not servo-thread
 

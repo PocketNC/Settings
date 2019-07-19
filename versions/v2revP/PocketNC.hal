@@ -25,7 +25,7 @@ loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programSta
 loadrt toggle names=eStopButton.toggle
 loadrt not names=eStopState.not,eStopDrivers.not,interlockOpen.not
 loadrt timedelay names=mPwr.timedelay
-loadrt oneshot names=programStart.oneshot,programPause.oneshot
+loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPressed.oneshot
 loadrt sum2 names=spindleMath
 loadrt scale names=spindleScale
 loadrt limit1 names=spindleLimit
@@ -303,17 +303,46 @@ setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
 net estop-loop			<= iocontrol.0.user-enable-out
 net estop-loop			=> iocontrol.0.emc-enable-in
 
-net eStopToggle	[POCKETNC_PINS]ESTOP_SIGNAL_LONG
-net eStopToggle	eStopButton.toggle.in
+net estopPulse	[POCKETNC_PINS]ESTOP_SIGNAL_LONG
+net estopPulse estopButtonPressed.oneshot.in
+#net eStopToggle	[POCKETNC_PINS]ESTOP_SIGNAL_LONG
+#net eStopToggle	eStopButton.toggle.in
 
-net eStopOn				<= eStopButton.toggle.out
-net eStopOn				=> halui.estop.activate
-net eStopOn				=> eStopState.not.in
-net eStopOff			<= eStopState.not.out
-net eStopOff			=> halui.estop.reset
-net eStopDriversEnable	<= halui.estop.is-activated
-net eStopDriversEnable	=> ledBlink.eStop.and.in1
-net eStopDriversEnable	=>  eStopDrivers.not.in
+setp estopButtonPressed.oneshot.width .1
+
+net estopButtonPushed estopButtonPressed.oneshot.out
+net estopButtonPushed triggerEstop.or.in0
+net estopButtonPushed doEstopReset.and.in0
+
+net estopTriggered triggerEstop.or.out
+net estopTriggered doEstop.and.in0
+
+net estopNotActivated estopNotActivated.not.out
+net estopNotActivated doEstop.and.in1
+
+net estopIsActivated halui.estop.is-activated
+net estopIsActivated estopNotActivated.not.in
+net estopIsActivated doEstopReset.and.in1
+
+net resetEstop doEstopReset.and.out
+net resetEstop halui.estop.reset
+
+net activateEstop doEstop.and.out
+net activateEstop halui.estop.activate
+
+net estopIsActivated halui.estop.is-activated
+net estopIsActivated ledBlink.eStop.and.in1
+net estopIsActivated eStopDrivers.not.in
+
+
+#net eStopOn				<= eStopButton.toggle.out
+#net eStopOn				=> halui.estop.activate
+#net eStopOn				=> eStopState.not.in
+#net eStopOff			<= eStopState.not.out
+#net eStopOff			=> halui.estop.reset
+#net eStopDriversEnable	<= halui.estop.is-activated
+#net eStopDriversEnable	=> ledBlink.eStop.and.in1
+#net eStopDriversEnable	=>  eStopDrivers.not.in
 
 
 # Machine power
