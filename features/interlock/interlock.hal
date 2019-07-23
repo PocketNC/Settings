@@ -1,18 +1,50 @@
 loadusr -Wn interlock ./features/interlock/interlock.py
 
-net interlockEnabled <= interlock.feature-enabled
-net interlockEnabled => interlockOpenAndEnabled.and.in1
-
+net interlockOpen <= [POCKETNC_PINS]INTERLOCK_OPEN_LONG
+net interlockOpen => interlockOpen.not.in
+net interlockClosed <= interlockOpen.not.out
 net interlockClosed => interlock.closed
-net interlockClosed => programStartInterlockCheck.and.in1
 
-net interlockPause <= interlock.pause-prog 
-net interlockPause => pause.or.in1
+net interlockClosed => interlockClosedAndReleased.and.in0
+net interlockReleased <= interlock.program-paused-by-interlock.not
+net interlockReleased => interlockClosedAndReleased.and.in1
 
-net inhibitSpindle <= interlock.spindle-inhibit
-net inhibitSpindle => motion.spindle-inhibit
+net interlockPause <= interlock.pause-program
+net interlockPause => pauseFromButtonOrInterlock.or.in1
 
-net progStarted => interlock.prog-running
+# unlink programStart.oneshot.out from progStart so that we can:
+# - suppress the signal if the interlock is open
+# - divert the signal to the component if resuming after the interlock was open
+unlinkp programStart.oneshot.out
+
+net progStartButtonPulse <= programStart.oneshot.out
+net progStartButtonPulse => startButtonInterlockCheck.and.in0
+
+net interlockCheckOk <= interlockClosedAndReleased.and.out
+net interlockCheckOk => startButtonInterlockCheck.and.in1
+
+net progStart <= startButtonInterlockCheck.and.out
+
+net progStartButtonPulse => interlock.start-button-pulse
+
+
+# unlink halui.program.resume from progStartFromPaused so that we can add an OR gate
+# to allow the interlock component to resume programs upon presses of the start button
+unlinkp halui.program.resume
+net progStartFromPaused => startFromButtonOrInterlock.or.in0
+
+net interlockResume <= interlock.resume-program
+net interlockResume => startFromButtonOrInterlock.or.in1
+
+net resumeProgram <= startFromButtonOrInterlock.or.out
+net resumeProgram => halui.program.resume
+
+
+### IN pins reporting machine state ###
+net currentVel <= motion.current-vel
+net currentVel => interlock.current-vel
+
+net progStarted => interlock.program-running
 net progStartPaused => interlock.program-is-paused
 
 net isSpindleOn <= halui.spindle.is-on
@@ -20,6 +52,17 @@ net isSpindleOn => interlock.spindle-is-on
 
 net isModeMdi <= halui.mode.is-mdi
 net isModeMdi => interlock.mode-is-mdi
+
+
+### OUT pins that change machine state ###
+net inhibitSpindle <= interlock.spindle-inhibit
+net inhibitSpindle => motion.spindle-inhibit
+
+net inhibitFeed <= interlock.feed-inhibit
+net inhibitFeed => motion.feed-inhibit
+
+net spindleStop <= interlock.spindle-stop
+net spindleStop => halui.spindle.stop
 
 net interlockException <= interlock.exception
 net interlockException => triggerEstopFromUserspace.or.in1

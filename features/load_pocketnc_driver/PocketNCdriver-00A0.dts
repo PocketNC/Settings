@@ -67,7 +67,7 @@
           0x154   0x37 /* P9.21   85      Interlock */
 					0x150   0x37 /* P9.22   84      Probe sig */
 					0x044   0x07 /* P9.23   17      Y Step */
-					0x184   0x37 /* P9.24   97      Spindle On */
+					0x184   0x17 /* P9.24   97      Spindle On */
 					0x1a4   0x07 /* P9.27   105     X Step  */
 					0x19c   0x07 /* P9.28   103     A Dir */
 					0x194   0x07 /* P9.29   101     X Dir */
