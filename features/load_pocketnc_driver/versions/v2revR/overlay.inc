@@ -58,6 +58,10 @@ A_LIMIT_SHORT=216
 A_LIMIT_LONG=bb_gpio.p9.in-16
 A_LIMIT_INVERT=bb_gpio.p9.in-16.invert 1
 
+INTERLOCK_OPEN_SHORT=221
+INTERLOCK_OPEN_LONG=bb_gpio.p9.in-21
+INTERLOCK_OPEN_INVERT=bb_gpio.p9.in-21.invert 1
+
 PROBE_SIGNAL_SHORT=222
 PROBE_SIGNAL_LONG=bb_gpio.p9.in-22
 PROBE_SIGNAL_INVERT=bb_gpio.p9.in-22.invert 1
@@ -67,3 +71,6 @@ SPINDLE_ON_LONG=bb_gpio.p9.out-24
 SPINDLE_ON_INVERT=bb_gpio.p9.out-24.invert 0
 
 SPINDLE_CLOCK_PIN=P8_8
+
+
+
