@@ -312,8 +312,6 @@ net estop-loop			=> iocontrol.0.emc-enable-in
 
 net estopPulse	[POCKETNC_PINS]ESTOP_SIGNAL_LONG
 net estopPulse estopButtonPressed.oneshot.in
-#net eStopToggle	[POCKETNC_PINS]ESTOP_SIGNAL_LONG
-#net eStopToggle	eStopButton.toggle.in
 
 setp estopButtonPressed.oneshot.width .1
 
@@ -340,16 +338,6 @@ net activateEstop halui.estop.activate
 net estopIsActivated halui.estop.is-activated
 net estopIsActivated ledBlink.eStop.and.in1
 net estopIsActivated eStopDrivers.not.in
-
-
-#net eStopOn				<= eStopButton.toggle.out
-#net eStopOn				=> halui.estop.activate
-#net eStopOn				=> eStopState.not.in
-#net eStopOff			<= eStopState.not.out
-#net eStopOff			=> halui.estop.reset
-#net eStopDriversEnable	<= halui.estop.is-activated
-#net eStopDriversEnable	=> ledBlink.eStop.and.in1
-#net eStopDriversEnable	=>  eStopDrivers.not.in
 
 
 # Machine power
