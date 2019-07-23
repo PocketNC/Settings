@@ -63,9 +63,9 @@ done <<- EOF
 	50	out	# p9.14		gpio1.18	Start LED
 	48	out	# p9.15		gpio1.16	Y Dir
 	51	in	# p9.16		gpio1.19	A Limit
-	5	  in	# p9.17	  gpio0.5		Unused
-  3   in  # p9.21   gpio0.3   Interlock
-	2	  in	# p9.22		gpio0.2		Probe Signal
+	5		in	# p9.17		gpio0.5		Unused
+	3		in	# p9.21		gpio0.3		Interlock
+	2		in	# p9.22		gpio0.2		Probe Signal
 	49	out	# p9.23		gpio1.17	Y Step
 	15	out	# P9.24		gpio0.15	Spindle On
 	115	out	# P9.27		gpio3.19	X Step
