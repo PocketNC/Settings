@@ -5,11 +5,15 @@ net progStartPaused hss_warmup.program_paused
 
 net spindleEnable hss_warmup.spindle_on
 
-net hssAborted hss_warmup.abort
+net hssWarmupAbort hss_warmup.abort
+net hssWarmupAbort pauseHssWarmupOrSensors.or.in0
 
 loadusr -Wn hss_sensors ./features/high_speed_spindle/hss_sensors.py
 
 net spindleEnable hss_sensors.spindle_on
-net hssAborted hss_sensors.abort
-net hssAborted triggerEstopFromUserspace.or.in0
 
+net hssSensorsAbort hss_sensors.abort
+net hssSensorsAbort pauseHssWarmupOrSensors.or.in1
+
+net hssAborted pauseHssWarmupOrSensors.or.out
+net hssAborted triggerEstopFromUserspace.or.in0

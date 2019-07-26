@@ -59,7 +59,7 @@ def readPressure():
   except:
     return SENSOR_READ_FAIL_VALUE
 
-#Returns temperature reading in degrees Celsius
+# Returns temperature reading in degrees Celsius
 def readTemperature():
   try:
     i2c = None
@@ -105,26 +105,30 @@ h = hal.component("hss_sensors")
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 
 # set to true when an E Stop should occur
-h.newpin("abort", hal.HAL_BIT, hal.HAL_IO)
+h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
 h['abort'] = False
 
 h.newpin('pressure', hal.HAL_FLOAT, hal.HAL_OUT)
 h['pressure'] = readPressure()
-h.newpin('p_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['p_abort'] = False
 h.newpin('p_detected', hal.HAL_BIT, hal.HAL_OUT)
 h['p_detected'] = (h['pressure'] != SENSOR_READ_FAIL_VALUE)
-h.newpin('p_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['p_detect_abort'] = not h['p_detected']
-
 h.newpin('temperature', hal.HAL_FLOAT, hal.HAL_OUT)
 h['temperature'] = readTemperature()
-h.newpin('t_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['t_abort'] = False
 h.newpin('t_detected', hal.HAL_BIT, hal.HAL_OUT)
 h['t_detected'] = (h['temperature'] != SENSOR_READ_FAIL_VALUE)
+
+# set to true if aborting due to low pressure
+h.newpin('p_abort', hal.HAL_BIT, hal.HAL_OUT)
+h['p_abort'] = False
+# set to true if aborting because the pressure sensor is not detected
+h.newpin('p_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
+h['p_detect_abort'] = False
+# set to true if aborting due to temperature reading outside bounds
+h.newpin('t_abort', hal.HAL_BIT, hal.HAL_OUT)
+h['t_abort'] = False
+# set to true if aborting because the temperature sensor is not detected
 h.newpin('t_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['t_detect_abort'] = not h['t_detected']
+h['t_detect_abort'] = False
 
 h.ready()
 
