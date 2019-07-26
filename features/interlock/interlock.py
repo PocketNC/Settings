@@ -52,9 +52,7 @@ try:
       h['pause-program'] = False
       h['resume-program'] = False
       h['spindle-stop'] = False
-      h['pause-alert'] = False
       h['exception'] = False
-      h['exception-alert'] = False
       h['program-paused-by-interlock.not'] =  not h['program-paused-by-interlock']
 
       if not ( h['program-is-paused'] or ( h['mode-is-mdi'] and h['spindle-is-on'] ) ):
