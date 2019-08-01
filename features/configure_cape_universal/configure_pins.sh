@@ -33,6 +33,7 @@ P9.16   in+     # A Limit
 P9.17   in+     # Unused
 P9.19   i2c     # I2C SCL
 P9.20   i2c     # I2C SDA
+P9.21   in+     # Interlock Open
 P9.22   in+     # Probe Signal
 P9.23   out-    # Y Step
 P9.24   out+    # Spindle On
