@@ -3,9 +3,6 @@
 import hal
 import os
 import time
-import logging
-
-logging.basicConfig(filename='/var/log/hal.log',format='%(asctime)sZ pid:%(process)s module:%(module)s %(message)s', level=logging.ERROR)
 
 pauseAlertIssued = False
 waitForSpindlePeriod = 2 # How long to wait for spindle to spin up before resuming motion
@@ -22,14 +19,21 @@ h.newpin('start-button-pulse', hal.HAL_BIT, hal.HAL_IN)
 
 h.newpin('release', hal.HAL_BIT, hal.HAL_IO)
 
+#Set to TRUE to pause a program. Rising edge signal, so must be False before True to have effect
 h.newpin('pause-program', hal.HAL_BIT, hal.HAL_OUT)
+#Set to TRUE to resume a program. Rising edge signal, so must be False before True to have effect
 h.newpin('resume-program', hal.HAL_BIT, hal.HAL_OUT)
+#Connects to motion.spindle-inhibit. Prevents all spindle motion while TRUE
 h.newpin('spindle-inhibit', hal.HAL_BIT, hal.HAL_OUT)
+#Connects to motion.feed-inhibit. Prevents all axis motion while TRUE
 h.newpin('feed-inhibit', hal.HAL_BIT, hal.HAL_OUT)
+#Connects to halui.spindle.stop pin. Only used in the situation where the spindle is turning but no program is active(i.e. running or paused)
 h.newpin('spindle-stop', hal.HAL_BIT, hal.HAL_OUT)
-h.newpin('program-paused-by-interlock', hal.HAL_BIT, hal.HAL_OUT)
+#Goes TRUE if a program is active and the interlock is opened. Then remains TRUE until the program is terminated
+#or the interlock is closed and h['release'] is set to TRUEh.newpin('program-paused-by-interlock', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('program-paused-by-interlock.not', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('pause-alert', hal.HAL_BIT, hal.HAL_OUT)
+#Triggers an E-Stop
 h.newpin('exception', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('exception-alert', hal.HAL_BIT, hal.HAL_OUT)
 
@@ -118,7 +122,6 @@ try:
 
     except Exception as e:
       print 'Exception in interlock component: %s' % (e)
-      logging.error(e)
       h['exception'] = True
       h['exception-alert'] = True
     time.sleep(.01)
