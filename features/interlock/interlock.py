@@ -27,12 +27,18 @@ h.newpin('resume-program', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('spindle-inhibit', hal.HAL_BIT, hal.HAL_OUT)
 #Connects to motion.feed-inhibit. Prevents all axis motion while TRUE
 h.newpin('feed-inhibit', hal.HAL_BIT, hal.HAL_OUT)
+
 #Connects to halui.spindle.stop pin. Only used in the situation where the spindle is turning but no program is active(i.e. running or paused)
 h.newpin('spindle-stop', hal.HAL_BIT, hal.HAL_OUT)
+#Set TRUE to issue an alert that the spindle has been stopped. Only used in the situation where the spindle is turning but no program is active.
+h.newpin('spindle-stop-alert', hal.HAL_BIT, hal.HAL_OUT)
+
 #Goes TRUE if a program is active and the interlock is opened. Then remains TRUE until the program is terminated
-#or the interlock is closed and h['release'] is set to TRUEh.newpin('program-paused-by-interlock', hal.HAL_BIT, hal.HAL_OUT)
+#or the interlock is closed and h['release'] is set to TRUE
+h.newpin('program-paused-by-interlock', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('program-paused-by-interlock.not', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('pause-alert', hal.HAL_BIT, hal.HAL_OUT)
+
 #Triggers an E-Stop
 h.newpin('exception', hal.HAL_BIT, hal.HAL_OUT)
 h.newpin('exception-alert', hal.HAL_BIT, hal.HAL_OUT)
@@ -42,6 +48,7 @@ h['resume-program'] = False
 h['spindle-inhibit'] = False
 h['feed-inhibit'] = False
 h['spindle-stop'] = False
+h['spindle-stop-alert'] = False
 h['program-paused-by-interlock'] = False
 h['program-paused-by-interlock.not'] = True
 h['pause-alert'] = False
@@ -114,8 +121,10 @@ try:
           #once Rockhopper has issued alert, be ready to issue alert again in case an attempt is made to start a program without first closing the interlock
           pauseAlertIssued = h['pause-alert']
         elif h['spindle-is-on']:
-          #This propagates through to halui.spindle-stop, and is necessary to prevent the spindle from resuming automatically when interlock closes
+          #This propagates through to halui.spindle.stop
+          #If the spindle is on, but the interpreter is idle (not paused or running), then this is necessary to prevent the spindle from resuming automatically when the interlock closes.
           h['spindle-stop'] = True
+          h['spindle-stop-alert'] = True
 
         h['spindle-inhibit'] = True
         h['release'] = False
