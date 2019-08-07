@@ -5,6 +5,7 @@ import os
 import time
 
 pauseAlertIssued = False
+spindlePauseAlertIssued = False
 waitForSpindlePeriod = 2 # How long to wait for spindle to spin up before resuming motion
 
 h = hal.component('interlock')
@@ -12,7 +13,8 @@ h = hal.component('interlock')
 h.newpin('closed', hal.HAL_BIT, hal.HAL_IN)
 h.newpin('program-running', hal.HAL_BIT, hal.HAL_IN)
 h.newpin('program-is-paused', hal.HAL_BIT, hal.HAL_IN)
-h.newpin('spindle-is-on', hal.HAL_BIT, hal.HAL_IN)
+h.newpin('spindle-is-enabled', hal.HAL_BIT, hal.HAL_IN)
+h.newpin('spindle-is-turning', hal.HAL_BIT, hal.HAL_IN)
 h.newpin('mode-is-mdi', hal.HAL_BIT, hal.HAL_IN)
 h.newpin('current-vel', hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin('start-button-pulse', hal.HAL_BIT, hal.HAL_IN)
@@ -66,7 +68,7 @@ try:
       h['exception'] = False
       h['program-paused-by-interlock.not'] =  not h['program-paused-by-interlock']
 
-      if not ( h['program-is-paused'] or ( h['mode-is-mdi'] and h['spindle-is-on'] ) ):
+      if not ( h['program-is-paused'] or ( h['mode-is-mdi'] and h['spindle-is-enabled'] ) ):
           h['program-paused-by-interlock'] = False
           h['feed-inhibit'] = False
 
@@ -102,6 +104,7 @@ try:
             time.sleep(.001)
 
         pauseAlertIssued = False
+        spindlePauseAlertIssued = False
       else:
         if h['program-running']:
           h['pause-program'] = True
@@ -113,6 +116,9 @@ try:
             pauseAlertIssued = True
             h['pause-alert'] = True
         elif h['program-is-paused']:
+          if h['spindle-is-turning'] and not spindlePauseAlertIssued:
+            spindlePauseAlertIssued = True
+            h['spindle-stop-alert'] = True
           # We do want to set feed-inhibit and program-paused-by-interlock True here, because the program could already be paused when the interlock is opened
           h['feed-inhibit'] = True
           h['program-paused-by-interlock'] = True
@@ -120,9 +126,8 @@ try:
           h['pause-program'] = False
           #once Rockhopper has issued alert, be ready to issue alert again in case an attempt is made to start a program without first closing the interlock
           pauseAlertIssued = h['pause-alert']
-        elif h['spindle-is-on']:
-          #This propagates through to halui.spindle.stop
-          #If the spindle is on, but the interpreter is idle (not paused or running), then this is necessary to prevent the spindle from resuming automatically when the interlock closes.
+        elif h['spindle-is-enabled']:
+          #If the spindle is on, but the interpreter is idle (not paused or running), then this stop is necessary to ensure the spindle does not resume immediately upon closing the interlock.
           h['spindle-stop'] = True
           h['spindle-stop-alert'] = True
 
