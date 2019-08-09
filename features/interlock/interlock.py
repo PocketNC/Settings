@@ -6,7 +6,7 @@ import time
 
 pauseAlertIssued = False
 spindlePauseAlertIssued = False
-waitForSpindlePeriod = 2 # How long to wait for spindle to spin up before resuming motion
+waitForSpindlePeriod = 3 # How long to wait for spindle to spin up before resuming motion
 
 h = hal.component('interlock')
 
