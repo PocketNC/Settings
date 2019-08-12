@@ -21,8 +21,13 @@ loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
-loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and,doEstop.and,doEstopReset.and,startButtonInterlockCheck.and,interlockClosedAndReleased.and
-loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,triggerEstop.or,triggerEstopFromUserspace.or,pauseFromButtonOrInterlock.or,startFromButtonOrInterlock.or
+loadrt and2 names=ledBlink.eStop.and,ledBlink.mPwr.and,ledBlink.pause.and,mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and,doEstop.and,doEstopReset.and
+newinst and2 startButtonInterlockCheck.and
+newinst and2 interlockClosedAndReleased.and
+loadrt or2 names=ledBlink.eStop.or,ledBlink.mPwr.or,ledBlink.pause.or,programStartFromPaused.or,triggerEstop.or
+newinst or2 triggerEstopFromUserspace.or
+newinst or2 pauseFromButtonOrInterlock.or
+newinst or2 startFromButtonOrInterlock.or
 loadrt toggle names=eStopButton.toggle
 loadrt not names=estopNotActivated.not,eStopDrivers.not,interlockOpen.not
 loadrt timedelay names=mPwr.timedelay
