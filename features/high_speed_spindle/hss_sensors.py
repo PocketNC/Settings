@@ -36,7 +36,7 @@ def readPressure():
     i2c = None
     try:
       from Adafruit_GPIO.I2C import Device
-      i2c = Device(MPRLS_I2CADDR, 0)
+      i2c = Device(MPRLS_I2CADDR, 2)
     except:
       from Adafruit_I2C import Adafruit_I2C
       i2c = Adafruit_I2C(MPRLS_I2CADDR, 1)
@@ -65,7 +65,7 @@ def readTemperature():
     i2c = None
     try:
       from Adafruit_GPIO.I2C import Device
-      i2c = Device(MCP9808_I2CADDR, 0)
+      i2c = Device(MCP9808_I2CADDR, 2)
     except:
       from Adafruit_I2C import Adafruit_I2C
       i2c = Adafruit_I2C(MCP9808_I2CADDR, 1)
@@ -74,18 +74,27 @@ def readTemperature():
     result = i2c.write16(MCP9808_REG_CONFIG, 0x0)
     if result is not None:
       return SENSOR_READ_FAIL_VALUE
-  
+
     # Set resolution
     i2c.write8(MCP9808_REG_RESOLUTION, 0x03)
-  
+
     # Wake up
-    conf_reg = i2c.reverseByteOrder(i2c.readU16(MCP9808_REG_CONFIG))
+    conf_reg = None
+    try:
+      conf_reg = (i2c.readU16BE(MCP9808_REG_CONFIG))
+    except:
+      conf_reg = i2c.reverseByteOrder(i2c.readU16(MCP9808_REG_CONFIG))
+
     conf_wake = conf_reg & ~MCP9808_REG_CONFIG_SHUTDOWN
     i2c.write16(MCP9808_REG_CONFIG, conf_wake)
     time.sleep(0.250)
     
     # Read
-    raw = i2c.reverseByteOrder(i2c.readU16(MCP9808_REG_AMBIENT_TEMP))
+    raw = None
+    try:
+      raw = (i2c.readU16BE(MCP9808_REG_AMBIENT_TEMP))
+    except:
+      raw = i2c.reverseByteOrder(i2c.readU16(MCP9808_REG_AMBIENT_TEMP))
     temp = raw & 0x0FFF
     temp /= 16.0
     if (raw & 0x1000):

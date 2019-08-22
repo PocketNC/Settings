@@ -47,8 +47,11 @@ net currentVel => interlock.current-vel
 net progStarted => interlock.program-running
 net progStartPaused => interlock.program-is-paused
 
-net isSpindleOn <= halui.spindle.is-on
-net isSpindleOn => interlock.spindle-is-on
+net isSpindleEnabled <= halui.spindle.is-on
+net isSpindleEnabled => interlock.spindle-is-enabled
+
+# sig spindleEnable is set by motion.spindle-on, which appears to only be true when the spindle is actually moving (it goes false when the spindle override rate is set to 0%)
+net spindleEnable => interlock.spindle-is-turning
 
 net isModeMdi <= halui.mode.is-mdi
 net isModeMdi => interlock.mode-is-mdi
