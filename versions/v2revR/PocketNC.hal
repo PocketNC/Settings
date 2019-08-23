@@ -69,6 +69,7 @@ addf programPause.oneshot	servo-thread
 addf runningIntoPause.and	servo-thread
 addf triggerEstop.or		servo-thread
 addf triggerEstopFromUserspace.or		servo-thread
+addf pauseHssWarmupOrSensors.or		servo-thread
 addf pauseFromButtonOrInterlock.or		servo-thread
 addf startButtonInterlockCheck.and servo-thread
 addf startFromButtonOrInterlock.or servo-thread

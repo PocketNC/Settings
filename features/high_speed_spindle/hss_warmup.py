@@ -57,6 +57,7 @@ lastSpindleOff = datetime.datetime.strptime(readLastSpindleOffFromDisk(), "%Y-%m
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("program_running", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("program_paused", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("completed_warmup", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("performing_warmup", hal.HAL_BIT, hal.HAL_IO)
 h.newpin("performing_full_warmup", hal.HAL_BIT, hal.HAL_IO)
 
@@ -67,7 +68,7 @@ h.newpin("warmup_needed", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("full_warmup_needed", hal.HAL_BIT, hal.HAL_OUT)
 
 # set to true when an E Stop should occur
-h.newpin("abort", hal.HAL_BIT, hal.HAL_IO)
+h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
 
 # set to true when aborted and reset by rockhopper after
 # the error has been reported
@@ -83,11 +84,12 @@ h.ready()
 
 try:
   while True:
-    if lastSpindleOn and not h['spindle_on'] and not h['performing_warmup'] and not abort:
+    if ( h['completed_warmup'] or not h['warmup_needed'] ) and lastSpindleOn and not h['spindle_on']:
       # if we turned the spindle off, record the current time
       # unless we cancelled the warm up sequence or someone tried to turn on the
       # spindle without warming up
       recordSpindleOff();
+      h['completed_warmup'] = False
 
     h['warmup_needed'] = checkWarmupNeeded()
     h['full_warmup_needed'] = checkFullWarmupNeeded()

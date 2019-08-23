@@ -30,7 +30,7 @@ HIGH_TEMP_CUTOFF = 48
 #Value returned by sensor read methods if the read fails
 SENSOR_READ_FAIL_VALUE = -999
 
-# Reads pressure in MPa
+# Returns pressure reading in MPa
 def readPressure():
   try:
     i2c = None
@@ -59,7 +59,7 @@ def readPressure():
   except:
     return SENSOR_READ_FAIL_VALUE
 
-#Returns temperature reading in degrees Celsius
+# Returns temperature reading in degrees Celsius
 def readTemperature():
   try:
     i2c = None
@@ -111,51 +111,64 @@ def readTemperature():
 print "Initializing hss_sensors!"
 h = hal.component("hss_sensors")
 
-h.newpin("detected", hal.HAL_BIT, hal.HAL_OUT)
-h['detected'] = (readPressure() != SENSOR_READ_FAIL_VALUE)
-
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
 
 # set to true when an E Stop should occur
-h.newpin("abort", hal.HAL_BIT, hal.HAL_IO)
+h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
 h['abort'] = False
 
-h.newpin("pressure", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin('pressure', hal.HAL_FLOAT, hal.HAL_OUT)
 h['pressure'] = readPressure()
-h.newpin("p_abort", hal.HAL_BIT, hal.HAL_OUT)
-h['p_abort'] = False
-
-h.newpin("temperature", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin('p_detected', hal.HAL_BIT, hal.HAL_OUT)
+h['p_detected'] = (h['pressure'] != SENSOR_READ_FAIL_VALUE)
+h.newpin('temperature', hal.HAL_FLOAT, hal.HAL_OUT)
 h['temperature'] = readTemperature()
-h.newpin("t_abort", hal.HAL_BIT, hal.HAL_OUT)
+h.newpin('t_detected', hal.HAL_BIT, hal.HAL_OUT)
+h['t_detected'] = (h['temperature'] != SENSOR_READ_FAIL_VALUE)
+
+# set to true if aborting due to low pressure
+h.newpin('p_abort', hal.HAL_BIT, hal.HAL_OUT)
+h['p_abort'] = False
+# set to true if aborting because the pressure sensor is not detected
+h.newpin('p_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
+h['p_detect_abort'] = False
+# set to true if aborting due to temperature reading outside bounds
+h.newpin('t_abort', hal.HAL_BIT, hal.HAL_OUT)
 h['t_abort'] = False
+# set to true if aborting because the temperature sensor is not detected
+h.newpin('t_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
+h['t_detect_abort'] = False
 
 h.ready()
 
 abort = False
 
+
 try:
   while True:
-    if h['detected']:
-      h['temperature'] = readTemperature()
-      h['pressure'] = readPressure()
-      abort = False
-      if h['spindle_on']:
-        if h['pressure'] < LOW_PRESSURE_CUTOFF:
-          h['p_abort'] = True 
-          abort = True    
-        
-        temperature = h['temperature'] 
-        if temperature < LOW_TEMP_CUTOFF or temperature > HIGH_TEMP_CUTOFF:
-          h['t_abort'] = True 
-          abort = True
+    h['pressure'] = readPressure()
+    h['p_detected'] = (h['pressure'] != SENSOR_READ_FAIL_VALUE)
+    h['temperature'] = readTemperature()
+    h['t_detected'] = (h['temperature'] != SENSOR_READ_FAIL_VALUE)
+    abort = False
+    if h['spindle_on']:
+      if not h['p_detected']:
+        h['p_detect_abort'] = True
+        abort = True
+      elif h['pressure'] < LOW_PRESSURE_CUTOFF:
+        h['p_abort'] = True 
+        abort = True    
       
-      h['abort'] = abort
+      if not h['t_detected']:
+        h['t_detect_abort'] = True
+        abort = True
+      elif h['temperature']  < LOW_TEMP_CUTOFF or h['temperature']  > HIGH_TEMP_CUTOFF:
+        h['t_abort'] = True 
+        abort = True
+    
+    h['abort'] = abort
 
-      time.sleep(1)
-    else:
-      time.sleep(10)
-      h['detected'] = (readPressure() != SENSOR_READ_FAIL_VALUE)
+    time.sleep(1)
 
 except KeyboardInterrupt:
   raise SystemExit
