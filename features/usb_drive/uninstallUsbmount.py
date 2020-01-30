@@ -20,8 +20,14 @@ def toIntOrString(text):
 def natural_keys(text):
     return [ toIntOrString(c) for c in re.split('[v.-]', text) ]
 
-
 if natural_keys(v) < natural_keys("v4.3.0"):
     removalCommand = "sudo apt-get --purge -y remove usbmount"    
-    p = subprocess.Popen(removalCommand.split(), stderr=subprocess.PIPE, stdout=subprocess.PIPE )
-    
+    p = subprocess.Popen( removalCommand.split() )
+  
+    kernelCheckCommand = "uname -r"
+    p = subprocess.Popen( kernelCheckCommand.split(), stdout=subprocess.PIPE)
+    if '4.19.59' in p.stdout.read():
+      removalCommand = "sudo apt-get --purge -y remove lockfile-progs"
+      p = subprocess.Popen( removalCommand.split() )
+
+
