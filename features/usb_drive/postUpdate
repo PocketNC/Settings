@@ -3,7 +3,7 @@
 if dpkg-query -W lockfile-progs; then
   echo 'lockfile-progs already installed'
 else
-  sudo dpkg -i ~/pocketnc/Settings/features/usb_drive/lockfile-progs_0.1.17+b1_armhf.deb
+  sudo dpkg -i /home/pocketnc/pocketnc/Settings/features/usb_drive/lockfile-progs_0.1.17+b1_armhf.deb
   sudo apt-get install -f
 fi
 
@@ -11,9 +11,9 @@ if dpkg-query -W usbmount; then
   echo 'usbmount already installed'
 else
   if uname -r | grep 3.8-1; then
-    sudo dpkg -i ~/pocketnc/Settings/features/usb_drive/usbmount_0.0.22_all.deb
+    sudo dpkg -i /home/pocketnc/pocketnc/Settings/features/usb_drive/usbmount_0.0.22_all.deb
   else
-    sudo dpkg -i ~/pocketnc/Settings/features/usb_drive/usbmount_0.0.24_all.deb
+    sudo dpkg -i /home/pocketnc/pocketnc/Settings/features/usb_drive/usbmount_0.0.24_all.deb
   fi
   sudo apt-get install -f
 fi
