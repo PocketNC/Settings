@@ -1,5 +1,19 @@
 #!/bin/bash
 
+if dpkg-query -W liblockfile-bin; then
+  echo 'liblockfile-bin alread installed'
+else
+  sudo dpkg -i /home/pocketnc/pocketnc/Settings/features/usb_drive/liblockfile-bin_1.16-1.1_armhf.deb
+  sudo apt-get install -f
+fi
+
+if dpkg-query -W liblockfile1; then
+  echo 'liblockfile1 already installed'
+else
+  sudo dpkg -i /home/pocketnc/pocketnc/Settings/features/usb_drive/liblockfile1_1.16-1.1_armhf.deb
+  sudo apt-get install -f
+fi
+
 if dpkg-query -W lockfile-progs; then
   echo 'lockfile-progs already installed'
 else
