@@ -37,6 +37,8 @@ P9.21   in+     # Interlock Open
 P9.22   in+     # Probe Signal
 P9.23   out-    # Y Step
 P9.24   out+    # Spindle On
+P9.25   in+     # X HLFB
+P9.26   in+     # Z HLFB
 P9.27   out-    # X Step
 P9.28   out-    # A Dir
 P9.29   out-    # X Dir
