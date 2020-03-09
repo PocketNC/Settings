@@ -41,7 +41,7 @@ if spindleClockPinParam:
   GPIO.setup(spindleClockPinParam["values"]["value"], GPIO.IN)
   GPIO.add_event_detect(spindleClockPinParam["values"]["value"], GPIO.RISING, countPulses)
 
-h = hal.component("spindle_voltage")
+h = hal.component("spindle_speed")
 h.newpin("speed_in", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("speed_measured", hal.HAL_FLOAT, hal.HAL_OUT)
 h.ready()

@@ -1,7 +1,7 @@
 # Start script to monitor spindle speed commands
 # so that it can issue i2c commands to change the
 # voltage.
-loadusr -W ./spindle_voltage.py
+loadusr -Wn spindle_speed ./spindle_speed_pwm.py
 
 # ###################################
 # Core EMC/HAL Loads
@@ -288,21 +288,21 @@ net tool-change-loop	=> iocontrol.0.tool-changed
 ### Home and Limit switches ###
 # X axis
 #
-#net XmaxAndHome	[POCKETNC_PINS]X_LIMIT_LONG
-#net XmaxAndHome	axis.0.home-sw-in
-#setp [POCKETNC_PINS]X_LIMIT_INVERT
+net XmaxAndHome	[POCKETNC_PINS]X_LIMIT_LONG
+net XmaxAndHome	axis.0.home-sw-in
+setp [POCKETNC_PINS]X_LIMIT_INVERT
 
-net XHomingDelay xHoming.timedelay.in
-net XHomingDelay axis.0.homing
+#net XHomingDelay xHoming.timedelay.in
+#net XHomingDelay axis.0.homing
 
-net XHomingAndHLFB1 [POCKETNC_PINS]X_HLFB_LONG
-net XHomingAndHLFB1 xHoming.and.in0
+#net XHomingAndHLFB1 [POCKETNC_PINS]X_HLFB_LONG
+#net XHomingAndHLFB1 xHoming.and.in0
 
-net XHomingAndHLFB2 xHoming.timedelay.out
-net XHomingAndHLFB2 xHoming.and.in1
+#net XHomingAndHLFB2 xHoming.timedelay.out
+#net XHomingAndHLFB2 xHoming.and.in1
 
-net XmaxAndHome xHoming.and.out
-net XmaxAndHome axis.0.home-sw-in
+#net XmaxAndHome xHoming.and.out
+#net XmaxAndHome axis.0.home-sw-in
 
 # Y axis
 net YmaxAndHome	[POCKETNC_PINS]Y_LIMIT_LONG
@@ -310,17 +310,20 @@ net YmaxAndHome	axis.1.home-sw-in
 setp [POCKETNC_PINS]Y_LIMIT_INVERT
 
 # Z axis
-net ZHomingDelay zHoming.timedelay.in
-net ZHomingDelay axis.2.homing
-
-net ZHomingAndHLFB1 [POCKETNC_PINS]Z_HLFB_LONG
-net ZHomingAndHLFB1 zHoming.and.in0
-
-net ZHomingAndHLFB2 zHoming.timedelay.out
-net ZHomingAndHLFB2 zHoming.and.in1
-
-net ZmaxAndHome zHoming.and.out
-net ZmaxAndHome axis.2.home-sw-in
+net ZmaxAndHome	[POCKETNC_PINS]Z_LIMIT_LONG
+net ZmaxAndHome	axis.2.home-sw-in
+setp [POCKETNC_PINS]Z_LIMIT_INVERT
+#net ZHomingDelay zHoming.timedelay.in
+#net ZHomingDelay axis.2.homing
+#
+#net ZHomingAndHLFB1 [POCKETNC_PINS]Z_HLFB_LONG
+#net ZHomingAndHLFB1 zHoming.and.in0
+#
+#net ZHomingAndHLFB2 zHoming.timedelay.out
+#net ZHomingAndHLFB2 zHoming.and.in1
+#
+#net ZmaxAndHome zHoming.and.out
+#net ZmaxAndHome axis.2.home-sw-in
 
 
 # A Axis Limit
@@ -437,9 +440,9 @@ net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
 net displaySpindleReverseButton	motion.spindle-reverse
 net spindleSpeedDummy motion.spindle-speed-out
 net spindleSpeed motion.spindle-speed-out-abs
-net spindleSpeed spindle_voltage.speed_in
+net spindleSpeed spindle_speed.speed_in
 
-net spindleSpeedMeasured spindle_voltage.speed_measured
+net spindleSpeedMeasured spindle_speed.speed_measured
 
 # ##################################################
 # Features

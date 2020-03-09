@@ -1,7 +1,7 @@
 # Start script to monitor spindle speed commands
 # so that it can issue i2c commands to change the
 # voltage.
-loadusr -W ./spindle_voltage.py
+loadusr -Wn spindle_speed ./spindle_speed_voltage.py
 
 # ###################################
 # Core EMC/HAL Loads
@@ -398,9 +398,9 @@ net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
 net displaySpindleReverseButton	motion.spindle-reverse
 net spindleSpeedDummy motion.spindle-speed-out
 net spindleSpeed motion.spindle-speed-out-abs
-net spindleSpeed spindle_voltage.speed_in
+net spindleSpeed spindle_speed.speed_in
 
-net spindleSpeedMeasured spindle_voltage.speed_measured
+net spindleSpeedMeasured spindle_speed.speed_measured
 
 # ##################################################
 # Features

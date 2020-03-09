@@ -1,6 +1,6 @@
-# Create a dummy spindle_voltage component so we can assume it's there on 
+# Create a dummy spindle_speed component so we can assume it's there on 
 # old machines that don't actually use it.
-loadusr -Wn spindle_voltage ./spindle_voltage_dummy.py
+loadusr -Wn spindle_speed ./spindle_speed_dummy.py
 
 # ###################################
 # Core EMC/HAL Loads
@@ -425,7 +425,7 @@ setp hpg.pwmgen.00.pwm_period       1000000
 setp hpg.pwmgen.00.out.00.pin       0x37
 setp hpg.pwmgen.00.out.00.enable    1
 
-net spindleSpeedMeasured spindle_voltage.speed_measured
+net spindleSpeedMeasured spindle_speed.speed_measured
 
 # ##################################################
 # Features
