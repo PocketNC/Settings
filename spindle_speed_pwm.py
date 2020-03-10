@@ -27,7 +27,7 @@ pwmPin = "P8_13"
 
 lastRPM = 0
 lastSpindleOn = False
-PWM.start(pwmPin, 0)
+PWM.start(pwmPin, 50)
 
 try:
   while True:

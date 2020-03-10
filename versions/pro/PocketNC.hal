@@ -216,63 +216,63 @@ setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN # = 0x4F should be 
 
 
 # ################
-# A [3] Axis
+# B [4] Axis
 # ################
 
 # axis enable chain
 newsig emcmot.03.enable bit
 sets emcmot.03.enable FALSE
-net emcmot.03.enable <= axis.3.amp-enable-out 
+net emcmot.03.enable <= axis.4.amp-enable-out 
 net emcmot.03.enable => hpg.stepgen.03.enable
 
 # position command and feedback
-net emcmot.03.pos-cmd <= axis.3.motor-pos-cmd
+net emcmot.03.pos-cmd <= axis.4.motor-pos-cmd
 net emcmot.03.pos-cmd => hpg.stepgen.03.position-cmd
 net motor.03.pos-fb <= hpg.stepgen.03.position-fb
-net motor.03.pos-fb => axis.3.motor-pos-fb
+net motor.03.pos-fb => axis.4.motor-pos-fb
 
 # timing parameters
-setp hpg.stepgen.03.dirsetup        [AXIS_3]DIRSETUP
-setp hpg.stepgen.03.dirhold         [AXIS_3]DIRHOLD
-setp hpg.stepgen.03.steplen         [AXIS_3]STEPLEN
-setp hpg.stepgen.03.stepspace       [AXIS_3]STEPSPACE
-setp hpg.stepgen.03.position-scale  [AXIS_3]SCALE
-setp hpg.stepgen.03.maxvel          [AXIS_3]STEPGEN_MAX_VEL
-setp hpg.stepgen.03.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
+setp hpg.stepgen.03.dirsetup        [AXIS_4]DIRSETUP
+setp hpg.stepgen.03.dirhold         [AXIS_4]DIRHOLD
+setp hpg.stepgen.03.steplen         [AXIS_4]STEPLEN
+setp hpg.stepgen.03.stepspace       [AXIS_4]STEPSPACE
+setp hpg.stepgen.03.position-scale  [AXIS_4]SCALE
+setp hpg.stepgen.03.maxvel          [AXIS_4]STEPGEN_MAX_VEL
+setp hpg.stepgen.03.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.03.steppin         [POCKETNC_PINS]A_STEP_PIN # = 0x90 - should be 930
-setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]A_DIR_PIN # = 0x91 - should be 928
+setp hpg.stepgen.03.steppin         [POCKETNC_PINS]B_STEP_PIN
+setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]B_DIR_PIN
 
 
 
 
 # ################
-# B [4] Axis
+# C [5] Axis
 # ################
 
 # axis enable chain
 newsig emcmot.04.enable bit
 sets emcmot.04.enable FALSE
-net emcmot.04.enable <= axis.4.amp-enable-out 
+net emcmot.04.enable <= axis.5.amp-enable-out 
 net emcmot.04.enable => hpg.stepgen.04.enable
 
 # position command and feedback
-net emcmot.04.pos-cmd <= axis.4.motor-pos-cmd
+net emcmot.04.pos-cmd <= axis.5.motor-pos-cmd
 net emcmot.04.pos-cmd => hpg.stepgen.04.position-cmd
 net motor.04.pos-fb <= hpg.stepgen.04.position-fb
-net motor.04.pos-fb => axis.4.motor-pos-fb
+net motor.04.pos-fb => axis.5.motor-pos-fb
 
 # timing parameters
-setp hpg.stepgen.04.dirsetup        [AXIS_4]DIRSETUP
-setp hpg.stepgen.04.dirhold         [AXIS_4]DIRHOLD
-setp hpg.stepgen.04.steplen         [AXIS_4]STEPLEN
-setp hpg.stepgen.04.stepspace       [AXIS_4]STEPSPACE
-setp hpg.stepgen.04.position-scale  [AXIS_4]SCALE
-setp hpg.stepgen.04.maxvel          [AXIS_4]STEPGEN_MAX_VEL
-setp hpg.stepgen.04.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
+setp hpg.stepgen.04.dirsetup        [AXIS_5]DIRSETUP
+setp hpg.stepgen.04.dirhold         [AXIS_5]DIRHOLD
+setp hpg.stepgen.04.steplen         [AXIS_5]STEPLEN
+setp hpg.stepgen.04.stepspace       [AXIS_5]STEPSPACE
+setp hpg.stepgen.04.position-scale  [AXIS_5]SCALE
+setp hpg.stepgen.04.maxvel          [AXIS_5]STEPGEN_MAX_VEL
+setp hpg.stepgen.04.maxaccel        [AXIS_5]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.04.steppin         [POCKETNC_PINS]B_STEP_PIN # = 0x4C - should be 812
-setp hpg.stepgen.04.dirpin          [POCKETNC_PINS]B_DIR_PIN # = 0x4D - should be 811
+setp hpg.stepgen.04.steppin         [POCKETNC_PINS]C_STEP_PIN
+setp hpg.stepgen.04.dirpin          [POCKETNC_PINS]C_DIR_PIN
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -326,16 +326,16 @@ setp [POCKETNC_PINS]Z_LIMIT_INVERT
 #net ZmaxAndHome axis.2.home-sw-in
 
 
-# A Axis Limit
-net AmaxAndHome [POCKETNC_PINS]A_LIMIT_LONG
-net AmaxAndHome axis.3.home-sw-in
-setp [POCKETNC_PINS]A_LIMIT_INVERT
-
-
-# B axis
-net BhomeAndIndex [POCKETNC_PINS]B_LIMIT_LONG
-net BhomeAndIndex => axis.4.home-sw-in
+# B Axis Limit
+net BmaxAndHome [POCKETNC_PINS]B_LIMIT_LONG
+net BmaxAndHome axis.4.home-sw-in
 setp [POCKETNC_PINS]B_LIMIT_INVERT
+
+
+# C axis
+net ChomeAndIndex [POCKETNC_PINS]C_LIMIT_LONG
+net ChomeAndIndex => axis.5.home-sw-in
+setp [POCKETNC_PINS]C_LIMIT_INVERT
 
 ### Control Panel Buttons ###
 # eStop

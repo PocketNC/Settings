@@ -16,11 +16,11 @@ Z_HLFB_SHORT=926
 Z_HLFB_LONG=bb_gpio.p9.in-26
 Z_HLFB_INVERT=bb_gpio.p9.in-26.invert 0
 
-A_STEP_PIN=930
-A_DIR_PIN=928
+B_STEP_PIN=930
+B_DIR_PIN=928
 
-B_STEP_PIN=812
-B_DIR_PIN=811
+C_STEP_PIN=812
+C_DIR_PIN=811
 
 X_LIMIT_SHORT=809
 X_LIMIT_LONG=bb_gpio.p8.in-09
@@ -42,9 +42,9 @@ Z_LIMIT_SHORT=818
 Z_LIMIT_LONG=bb_gpio.p8.in-18
 Z_LIMIT_INVERT=bb_gpio.p8.in-18.invert 1
 
-B_LIMIT_SHORT=819
-B_LIMIT_LONG=bb_gpio.p8.in-19
-B_LIMIT_INVERT=bb_gpio.p8.in-19.invert 1
+C_LIMIT_SHORT=819
+C_LIMIT_LONG=bb_gpio.p8.in-19
+C_LIMIT_INVERT=bb_gpio.p8.in-19.invert 1
 
 START_SIGNAL_SHORT=826
 START_SIGNAL_LONG=bb_gpio.p8.in-26
@@ -52,7 +52,7 @@ START_SIGNAL_INVERT=bb_gpio.p8.in-26.invert 1
 
 SPINDLE_DIR_SHORT=911
 SPINDLE_DIR_LONG=bb_gpio.p9.out-11
-SPINDLE_DIR_INVERT=bb_gpio.p9.out-11.invert 0
+SPINDLE_DIR_INVERT=bb_gpio.p9.out-11.invert 1
 
 ENABLE_SHORT=912
 ENABLE_LONG=bb_gpio.p9.out-12
@@ -62,9 +62,9 @@ START_LED_SHORT=914
 START_LED_LONG=bb_gpio.p9.out-14
 START_LED_INVERT=bb_gpio.p9.out-14.invert 0
 
-A_LIMIT_SHORT=916
-A_LIMIT_LONG=bb_gpio.p9.in-16
-A_LIMIT_INVERT=bb_gpio.p9.in-16.invert 1
+B_LIMIT_SHORT=916
+B_LIMIT_LONG=bb_gpio.p9.in-16
+B_LIMIT_INVERT=bb_gpio.p9.in-16.invert 1
 
 INTERLOCK_OPEN_SHORT=921
 INTERLOCK_OPEN_LONG=bb_gpio.p9.in-21

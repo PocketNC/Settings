@@ -2,5 +2,5 @@
 
 VERSION=`./version.py`
 
-./features/configure_cape_universal/configure_pins.sh
+./features/configure_cape_universal/versions/$VERSION/configure_pins.sh
 ./generate_bb_gpio_config.py ./features/configure_cape_universal/versions/$VERSION/overlay.inc ./features/configure_cape_universal/overlay.inc

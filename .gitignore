@@ -9,8 +9,12 @@ last-spindle-off-time.txt
 tool.tbl
 CalibrationOverlay.inc
 /version
+x.comp
+y.comp
+z.comp
 a.comp
 b.comp
+c.comp
 
 # Swap
 [._]*.s[a-v][a-z]
