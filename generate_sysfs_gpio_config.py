@@ -30,11 +30,11 @@ for param in overlay['parameters']:
   if "out" in value and name.endswith("_LONG"):
     outputs.append(name.replace("_LONG", ""))
 
-bb_gpio_config = "hal_bb_gpio output_pins=%s input_pins=%s" % (",".join([ short_values[o] for o in outputs ]),
-                                                               ",".join([ short_values[i] for i in inputs ]))
+bb_gpio_config = "sysfs_gpio board=BBAI output_pins=%s input_pins=%s" % (",".join([ short_values[o] for o in outputs ]),
+                                                                         ",".join([ short_values[i] for i in inputs ]))
 
 set_parameter(overlay, "POCKETNC_PINS", "BB_GPIO_CONFIG", bb_gpio_config)
-set_parameter(overlay, "POCKETNC_PINS", "BB_GPIO_READ", "bb_gpio.read")
-set_parameter(overlay, "POCKETNC_PINS", "BB_GPIO_WRITE", "bb_gpio.write")
+set_parameter(overlay, "POCKETNC_PINS", "BB_GPIO_READ", "sysfs_gpio.read")
+set_parameter(overlay, "POCKETNC_PINS", "BB_GPIO_WRITE", "sysfs_gpio.write")
 
 write_ini_data(overlay, output_overlay_path)

@@ -1,7 +1,10 @@
 #!/bin/bash
 
-if [ ! -f /sys/devices/bone_capemgr.*/slots ]; then
-  echo 1
-else
-  echo 0
-fi
+# TODO - perform better check for cape universal support
+echo 0
+
+#if [ ! -f /sys/devices/bone_capemgr.*/slots ]; then
+#  echo 1
+#else
+#  echo 0
+#fi

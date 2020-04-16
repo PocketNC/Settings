@@ -1,0 +1,6 @@
+#!/bin/bash
+
+VERSION=`./version.py`
+
+./features/configure_bbai_pins/configure_pins.sh
+./generate_sysfs_gpio_config.py ./features/configure_bbai_pins/versions/$VERSION/overlay.inc ./features/configure_bbai_pins/overlay.inc

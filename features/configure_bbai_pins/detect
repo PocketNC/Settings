@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# TODO - better detect
+echo 1

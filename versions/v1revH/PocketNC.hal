@@ -29,12 +29,12 @@ loadrt limit1 names=spindleLimit
 # ################################################
 # THREADS
 # ################################################
-addf hpg.capture-position	servo-thread
-addf bb_gpio.read						servo-thread
-addf motion-command-handler				servo-thread
-addf motion-controller					servo-thread
-addf hpg.update			servo-thread
-addf bb_gpio.write						servo-thread
+addf hpg.capture-position          servo-thread
+addf [POCKETNC_PINS]BB_GPIO_READ   servo-thread
+addf motion-command-handler        servo-thread
+addf motion-controller             servo-thread
+addf hpg.update                    servo-thread
+addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 
 
 ######################

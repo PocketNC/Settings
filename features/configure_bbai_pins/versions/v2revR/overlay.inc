@@ -1,0 +1,73 @@
+[POCKETNC_PINS]
+X_STEP_PIN=927
+X_DIR_PIN=929
+
+Y_STEP_PIN=923
+Y_DIR_PIN=915
+
+Z_STEP_PIN=816
+Z_DIR_PIN=815
+
+A_STEP_PIN=930
+A_DIR_PIN=928
+
+B_STEP_PIN=812
+B_DIR_PIN=811
+
+X_LIMIT_SHORT=809
+X_LIMIT_LONG=sysfs_gpio.p809-in
+X_LIMIT_INVERT=sysfs_gpio.p809-in.invert 1
+
+ESTOP_SIGNAL_SHORT=810
+ESTOP_SIGNAL_LONG=sysfs_gpio.p810-in
+ESTOP_SIGNAL_INVERT=sysfs_gpio.p810-in.invert 1
+
+Y_LIMIT_SHORT=814
+Y_LIMIT_LONG=sysfs_gpio.p814-in
+Y_LIMIT_INVERT=sysfs_gpio.p814-in.invert 1
+
+ESTOP_LED_SHORT=817
+ESTOP_LED_LONG=sysfs_gpio.p817-out
+ESTOP_LED_INVERT=sysfs_gpio.p817-out.invert 0
+
+Z_LIMIT_SHORT=818
+Z_LIMIT_LONG=sysfs_gpio.p818-in
+Z_LIMIT_INVERT=sysfs_gpio.p818-in.invert 1
+
+B_LIMIT_SHORT=819
+B_LIMIT_LONG=sysfs_gpio.p819-in
+B_LIMIT_INVERT=sysfs_gpio.p819-in.invert 1
+
+START_SIGNAL_SHORT=826
+START_SIGNAL_LONG=sysfs_gpio.p826-in
+START_SIGNAL_INVERT=sysfs_gpio.p826-in.invert 1
+
+SPINDLE_DIR_SHORT=911
+SPINDLE_DIR_LONG=sysfs_gpio.p911-out
+SPINDLE_DIR_INVERT=sysfs_gpio.p911-out.invert 0
+
+ENABLE_SHORT=912
+ENABLE_LONG=sysfs_gpio.p912-out
+ENABLE_INVERT=sysfs_gpio.p912-out.invert 0
+
+START_LED_SHORT=914
+START_LED_LONG=sysfs_gpio.p914-out
+START_LED_INVERT=sysfs_gpio.p914-out.invert 0
+
+A_LIMIT_SHORT=916
+A_LIMIT_LONG=sysfs_gpio.p916-in
+A_LIMIT_INVERT=sysfs_gpio.p916-in.invert 1
+
+INTERLOCK_OPEN_SHORT=921
+INTERLOCK_OPEN_LONG=sysfs_gpio.p921-in
+INTERLOCK_OPEN_INVERT=sysfs_gpio.p921-in.invert 1
+
+PROBE_SIGNAL_SHORT=922
+PROBE_SIGNAL_LONG=sysfs_gpio.p922-in
+PROBE_SIGNAL_INVERT=sysfs_gpio.p922-in.invert 1
+
+SPINDLE_ON_SHORT=924
+SPINDLE_ON_LONG=sysfs_gpio.p924-out
+SPINDLE_ON_INVERT=sysfs_gpio.p924-out.invert 0
+
+SPINDLE_CLOCK_PIN=P8_8

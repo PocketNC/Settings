@@ -15,6 +15,7 @@
 #    our boards as capes (in which case a hardware change would be necessary), but we may do our own versioning using
 #    the EEPROM chip at address 0x50, which was installed on v2revR.
 
+import sys
 import os
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
 
@@ -48,8 +49,8 @@ def getVersion():
     try:
       from Adafruit_GPIO.I2C import Device
 
-      i2c = Device(0x50, 2)
       try:
+        i2c = Device(0x50, 2)
         test = i2c.readU8(0)
         # TODO put version information on EEPROM chip.
         version = "v2revR"

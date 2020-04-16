@@ -35,12 +35,12 @@ loadrt limit1 names=spindleLimit
 # ################################################
 # THREADS
 # ################################################
-addf hpg.capture-position	servo-thread
-addf bb_gpio.read						servo-thread
-addf motion-command-handler				servo-thread
-addf motion-controller					servo-thread
-addf hpg.update			servo-thread
-addf bb_gpio.write						servo-thread
+addf hpg.capture-position	   servo-thread
+addf [POCKETNC_PINS]BB_GPIO_READ   servo-thread
+addf motion-command-handler        servo-thread
+addf motion-controller             servo-thread
+addf hpg.update                    servo-thread
+addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 
 
 ######################
@@ -145,8 +145,8 @@ setp hpg.stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
 setp hpg.stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
 
 #setp hpg.stepgen.00.step_type       0
-setp hpg.stepgen.00.steppin         147 # = 0x93 - should be 927
-setp hpg.stepgen.00.dirpin          143 # = 0x8F - should be 929
+setp hpg.stepgen.00.steppin         927 # = 0x93 - should be 927
+setp hpg.stepgen.00.dirpin          929 # = 0x8F - should be 929
 
 
 # ################
@@ -175,8 +175,8 @@ setp hpg.stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
 setp hpg.stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
 
 #setp hpg.stepgen.01.step_type       0
-setp hpg.stepgen.01.steppin         81 # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
-setp hpg.stepgen.01.dirpin          80 # should be 915
+setp hpg.stepgen.01.steppin         923 # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
+setp hpg.stepgen.01.dirpin          915 # should be 915
 
 
 # ################
@@ -205,8 +205,8 @@ setp hpg.stepgen.02.maxvel          [AXIS_2]STEPGEN_MAX_VEL
 setp hpg.stepgen.02.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
 
 #setp hpg.stepgen.02.step_type       0
-setp hpg.stepgen.02.steppin         78 # = 0x4E - should be 816
-setp hpg.stepgen.02.dirpin          79 # = 0x4F should be 815
+setp hpg.stepgen.02.steppin         816 # = 0x4E - should be 816
+setp hpg.stepgen.02.dirpin          815 # = 0x4F should be 815
 
 
 # ################
@@ -234,8 +234,8 @@ setp hpg.stepgen.03.position-scale  [AXIS_3]SCALE
 setp hpg.stepgen.03.maxvel          [AXIS_3]STEPGEN_MAX_VEL
 setp hpg.stepgen.03.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.03.steppin         144 # = 0x90 - should be 930
-setp hpg.stepgen.03.dirpin          145 # = 0x91 - should be 928
+setp hpg.stepgen.03.steppin         930 # = 0x90 - should be 930
+setp hpg.stepgen.03.dirpin          928 # = 0x91 - should be 928
 
 
 
@@ -265,8 +265,8 @@ setp hpg.stepgen.04.position-scale  [AXIS_4]SCALE
 setp hpg.stepgen.04.maxvel          [AXIS_4]STEPGEN_MAX_VEL
 setp hpg.stepgen.04.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.04.steppin         76 # = 0x4C - should be 812
-setp hpg.stepgen.04.dirpin          77 # = 0x4D - should be 811
+setp hpg.stepgen.04.steppin         812 # = 0x4C - should be 812
+setp hpg.stepgen.04.dirpin          811 # = 0x4D - should be 811
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
