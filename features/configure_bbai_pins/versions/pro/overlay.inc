@@ -14,6 +14,26 @@ B_DIR_PIN=1837
 C_STEP_PIN=1840
 C_DIR_PIN=1841
 
+X_FEEDBACK_SHORT=925
+X_FEEDBACK_LONG=sysfs_gpio.p925-in
+X_FEEDBACK_INVERT=sysfs_gpio.p925-in.invert 0
+
+Y_FEEDBACK_SHORT=830
+Y_FEEDBACK_LONG=sysfs_gpio.p830-in
+Y_FEEDBACK_INVERT=sysfs_gpio.p830-in.invert 0
+
+Z_FEEDBACK_SHORT=926
+Z_FEEDBACK_LONG=sysfs_gpio.p926-in
+Z_FEEDBACK_INVERT=sysfs_gpio.p926-in.invert 0
+
+B_FEEDBACK_SHORT=807
+B_FEEDBACK_LONG=sysfs_gpio.p807-in
+B_FEEDBACK_INVERT=sysfs_gpio.p807-in.invert 0
+
+C_FEEDBACK_SHORT=827
+C_FEEDBACK_LONG=sysfs_gpio.p827-in
+C_FEEDBACK_INVERT=sysfs_gpio.p827-in.invert 0
+
 X_LIMIT_SHORT=809
 X_LIMIT_LONG=sysfs_gpio.p809-in
 X_LIMIT_INVERT=sysfs_gpio.p809-in.invert 1

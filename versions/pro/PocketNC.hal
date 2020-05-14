@@ -1,7 +1,9 @@
 # Start script to monitor spindle speed commands
 # so that it can issue i2c commands to change the
 # voltage.
-loadusr -Wn spindle_speed ./spindle_speed_pwm_bbai.py
+#loadusr -Wn spindle_speed ./spindle_speed_pwm_bbai.py
+loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00
+loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/pro/vfd.ini -S SPINDLEVFD -r
 
 # ###################################
 # Core EMC/HAL Loads
@@ -36,63 +38,95 @@ newinst and2 interlockClosedAndReleased.and
 newinst and2 zHoming.and
 newinst and2 xHoming.and
 
-loadrt or2 names=[HAL]OR_COMPONENTS
+#loadrt or2 names=[HAL]OR_COMPONENTS
+newinst or2 ledBlink.eStop.or
+newinst or2 ledBlink.mPwr.or
+newinst or2 ledBlink.pause.or
+newinst or2 programStartFromPaused.or
+newinst or2 triggerEstop.or
+newinst or2 triggerEstopFromUserspace.or
+newinst or2 pauseFromButtonOrInterlock.or
+newinst or2 startFromButtonOrInterlock.or
+
+newinst lutn eStopOr functn=0xfffffffe pincount=5
+newinst lutn motorFaultOr functn=0xfffffffe pincount=5
+
 loadrt toggle names=eStopButton.toggle
 loadrt not names=estopNotActivated.not,eStopDrivers.not,interlockOpen.not
 loadrt timedelay names=mPwr.timedelay,zHoming.timedelay,xHoming.timedelay
 loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPressed.oneshot
 
-
-loadrt threads name1=my-thread period1=1000000
-
 # ################################################
 # THREADS
 # ################################################
-addf hpg.capture-position	my-thread
+addf hpg.capture-position	servo-thread
 addf [POCKETNC_PINS]BB_GPIO_READ   servo-thread
-addf motion-command-handler				my-thread
-addf motion-controller					my-thread
-addf hpg.update			my-thread
+addf motion-command-handler				servo-thread
+addf motion-controller					servo-thread
+addf hpg.update			servo-thread
 addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 
 ######################
 # Testing
 ######################
 # LED logic - make blink signals.
-addf ledBlink.eStop.or					my-thread
-addf ledBlink.mPwr.or					my-thread
-addf ledBlink.pause.or					my-thread
-addf ledBlinkSignal.update				my-thread
-addf ledBlinkSignal.floatToS32			my-thread
-addf ledBlinkSignal.s32toBit			my-thread
-addf ledBlink.eStop.and					my-thread
-addf ledBlink.mPwr.and					my-thread
-addf ledBlink.pause.and					my-thread
-addf estopNotActivated.not			my-thread
-addf eStopButton.toggle		my-thread
-addf eStopDrivers.not		my-thread
-addf doEstop.and	my-thread
-addf doEstopReset.and	my-thread
-addf estopButtonPressed.oneshot my-thread
-addf mPwr.timedelay		my-thread
-addf zHoming.timedelay		my-thread
-addf xHoming.timedelay		my-thread
-addf mPwr.and			my-thread
-addf programStart.oneshot	my-thread
-addf programStartFromPaused.or		my-thread
-addf programStartFromIdle.and		my-thread
-addf programStartFromPaused.and		my-thread
-addf programPause.oneshot	my-thread
-addf runningIntoPause.and	my-thread
-addf triggerEstop.or		my-thread
-addf triggerEstopFromUserspace.or		my-thread
-addf pauseFromButtonOrInterlock.or		my-thread
-addf startButtonInterlockCheck.and my-thread
-addf startFromButtonOrInterlock.or my-thread
-addf interlockOpen.not my-thread
-addf interlockClosedAndReleased.and my-thread
-addf zHoming.and my-thread
-addf xHoming.and my-thread
+addf ledBlink.eStop.or					servo-thread
+addf ledBlink.mPwr.or					servo-thread
+addf ledBlink.pause.or					servo-thread
+addf ledBlinkSignal.update				servo-thread
+addf ledBlinkSignal.floatToS32			servo-thread
+addf ledBlinkSignal.s32toBit			servo-thread
+addf ledBlink.eStop.and					servo-thread
+addf ledBlink.mPwr.and					servo-thread
+addf ledBlink.pause.and					servo-thread
+addf estopNotActivated.not			servo-thread
+addf eStopButton.toggle		servo-thread
+addf eStopDrivers.not		servo-thread
+addf doEstop.and	servo-thread
+addf doEstopReset.and	servo-thread
+addf estopButtonPressed.oneshot servo-thread
+addf mPwr.timedelay		servo-thread
+addf zHoming.timedelay		servo-thread
+addf xHoming.timedelay		servo-thread
+addf mPwr.and			servo-thread
+addf programStart.oneshot	servo-thread
+addf programStartFromPaused.or		servo-thread
+addf programStartFromIdle.and		servo-thread
+addf programStartFromPaused.and		servo-thread
+addf programPause.oneshot	servo-thread
+addf runningIntoPause.and	servo-thread
+addf triggerEstop.or		servo-thread
+addf triggerEstopFromUserspace.or		servo-thread
+addf pauseFromButtonOrInterlock.or		servo-thread
+addf startButtonInterlockCheck.and servo-thread
+addf startFromButtonOrInterlock.or servo-thread
+addf interlockOpen.not servo-thread
+addf interlockClosedAndReleased.and servo-thread
+addf zHoming.and servo-thread
+addf xHoming.and servo-thread
+addf eStopOr.funct servo-thread
+addf motorFaultOr.funct servo-thread
+
+### Motor Feedback
+# X feedback
+net XFault [POCKETNC_PINS]X_FEEDBACK_LONG
+net XFault motorFaultOr.in-00
+
+# Y feedback
+net YFault [POCKETNC_PINS]Y_FEEDBACK_LONG
+net YFault motorFaultOr.in-01
+
+# Z feedback
+net ZFault [POCKETNC_PINS]Z_FEEDBACK_LONG
+net ZFault motorFaultOr.in-02
+
+# B feedback
+net BFault [POCKETNC_PINS]B_FEEDBACK_LONG
+net BFault motorFaultOr.in-03
+
+# C feedback
+net CFault [POCKETNC_PINS]C_FEEDBACK_LONG
+net CFault motorFaultOr.in-04
 
 # Setup pins and signals
 setp ledBlinkSignal.offset 1
@@ -367,7 +401,13 @@ net estopIsActivated doEstopReset.and.in1
 net resetEstop doEstopReset.and.out
 net resetEstop halui.estop.reset
 
-net activateEstop doEstop.and.out
+net eStopButtonSignal doEstop.and.out
+net eStopButtonSignal eStopOr.in-00
+
+net motorFaultSignal motorFaultOr.out
+net motorFaultSignal eStopOr.in-01
+
+net activateEstop eStopOr.out
 net activateEstop halui.estop.activate
 
 net estopIsActivated halui.estop.is-activated
@@ -432,17 +472,22 @@ setp [POCKETNC_PINS]SPINDLE_DIR_INVERT
 setp [POCKETNC_PINS]SPINDLE_ON_INVERT
 
 net spindleEnable motion.spindle-on
-net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
+#net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
+net spindleEnable spindle-vfd.spindle-on
 
-net spindleDirection motion.spindle-forward
-net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
+#net spindleDirection motion.spindle-forward
+#net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
 
 net displaySpindleReverseButton	motion.spindle-reverse
-net spindleSpeedDummy motion.spindle-speed-out
-net spindleSpeed motion.spindle-speed-out-abs
-net spindleSpeed spindle_speed.speed_in
 
-net spindleSpeedMeasured spindle_speed.speed_measured
+net spindleSpeed motion.spindle-speed-out
+net spindleSpeed spindle-vfd.speed-command
+
+#net spindleSpeedDummy motion.spindle-speed-out
+#net spindleSpeed motion.spindle-speed-out-abs
+#net spindleSpeed spindle_speed.speed_in
+
+#net spindleSpeedMeasured spindle_speed.speed_measured
 
 # ##################################################
 # Features
