@@ -2,7 +2,8 @@
 # so that it can issue i2c commands to change the
 # voltage.
 #loadusr -Wn spindle_speed ./spindle_speed_pwm_bbai.py
-loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00
+loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
+loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
 loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/pro/vfd.ini -S SPINDLEVFD -r
 
 # ###################################
@@ -22,7 +23,10 @@ loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
 loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
-loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
+
+newinst conv_s32_bit ledBlinkSignal.s32toBit
+newinst conv_s32_bit spindleError.s32toBit
+
 #loadrt and2 names=[HAL]AND_COMPONENTS
 newinst and2 ledBlink.eStop.and
 newinst and2 ledBlink.mPwr.and
@@ -51,8 +55,12 @@ newinst or2 startFromButtonOrInterlock.or
 newinst lutn eStopOr functn=0xfffffffe pincount=5
 newinst lutn motorFaultOr functn=0xfffffffe pincount=5
 
+newinst not estopNotActivated.not
+newinst not eStopDrivers.not
+newinst not interlockOpen.not
+newinst not spindleModBus.not
+
 loadrt toggle names=eStopButton.toggle
-loadrt not names=estopNotActivated.not,eStopDrivers.not,interlockOpen.not
 loadrt timedelay names=mPwr.timedelay,zHoming.timedelay,xHoming.timedelay
 loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPressed.oneshot
 
@@ -76,9 +84,11 @@ addf ledBlink.pause.or					servo-thread
 addf ledBlinkSignal.update				servo-thread
 addf ledBlinkSignal.floatToS32			servo-thread
 addf ledBlinkSignal.s32toBit			servo-thread
+addf spindleError.s32toBit			servo-thread
 addf ledBlink.eStop.and					servo-thread
 addf ledBlink.mPwr.and					servo-thread
 addf ledBlink.pause.and					servo-thread
+addf spindleModBus.not			servo-thread
 addf estopNotActivated.not			servo-thread
 addf eStopButton.toggle		servo-thread
 addf eStopDrivers.not		servo-thread
@@ -407,6 +417,13 @@ net eStopButtonSignal eStopOr.in-00
 net motorFaultSignal motorFaultOr.out
 net motorFaultSignal eStopOr.in-01
 
+setp spindleError.s32toBit.clamp 1
+net SpindleFault spindleError.s32toBit.out
+net SpindleFault eStopOr.in-02
+
+net SpindleModBusNotOk spindleModBus.not.out
+net SpindleModBusNotOk eStopOr.in-03
+
 net activateEstop eStopOr.out
 net activateEstop halui.estop.activate
 
@@ -474,6 +491,7 @@ setp [POCKETNC_PINS]SPINDLE_ON_INVERT
 net spindleEnable motion.spindle-on
 #net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
 net spindleEnable spindle-vfd.spindle-on
+net spindleEnable mcp21.A.out-00
 
 #net spindleDirection motion.spindle-forward
 #net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
@@ -482,6 +500,13 @@ net displaySpindleReverseButton	motion.spindle-reverse
 
 net spindleSpeed motion.spindle-speed-out
 net spindleSpeed spindle-vfd.speed-command
+net spindleError spindle-vfd.error-code
+net spindleError spindleError.s32toBit.in
+
+net spindleModBusOk spindle-vfd.modbus-ok
+net spindleModBusOk spindleModBus.not.in
+
+setp spindle-vfd.enable 1
 
 #net spindleSpeedDummy motion.spindle-speed-out
 #net spindleSpeed motion.spindle-speed-out-abs
