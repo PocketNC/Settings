@@ -20,9 +20,13 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 
 # load low-level drivers
 loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
-loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
+
+newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 pru_period=730
+newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 pru_period=730
+newinst hal_pru_generic hpg2 [PRUCONF]PRUCODE pru=2 num_pwmreads=6 num_encoders=1 pru_period=10000
+newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=1 pru_period=730
 
 newinst conv_s32_bit ledBlinkSignal.s32toBit
 newinst conv_s32_bit spindleError.s32toBit
@@ -67,11 +71,17 @@ loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPresse
 # ################################################
 # THREADS
 # ################################################
-addf hpg.capture-position	servo-thread
+addf hpg0.capture-position         servo-thread
+addf hpg1.capture-position         servo-thread
+addf hpg2.capture-position         servo-thread
+addf hpg3.capture-position         servo-thread
 addf [POCKETNC_PINS]BB_GPIO_READ   servo-thread
-addf motion-command-handler				servo-thread
-addf motion-controller					servo-thread
-addf hpg.update			servo-thread
+addf motion-command-handler        servo-thread
+addf motion-controller             servo-thread
+addf hpg0.update                   servo-thread
+addf hpg1.update                   servo-thread
+addf hpg2.update                   servo-thread
+addf hpg3.update                   servo-thread
 addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 
 ######################
@@ -118,24 +128,30 @@ addf eStopOr.funct servo-thread
 addf motorFaultOr.funct servo-thread
 
 ### Motor Feedback
+
 # X feedback
-net XFault [POCKETNC_PINS]X_FEEDBACK_LONG
+setp hpg2.pwmread.00.max_time 2074689
+setp hpg2.pwmread.00.pin [POCKETNC_PINS]X_FEEDBACK_PIN
 net XFault motorFaultOr.in-00
 
 # Y feedback
-net YFault [POCKETNC_PINS]Y_FEEDBACK_LONG
+setp hpg2.pwmread.01.max_time 2074689
+setp hpg2.pwmread.01.pin [POCKETNC_PINS]Y_FEEDBACK_PIN
 net YFault motorFaultOr.in-01
 
 # Z feedback
-net ZFault [POCKETNC_PINS]Z_FEEDBACK_LONG
+setp hpg2.pwmread.02.max_time 2074689
+setp hpg2.pwmread.02.pin [POCKETNC_PINS]Z_FEEDBACK_PIN
 net ZFault motorFaultOr.in-02
 
 # B feedback
-net BFault [POCKETNC_PINS]B_FEEDBACK_LONG
+setp hpg2.pwmread.03.max_time 2074689
+setp hpg2.pwmread.03.pin [POCKETNC_PINS]B_FEEDBACK_PIN
 net BFault motorFaultOr.in-03
 
 # C feedback
-net CFault [POCKETNC_PINS]C_FEEDBACK_LONG
+setp hpg2.pwmread.04.max_time 2074689
+setp hpg2.pwmread.04.pin [POCKETNC_PINS]C_FEEDBACK_PIN
 net CFault motorFaultOr.in-04
 
 # Setup pins and signals
@@ -179,26 +195,26 @@ net pauseLed [POCKETNC_PINS]START_LED_LONG
 newsig emcmot.00.enable bit
 sets emcmot.00.enable FALSE
 net emcmot.00.enable <= axis.0.amp-enable-out 
-net emcmot.00.enable => hpg.stepgen.00.enable
+net emcmot.00.enable => hpg3.stepgen.00.enable
 
 # position command and feedback
 net emcmot.00.pos-cmd <= axis.0.motor-pos-cmd
-net emcmot.00.pos-cmd => hpg.stepgen.00.position-cmd
-net motor.00.pos-fb <= hpg.stepgen.00.position-fb
+net emcmot.00.pos-cmd => hpg3.stepgen.00.position-cmd
+net motor.00.pos-fb <= hpg3.stepgen.00.position-fb
 net motor.00.pos-fb => axis.0.motor-pos-fb
 
 
 # timing parameters
-setp hpg.stepgen.00.dirsetup        [AXIS_0]DIRSETUP
-setp hpg.stepgen.00.dirhold         [AXIS_0]DIRHOLD
-setp hpg.stepgen.00.steplen         [AXIS_0]STEPLEN
-setp hpg.stepgen.00.stepspace       [AXIS_0]STEPSPACE
-setp hpg.stepgen.00.position-scale  [AXIS_0]SCALE
-setp hpg.stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
-setp hpg.stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
+setp hpg3.stepgen.00.dirsetup        [AXIS_0]DIRSETUP
+setp hpg3.stepgen.00.dirhold         [AXIS_0]DIRHOLD
+setp hpg3.stepgen.00.steplen         [AXIS_0]STEPLEN
+setp hpg3.stepgen.00.stepspace       [AXIS_0]STEPSPACE
+setp hpg3.stepgen.00.position-scale  [AXIS_0]SCALE
+setp hpg3.stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
+setp hpg3.stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN # = 0x93 - should be 927
-setp hpg.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN # = 0x8F - should be 929
+setp hpg3.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN
+setp hpg3.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN
 
 
 # ################
@@ -209,25 +225,25 @@ setp hpg.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN # = 0x8F - should b
 newsig emcmot.01.enable bit
 sets emcmot.01.enable FALSE
 net emcmot.01.enable <= axis.1.amp-enable-out 
-net emcmot.01.enable => hpg.stepgen.01.enable
+net emcmot.01.enable => hpg0.stepgen.01.enable
 
 # position command and feedback
 net emcmot.01.pos-cmd <= axis.1.motor-pos-cmd
-net emcmot.01.pos-cmd => hpg.stepgen.01.position-cmd
-net motor.01.pos-fb <= hpg.stepgen.01.position-fb
+net emcmot.01.pos-cmd => hpg0.stepgen.01.position-cmd
+net motor.01.pos-fb <= hpg0.stepgen.01.position-fb
 net motor.01.pos-fb => axis.1.motor-pos-fb
 
 # timing parameters
-setp hpg.stepgen.01.dirsetup        [AXIS_1]DIRSETUP
-setp hpg.stepgen.01.dirhold         [AXIS_1]DIRHOLD
-setp hpg.stepgen.01.steplen         [AXIS_1]STEPLEN
-setp hpg.stepgen.01.stepspace       [AXIS_1]STEPSPACE
-setp hpg.stepgen.01.position-scale  [AXIS_1]SCALE
-setp hpg.stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
-setp hpg.stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
+setp hpg0.stepgen.01.dirsetup        [AXIS_1]DIRSETUP
+setp hpg0.stepgen.01.dirhold         [AXIS_1]DIRHOLD
+setp hpg0.stepgen.01.steplen         [AXIS_1]STEPLEN
+setp hpg0.stepgen.01.stepspace       [AXIS_1]STEPSPACE
+setp hpg0.stepgen.01.position-scale  [AXIS_1]SCALE
+setp hpg0.stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
+setp hpg0.stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
-setp hpg.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN # should be 915
+setp hpg0.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN 
+setp hpg0.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN
 
 
 # ################
@@ -238,25 +254,25 @@ setp hpg.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN # should be 915
 newsig emcmot.02.enable bit
 sets emcmot.02.enable FALSE
 net emcmot.02.enable <= axis.2.amp-enable-out 
-net emcmot.02.enable => hpg.stepgen.02.enable
+net emcmot.02.enable => hpg1.stepgen.00.enable
 
 # position command and feedback
 net emcmot.02.pos-cmd <= axis.2.motor-pos-cmd
-net emcmot.02.pos-cmd => hpg.stepgen.02.position-cmd
-net motor.02.pos-fb <= hpg.stepgen.02.position-fb
+net emcmot.02.pos-cmd => hpg1.stepgen.00.position-cmd
+net motor.02.pos-fb <= hpg1.stepgen.00.position-fb
 net motor.02.pos-fb => axis.2.motor-pos-fb
 
 # timing parameters
-setp hpg.stepgen.02.dirsetup        [AXIS_2]DIRSETUP
-setp hpg.stepgen.02.dirhold         [AXIS_2]DIRHOLD
-setp hpg.stepgen.02.steplen         [AXIS_2]STEPLEN
-setp hpg.stepgen.02.stepspace       [AXIS_2]STEPSPACE
-setp hpg.stepgen.02.position-scale  [AXIS_2]SCALE
-setp hpg.stepgen.02.maxvel          [AXIS_2]STEPGEN_MAX_VEL
-setp hpg.stepgen.02.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
+setp hpg1.stepgen.00.dirsetup        [AXIS_2]DIRSETUP
+setp hpg1.stepgen.00.dirhold         [AXIS_2]DIRHOLD
+setp hpg1.stepgen.00.steplen         [AXIS_2]STEPLEN
+setp hpg1.stepgen.00.stepspace       [AXIS_2]STEPSPACE
+setp hpg1.stepgen.00.position-scale  [AXIS_2]SCALE
+setp hpg1.stepgen.00.maxvel          [AXIS_2]STEPGEN_MAX_VEL
+setp hpg1.stepgen.00.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.02.steppin         [POCKETNC_PINS]Z_STEP_PIN # = 0x4E - should be 816
-setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN # = 0x4F should be 815
+setp hpg1.stepgen.00.steppin         [POCKETNC_PINS]Z_STEP_PIN
+setp hpg1.stepgen.00.dirpin          [POCKETNC_PINS]Z_DIR_PIN
 
 
 # ################
@@ -267,25 +283,25 @@ setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN # = 0x4F should be 
 newsig emcmot.03.enable bit
 sets emcmot.03.enable FALSE
 net emcmot.03.enable <= axis.4.amp-enable-out 
-net emcmot.03.enable => hpg.stepgen.03.enable
+net emcmot.03.enable => hpg1.stepgen.01.enable
 
 # position command and feedback
 net emcmot.03.pos-cmd <= axis.4.motor-pos-cmd
-net emcmot.03.pos-cmd => hpg.stepgen.03.position-cmd
-net motor.03.pos-fb <= hpg.stepgen.03.position-fb
+net emcmot.03.pos-cmd => hpg1.stepgen.01.position-cmd
+net motor.03.pos-fb <= hpg1.stepgen.01.position-fb
 net motor.03.pos-fb => axis.4.motor-pos-fb
 
 # timing parameters
-setp hpg.stepgen.03.dirsetup        [AXIS_4]DIRSETUP
-setp hpg.stepgen.03.dirhold         [AXIS_4]DIRHOLD
-setp hpg.stepgen.03.steplen         [AXIS_4]STEPLEN
-setp hpg.stepgen.03.stepspace       [AXIS_4]STEPSPACE
-setp hpg.stepgen.03.position-scale  [AXIS_4]SCALE
-setp hpg.stepgen.03.maxvel          [AXIS_4]STEPGEN_MAX_VEL
-setp hpg.stepgen.03.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
+setp hpg1.stepgen.01.dirsetup        [AXIS_4]DIRSETUP
+setp hpg1.stepgen.01.dirhold         [AXIS_4]DIRHOLD
+setp hpg1.stepgen.01.steplen         [AXIS_4]STEPLEN
+setp hpg1.stepgen.01.stepspace       [AXIS_4]STEPSPACE
+setp hpg1.stepgen.01.position-scale  [AXIS_4]SCALE
+setp hpg1.stepgen.01.maxvel          [AXIS_4]STEPGEN_MAX_VEL
+setp hpg1.stepgen.01.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.03.steppin         [POCKETNC_PINS]B_STEP_PIN
-setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]B_DIR_PIN
+setp hpg1.stepgen.01.steppin         [POCKETNC_PINS]B_STEP_PIN
+setp hpg1.stepgen.01.dirpin          [POCKETNC_PINS]B_DIR_PIN
 
 
 
@@ -298,25 +314,25 @@ setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]B_DIR_PIN
 newsig emcmot.04.enable bit
 sets emcmot.04.enable FALSE
 net emcmot.04.enable <= axis.5.amp-enable-out 
-net emcmot.04.enable => hpg.stepgen.04.enable
+net emcmot.04.enable => hpg0.stepgen.00.enable
 
 # position command and feedback
 net emcmot.04.pos-cmd <= axis.5.motor-pos-cmd
-net emcmot.04.pos-cmd => hpg.stepgen.04.position-cmd
-net motor.04.pos-fb <= hpg.stepgen.04.position-fb
+net emcmot.04.pos-cmd => hpg0.stepgen.00.position-cmd
+net motor.04.pos-fb <= hpg0.stepgen.00.position-fb
 net motor.04.pos-fb => axis.5.motor-pos-fb
 
 # timing parameters
-setp hpg.stepgen.04.dirsetup        [AXIS_5]DIRSETUP
-setp hpg.stepgen.04.dirhold         [AXIS_5]DIRHOLD
-setp hpg.stepgen.04.steplen         [AXIS_5]STEPLEN
-setp hpg.stepgen.04.stepspace       [AXIS_5]STEPSPACE
-setp hpg.stepgen.04.position-scale  [AXIS_5]SCALE
-setp hpg.stepgen.04.maxvel          [AXIS_5]STEPGEN_MAX_VEL
-setp hpg.stepgen.04.maxaccel        [AXIS_5]STEPGEN_MAX_ACC
+setp hpg0.stepgen.00.dirsetup        [AXIS_5]DIRSETUP
+setp hpg0.stepgen.00.dirhold         [AXIS_5]DIRHOLD
+setp hpg0.stepgen.00.steplen         [AXIS_5]STEPLEN
+setp hpg0.stepgen.00.stepspace       [AXIS_5]STEPSPACE
+setp hpg0.stepgen.00.position-scale  [AXIS_5]SCALE
+setp hpg0.stepgen.00.maxvel          [AXIS_5]STEPGEN_MAX_VEL
+setp hpg0.stepgen.00.maxaccel        [AXIS_5]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.04.steppin         [POCKETNC_PINS]C_STEP_PIN
-setp hpg.stepgen.04.dirpin          [POCKETNC_PINS]C_DIR_PIN
+setp hpg0.stepgen.00.steppin         [POCKETNC_PINS]C_STEP_PIN
+setp hpg0.stepgen.00.dirpin          [POCKETNC_PINS]C_DIR_PIN
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -485,8 +501,6 @@ net toolProbe motion.probe-input
 setp [POCKETNC_PINS]PROBE_SIGNAL_INVERT
 
 ### Spindle ###
-setp [POCKETNC_PINS]SPINDLE_DIR_INVERT
-setp [POCKETNC_PINS]SPINDLE_ON_INVERT
 
 net spindleEnable motion.spindle-on
 #net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
