@@ -59,9 +59,14 @@ done <<- EOF
 	242	out	# P8.17		gpio8.18	E-Stop LED
 	105	in	# P8.18		gpio4.9		Z Limit
 	106	in	# P8.19		gpio4.10	B Limit
+	 22	out	# P8.23		gpio1.22	X Enable
 	124	in	# p8.26		gpio4.28	Start Signal
 	119	in	# p8.27		gpio8.19	C Feedback
 	118	in	# p8.30		gpio4.20	Y Feedback
+	238	out	# p8.31		gpio8.14	Y Enable
+	236	out	# p8.35		gpio8.12	Z Enable
+	230	out	# p8.39		gpio8.6	        B Enable
+	226	out	# p8.43		gpio8.2	        C Enable
 	241	out	# p9.11		gpio8.17	Spindle Dir
 	128	out	# p9.12		gpio5.0 	Enable
 	172	in	# p9.13		gpio6.12	Y Feedback - not connected
