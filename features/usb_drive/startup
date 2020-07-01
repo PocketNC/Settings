@@ -2,6 +2,6 @@
 
 for i in {0..7}
   do
-    mkdir -p "/media/usb$i"
+    sudo mkdir -p "/media/usb$i"
   done
 
