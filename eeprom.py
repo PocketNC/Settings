@@ -12,7 +12,7 @@ eepromReadWPRExecutable = os.path.join(POCKETNC_DIRECTORY, "Settings/eepromReadW
 Version = collections.namedtuple("Version", ["major", "minor", "patch"])
 
 class EEPROM:
-  def __init__(self, driver="24c64", addr=0x50, bus=1):
+  def __init__(self, driver="24c64", addr=0x50, bus=2):
     self._driver = driver
     self._addr = addr
     self._bus = bus
@@ -151,17 +151,15 @@ class EEPROM:
     
 
 # During board assembly, the EEPROM is programed with the board revision using semantic versioning
-# First two bytes are the major version
-# Next two bytes are the minor version
-# Next two bytes are the patch version
+# First byte is the major version
+# Next byte is the minor version
+# Next byte is the patch version
   def ReadBoardRevision(self):
-    bytes = self.ReadBytes(0, 6)
+    bytes = self.ReadBytes(0, 3)
 
-    print bytes
-
-    return Version(bytes[0] << 8 | bytes[1],
-                   bytes[2] << 8 | bytes[3],
-                   bytes[4] << 8 | bytes[5])
+    return Version(bytes[0],
+                   bytes[1],
+                   bytes[2])
 
 
 if __name__ == "__main__":

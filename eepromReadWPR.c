@@ -1,3 +1,9 @@
+// eepromReadWPR.c can be compiled with gcc eepromReadWPR.c -o eepromReadWPR
+// eeeprom.isLocked relies on eepromReadWPR executable being in the Settings folder
+// Maybe this should be in a bin folder somewhere with a Makefile that can run
+// in a postUpdate script to ensure programs that require compiling are compiled 
+// when updated.
+
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
