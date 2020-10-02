@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # version.py
 # If run as a script, print the current machine version to stdout. This is for easy use by bash scripts.
@@ -91,4 +91,4 @@ def clearVersionFile():
   os.remove(os.path.join(POCKETNC_DIRECTORY, "Settings/version"))
 
 if __name__ == "__main__":
-  print getVersion()
+  print(getVersion())

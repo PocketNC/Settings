@@ -1,5 +1,6 @@
 #!/bin/bash
 
-DETECT=`./features/high_speed_spindle/detect_hss_mprls.py`
+#DETECT=`./features/high_speed_spindle/detect_hss_mprls.py`
 
-echo $DETECT
+#echo $DETECT
+echo 0

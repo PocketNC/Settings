@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import hal, time
 
 h = hal.component("run_time_clock")

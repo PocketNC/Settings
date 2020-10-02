@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 import time
 
@@ -11,7 +11,7 @@ def detect():
   # So, we need to capture stdout when running i2c calls.
   # Capturing class for capturing stdout 
   # taken from https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
-  from cStringIO import StringIO
+  from io import StringIO
   import sys
 
   class Capturing(list):
@@ -44,4 +44,4 @@ def detect():
       return 0
 
 if __name__ == "__main__":
-  print detect()
+  print(detect())

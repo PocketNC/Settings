@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/python3
 
 from copy import deepcopy
 import os
@@ -38,9 +38,9 @@ if __name__ == "__main__":
     detect_path = os.path.join(feature_path, "detect")
 
     if os.path.isfile(detect_path):
-      detected = subprocess.check_output(detect_path).strip()
+      detected = subprocess.check_output(detect_path).strip().decode("utf-8")
       if detected == "1":
-        print "Detected feature, %s" % feature
+        print("Detected feature, %s" % feature)
         features.add(feature)
 
   # Manually enabled/disabled features

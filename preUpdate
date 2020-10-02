@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/python3
 
 import os
 import subprocess
@@ -13,7 +13,7 @@ for feature in os.listdir(FEATURES_DIR):
   pre_update_path = os.path.join(feature_path, "preUpdate")
 
   if os.path.isfile(detect_path):
-    detect = subprocess.check_output([ detect_path ]).strip()
+    detect = subprocess.check_output([ detect_path ]).strip().decode("utf-8")
     if detect == "1" and os.path.isfile(pre_update_path):
       print "Executing preUpdate for feature, %s" % feature
       p = subprocess.check_output([ pre_update_path, sys.argv[1] ])
