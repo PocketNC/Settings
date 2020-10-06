@@ -306,23 +306,23 @@ setp hpg1.stepgen.00.dirpin          [POCKETNC_PINS]Z_DIR_PIN
 # axis enable chain
 newsig emcmot.03.enable bit
 sets emcmot.03.enable FALSE
-net emcmot.03.enable <= joint.4.amp-enable-out 
+net emcmot.03.enable <= joint.3.amp-enable-out 
 net emcmot.03.enable => hpg1.stepgen.01.enable
 
 # position command and feedback
-net emcmot.03.pos-cmd <= joint.4.motor-pos-cmd
+net emcmot.03.pos-cmd <= joint.3.motor-pos-cmd
 net emcmot.03.pos-cmd => hpg1.stepgen.01.position-cmd
 net motor.03.pos-fb <= hpg1.stepgen.01.position-fb
-net motor.03.pos-fb => joint.4.motor-pos-fb
+net motor.03.pos-fb => joint.3.motor-pos-fb
 
 # timing parameters
-setp hpg1.stepgen.01.dirsetup        [JOINT_4]DIRSETUP
-setp hpg1.stepgen.01.dirhold         [JOINT_4]DIRHOLD
-setp hpg1.stepgen.01.steplen         [JOINT_4]STEPLEN
-setp hpg1.stepgen.01.stepspace       [JOINT_4]STEPSPACE
-setp hpg1.stepgen.01.position-scale  [JOINT_4]SCALE
-setp hpg1.stepgen.01.maxvel          [JOINT_4]STEPGEN_MAX_VEL
-setp hpg1.stepgen.01.maxaccel        [JOINT_4]STEPGEN_MAX_ACC
+setp hpg1.stepgen.01.dirsetup        [JOINT_3]DIRSETUP
+setp hpg1.stepgen.01.dirhold         [JOINT_3]DIRHOLD
+setp hpg1.stepgen.01.steplen         [JOINT_3]STEPLEN
+setp hpg1.stepgen.01.stepspace       [JOINT_3]STEPSPACE
+setp hpg1.stepgen.01.position-scale  [JOINT_3]SCALE
+setp hpg1.stepgen.01.maxvel          [JOINT_3]STEPGEN_MAX_VEL
+setp hpg1.stepgen.01.maxaccel        [JOINT_3]STEPGEN_MAX_ACC
 
 setp hpg1.stepgen.01.steppin         [POCKETNC_PINS]B_STEP_PIN
 setp hpg1.stepgen.01.dirpin          [POCKETNC_PINS]B_DIR_PIN
@@ -337,23 +337,23 @@ setp hpg1.stepgen.01.dirpin          [POCKETNC_PINS]B_DIR_PIN
 # axis enable chain
 newsig emcmot.04.enable bit
 sets emcmot.04.enable FALSE
-net emcmot.04.enable <= joint.5.amp-enable-out 
+net emcmot.04.enable <= joint.4.amp-enable-out 
 net emcmot.04.enable => hpg0.stepgen.00.enable
 
 # position command and feedback
-net emcmot.04.pos-cmd <= joint.5.motor-pos-cmd
+net emcmot.04.pos-cmd <= joint.4.motor-pos-cmd
 net emcmot.04.pos-cmd => hpg0.stepgen.00.position-cmd
 net motor.04.pos-fb <= hpg0.stepgen.00.position-fb
-net motor.04.pos-fb => joint.5.motor-pos-fb
+net motor.04.pos-fb => joint.4.motor-pos-fb
 
 # timing parameters
-setp hpg0.stepgen.00.dirsetup        [JOINT_5]DIRSETUP
-setp hpg0.stepgen.00.dirhold         [JOINT_5]DIRHOLD
-setp hpg0.stepgen.00.steplen         [JOINT_5]STEPLEN
-setp hpg0.stepgen.00.stepspace       [JOINT_5]STEPSPACE
-setp hpg0.stepgen.00.position-scale  [JOINT_5]SCALE
-setp hpg0.stepgen.00.maxvel          [JOINT_5]STEPGEN_MAX_VEL
-setp hpg0.stepgen.00.maxaccel        [JOINT_5]STEPGEN_MAX_ACC
+setp hpg0.stepgen.00.dirsetup        [JOINT_4]DIRSETUP
+setp hpg0.stepgen.00.dirhold         [JOINT_4]DIRHOLD
+setp hpg0.stepgen.00.steplen         [JOINT_4]STEPLEN
+setp hpg0.stepgen.00.stepspace       [JOINT_4]STEPSPACE
+setp hpg0.stepgen.00.position-scale  [JOINT_4]SCALE
+setp hpg0.stepgen.00.maxvel          [JOINT_4]STEPGEN_MAX_VEL
+setp hpg0.stepgen.00.maxaccel        [JOINT_4]STEPGEN_MAX_ACC
 
 setp hpg0.stepgen.00.steppin         [POCKETNC_PINS]C_STEP_PIN
 setp hpg0.stepgen.00.dirpin          [POCKETNC_PINS]C_DIR_PIN
@@ -412,13 +412,13 @@ setp [POCKETNC_PINS]Z_LIMIT_INVERT
 
 # B Axis Limit
 net BmaxAndHome [POCKETNC_PINS]B_LIMIT_LONG
-net BmaxAndHome joint.4.home-sw-in
+net BmaxAndHome joint.3.home-sw-in
 setp [POCKETNC_PINS]B_LIMIT_INVERT
 
 
 # C axis
 net ChomeAndIndex [POCKETNC_PINS]C_LIMIT_LONG
-net ChomeAndIndex => joint.5.home-sw-in
+net ChomeAndIndex => joint.4.home-sw-in
 setp [POCKETNC_PINS]C_LIMIT_INVERT
 
 ### Control Panel Buttons ###
@@ -479,6 +479,11 @@ net driversEnable mPwr.timedelay.in
 net delayedEnable mPwr.timedelay.out
 net delayedEnable halui.machine.on
 net delayedEnable [POCKETNC_PINS]ENABLE_LONG
+net delayedEnable [POCKETNC_PINS]X_ENABLE_LONG
+net delayedEnable [POCKETNC_PINS]Y_ENABLE_LONG
+net delayedEnable [POCKETNC_PINS]Z_ENABLE_LONG
+net delayedEnable [POCKETNC_PINS]B_ENABLE_LONG
+net delayedEnable [POCKETNC_PINS]C_ENABLE_LONG
 net delayedEnable ledBlink.mPwr.and.in1
 net delayedEnable mPwr.and.in0
 
