@@ -576,3 +576,7 @@ setp triggerEstopFromUserspace.or.in0 0
 # triggerEstopFromUserspace.or.in1 is set to True if an exception occurs in the interlock component. For other machines, initialize to 0
 setp triggerEstopFromUserspace.or.in1 0
 
+net kinstype-select motion.analog-out-03
+net kinstype-select motion.switchkins-type
+net tool-offset motion.tooloffset.z
+net tool-offset xyzbc-trt-kins.tool-offset  
