@@ -4,7 +4,7 @@
 #loadusr -Wn spindle_speed ./spindle_speed_pwm_bbai.py
 loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
 loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
-#loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/pro/vfd.ini -S SPINDLEVFD -r
+loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/pro/vfd.ini -S SPINDLEVFD -r
 
 # ###################################
 # Core EMC/HAL Loads
@@ -533,7 +533,7 @@ setp [POCKETNC_PINS]PROBE_SIGNAL_INVERT
 
 net spindleEnable spindle.0.on
 #net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
-#net spindleEnable spindle-vfd.spindle-on
+net spindleEnable spindle-vfd.spindle-on
 net spindleEnable mcp21.A.out-00
 
 #net spindleDirection spindle.0.forward
@@ -542,14 +542,14 @@ net spindleEnable mcp21.A.out-00
 net displaySpindleReverseButton	spindle.0.reverse
 
 net spindleSpeed spindle.0.speed-out
-#net spindleSpeed spindle-vfd.speed-command
-#net spindleError spindle-vfd.error-code
+net spindleSpeed spindle-vfd.speed-command
+net spindleError spindle-vfd.error-code
 net spindleError spindleError.s32toBit.in
 
-#net spindleModBusOk spindle-vfd.modbus-ok
+net spindleModBusOk spindle-vfd.modbus-ok
 net spindleModBusOk spindleModBus.not.in
 
-#setp spindle-vfd.enable 1
+setp spindle-vfd.enable 1
 
 #net spindleSpeedDummy spindle.0.speed-out
 #net spindleSpeed spindle.0.speed-out-abs
