@@ -27,7 +27,7 @@ loadrt torque axes=xyzbc
 newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 pru_period=730
 newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 pru_period=730
 newinst hal_pru_generic hpg2 [PRUCONF]PRUCODE pru=2 num_pwmreads=6 pru_period=10000
-newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=1 pru_period=730
+newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=2 pru_period=730
 
 newinst conv_s32_bit ledBlinkSignal.s32toBit
 newinst conv_s32_bit spindleError.s32toBit
@@ -580,3 +580,20 @@ net kinstype-select motion.analog-out-03
 net kinstype-select motion.switchkins-type
 net tool-offset motion.tooloffset.z
 net tool-offset xyzbc-trt-kins.tool-offset  
+
+####################################################
+# Tool Changer
+####################################################
+
+setp hpg3.stepgen.01.dirsetup        [TOOL_CHANGER]DIRSETUP
+setp hpg3.stepgen.01.dirhold         [TOOL_CHANGER]DIRHOLD
+setp hpg3.stepgen.01.steplen         [TOOL_CHANGER]STEPLEN
+setp hpg3.stepgen.01.stepspace       [TOOL_CHANGER]STEPSPACE
+setp hpg3.stepgen.01.position-scale  [TOOL_CHANGER]SCALE
+setp hpg3.stepgen.01.maxvel          [TOOL_CHANGER]STEPGEN_MAX_VEL
+setp hpg3.stepgen.01.maxaccel        [TOOL_CHANGER]STEPGEN_MAX_ACC
+
+setp hpg3.stepgen.01.steppin         [POCKETNC_PINS]TOOL_CHANGER_STEP_PIN
+setp hpg3.stepgen.01.dirpin          [POCKETNC_PINS]TOOL_CHANGER_DIR_PIN
+
+setp hpg3.stepgen.01.control-type 1
