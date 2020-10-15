@@ -597,6 +597,9 @@ net kinstype-select motion.switchkins-type
 net tool-offset motion.tooloffset.z
 net tool-offset xyzbc-trt-kins.tool-offset  
 
+net mist-coolant mcp22.B.out-06
+net mist-coolant iocontrol.0.coolant-mist 
+
 ####################################################
 # Tool Changer
 ####################################################

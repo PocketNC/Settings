@@ -1,0 +1,3 @@
+#!/bin/bash
+
+halcmd setp mcp21.A.out-01 1
