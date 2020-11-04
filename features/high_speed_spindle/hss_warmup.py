@@ -94,13 +94,17 @@ try:
     h['warmup_needed'] = checkWarmupNeeded()
     h['full_warmup_needed'] = checkFullWarmupNeeded()
 
-    if h['spindle_on'] and not lastSpindleOn:
-      # if the spindle is being turned on, check whether we should abort
-      needs_warmup = h['warmup_needed']
-      needs_full_warmup = h['full_warmup_needed']
-      abort = needs_warmup and not h['performing_warmup']
-      abort = abort or ( needs_full_warmup and not h['performing_full_warmup'] )
-      if abort:
+    if h['spindle_on']:
+      if not lastSpindleOn:
+        # if the spindle is being turned on, check whether we should abort
+        needs_warmup = h['warmup_needed']
+        needs_full_warmup = h['full_warmup_needed']
+        abort = needs_warmup and not h['performing_warmup']
+        abort = abort or ( needs_full_warmup and not h['performing_full_warmup'] )
+        if abort:
+          h['aborted'] = True
+      elif h['warmup_needed'] and not h['performing_warmup']:
+        abort = True
         h['aborted'] = True
     else:
       abort = False
