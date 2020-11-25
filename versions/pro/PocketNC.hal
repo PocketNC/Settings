@@ -23,6 +23,7 @@ loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 
 loadrt torque axes=xyzbct
+loadrt feedrate 
 
 newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 num_pwmreads=0 pru_period=730
 newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 num_pwmreads=0 pru_period=730
@@ -85,6 +86,7 @@ addf hpg2.update                   servo-thread
 addf hpg3.update                   servo-thread
 addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 addf torque.funct                  servo-thread
+addf feedrate.funct                servo-thread
 
 ######################
 # Testing
@@ -137,6 +139,7 @@ setp hpg2.pwmread.00.pin [POCKETNC_PINS]X_FEEDBACK_PIN
 
 net XDutyCycle hpg2.pwmread.00.duty_cycle
 net XDutyCycle torque.duty_cycle.x
+setp torque.filter.x .999
 
 net XFault torque.fault.x
 net XFault motorFaultOr.in-00
@@ -147,6 +150,7 @@ setp hpg2.pwmread.01.pin [POCKETNC_PINS]Y_FEEDBACK_PIN
 
 net YDutyCycle hpg2.pwmread.01.duty_cycle
 net YDutyCycle torque.duty_cycle.y
+setp torque.filter.y .999
 
 net YFault torque.fault.y
 net YFault motorFaultOr.in-01
@@ -157,6 +161,7 @@ setp hpg2.pwmread.02.pin [POCKETNC_PINS]Z_FEEDBACK_PIN
 
 net ZDutyCycle hpg2.pwmread.02.duty_cycle
 net ZDutyCycle torque.duty_cycle.z
+setp torque.filter.z .999
 
 net ZFault torque.fault.z
 net ZFault motorFaultOr.in-02
@@ -167,6 +172,7 @@ setp hpg2.pwmread.03.pin [POCKETNC_PINS]B_FEEDBACK_PIN
 
 net BDutyCycle hpg2.pwmread.03.duty_cycle
 net BDutyCycle torque.duty_cycle.b
+setp torque.filter.b .999
 
 net BFault torque.fault.b
 net BFault motorFaultOr.in-03
@@ -177,6 +183,7 @@ setp hpg2.pwmread.04.pin [POCKETNC_PINS]C_FEEDBACK_PIN
 
 net CDutyCycle hpg2.pwmread.04.duty_cycle
 net CDutyCycle torque.duty_cycle.c
+setp torque.filter.c .999
 
 net CFault torque.fault.c
 net CFault motorFaultOr.in-04
@@ -617,3 +624,21 @@ setp hpg3.stepgen.01.dirpin          [POCKETNC_PINS]TOOL_CHANGER_DIR_PIN
 
 setp hpg3.stepgen.01.control-type 1
 setp hpg3.stepgen.01.enable 1
+
+# Feedrate calculation
+net XPos feedrate.x
+net XPos joint.0.pos-fb
+
+net YPos feedrate.y
+net YPos joint.1.pos-fb
+
+net ZPos feedrate.z
+net ZPos joint.2.pos-fb
+
+net tool-offset feedrate.tz
+
+net BPos feedrate.b
+net BPos joint.3.pos-fb
+
+net CPos feedrate.c
+net CPos joint.4.pos-fb
