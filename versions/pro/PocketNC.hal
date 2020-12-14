@@ -25,10 +25,10 @@ loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 loadrt torque axes=xyzbct
 loadrt feedrate 
 
-newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 num_pwmreads=0 pru_period=730
-newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 num_pwmreads=0 pru_period=730
+newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 num_pwmreads=0 pru_period=800
+newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 num_pwmreads=0 pru_period=800
 newinst hal_pru_generic hpg2 [PRUCONF]PRUCODE pru=2 num_stepgens=0 num_pwmreads=7 pru_period=10000
-newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=2 num_pwmreads=0 pru_period=730
+newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=2 num_pwmreads=0 pru_period=800
 
 newinst conv_s32_bit ledBlinkSignal.s32toBit
 newinst conv_s32_bit spindleError.s32toBit
@@ -611,34 +611,34 @@ net mist-coolant iocontrol.0.coolant-mist
 # Tool Changer
 ####################################################
 
-setp hpg3.stepgen.01.dirsetup        [TOOL_CHANGER]DIRSETUP
-setp hpg3.stepgen.01.dirhold         [TOOL_CHANGER]DIRHOLD
-setp hpg3.stepgen.01.steplen         [TOOL_CHANGER]STEPLEN
-setp hpg3.stepgen.01.stepspace       [TOOL_CHANGER]STEPSPACE
-setp hpg3.stepgen.01.position-scale  [TOOL_CHANGER]SCALE
-setp hpg3.stepgen.01.maxvel          [TOOL_CHANGER]STEPGEN_MAX_VEL
-setp hpg3.stepgen.01.maxaccel        [TOOL_CHANGER]STEPGEN_MAX_ACC
-
-setp hpg3.stepgen.01.steppin         [POCKETNC_PINS]TOOL_CHANGER_STEP_PIN
-setp hpg3.stepgen.01.dirpin          [POCKETNC_PINS]TOOL_CHANGER_DIR_PIN
-
-setp hpg3.stepgen.01.control-type 1
-setp hpg3.stepgen.01.enable 1
+#setp hpg3.stepgen.01.dirsetup        [TOOL_CHANGER]DIRSETUP
+#setp hpg3.stepgen.01.dirhold         [TOOL_CHANGER]DIRHOLD
+#setp hpg3.stepgen.01.steplen         [TOOL_CHANGER]STEPLEN
+#setp hpg3.stepgen.01.stepspace       [TOOL_CHANGER]STEPSPACE
+#setp hpg3.stepgen.01.position-scale  [TOOL_CHANGER]SCALE
+#setp hpg3.stepgen.01.maxvel          [TOOL_CHANGER]STEPGEN_MAX_VEL
+#setp hpg3.stepgen.01.maxaccel        [TOOL_CHANGER]STEPGEN_MAX_ACC
+#
+#setp hpg3.stepgen.01.steppin         [POCKETNC_PINS]TOOL_CHANGER_STEP_PIN
+#setp hpg3.stepgen.01.dirpin          [POCKETNC_PINS]TOOL_CHANGER_DIR_PIN
+#
+#setp hpg3.stepgen.01.control-type 1
+#setp hpg3.stepgen.01.enable 1
 
 # Feedrate calculation
 net XPos feedrate.x
-net XPos joint.0.pos-fb
+net XPos joint.0.pos-cmd
 
 net YPos feedrate.y
-net YPos joint.1.pos-fb
+net YPos joint.1.pos-cmd
 
 net ZPos feedrate.z
-net ZPos joint.2.pos-fb
+net ZPos joint.2.pos-cmd
 
 net tool-offset feedrate.tz
 
 net BPos feedrate.b
-net BPos joint.3.pos-fb
+net BPos joint.3.pos-cmd
 
 net CPos feedrate.c
-net CPos joint.4.pos-fb
+net CPos joint.4.pos-cmd
