@@ -1,11 +1,11 @@
-# Start script to monitor spindle speed commands
-# so that it can issue i2c commands to change the
-# voltage.
-#loadusr -Wn spindle_speed ./spindle_speed_pwm_bbai.py
+# IO Expanders
 loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
 loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
+
+# Spindle VFD control over serial
 loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/pro/vfd.ini -S SPINDLEVFD -r
 
+# D5 Next water cooler data
 loadusr -Wn d5next ./d5next.py
 
 # ###################################
@@ -18,59 +18,17 @@ loadrt [KINS]KINEMATICS
 # motion controller, get name and thread periods from ini file
 loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS 
 
-
 # load low-level drivers
 loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
-loadrt siggen names=ledBlinkSignal
-loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 
 loadrt torque axes=xyzbct
 loadrt feedrate 
+loadrt pro-estop
 
 newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 num_pwmreads=0 pru_period=800
 newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 num_pwmreads=0 pru_period=800
 newinst hal_pru_generic hpg2 [PRUCONF]PRUCODE pru=2 num_stepgens=0 num_pwmreads=7 pru_period=10000
 newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=2 num_pwmreads=0 pru_period=800
-
-newinst conv_s32_bit ledBlinkSignal.s32toBit
-newinst conv_s32_bit spindleError.s32toBit
-
-#loadrt and2 names=[HAL]AND_COMPONENTS
-newinst and2 ledBlink.eStop.and
-newinst and2 ledBlink.mPwr.and
-newinst and2 ledBlink.pause.and
-newinst and2 mPwr.and
-newinst and2 programStartFromIdle.and
-newinst and2 programStartFromPaused.and
-newinst and2 runningIntoPause.and
-newinst and2 doEstop.and
-newinst and2 doEstopReset.and
-newinst and2 startButtonInterlockCheck.and
-newinst and2 interlockClosedAndReleased.and
-newinst and2 zHoming.and
-newinst and2 xHoming.and
-
-#loadrt or2 names=[HAL]OR_COMPONENTS
-newinst or2 ledBlink.eStop.or
-newinst or2 ledBlink.mPwr.or
-newinst or2 ledBlink.pause.or
-newinst or2 programStartFromPaused.or
-newinst or2 triggerEstop.or
-newinst or2 triggerEstopFromUserspace.or
-newinst or2 pauseFromButtonOrInterlock.or
-newinst or2 startFromButtonOrInterlock.or
-
-newinst lutn eStopOr functn=0xfffffffe pincount=5
-newinst lutn motorFaultOr functn=0xfffffffe pincount=5
-
-newinst not estopNotActivated.not
-newinst not eStopDrivers.not
-newinst not interlockOpen.not
-newinst not spindleModBus.not
-
-loadrt toggle names=eStopButton.toggle
-loadrt timedelay names=mPwr.timedelay,zHoming.timedelay,xHoming.timedelay
-loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPressed.oneshot
 
 # ################################################
 # THREADS
@@ -89,49 +47,7 @@ addf hpg3.update                   servo-thread
 addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 addf torque.funct                  servo-thread
 addf feedrate.funct                servo-thread
-
-######################
-# Testing
-######################
-# LED logic - make blink signals.
-addf ledBlink.eStop.or					servo-thread
-addf ledBlink.mPwr.or					servo-thread
-addf ledBlink.pause.or					servo-thread
-addf ledBlinkSignal.update				servo-thread
-addf ledBlinkSignal.floatToS32			servo-thread
-addf ledBlinkSignal.s32toBit			servo-thread
-addf spindleError.s32toBit			servo-thread
-addf ledBlink.eStop.and					servo-thread
-addf ledBlink.mPwr.and					servo-thread
-addf ledBlink.pause.and					servo-thread
-addf spindleModBus.not			servo-thread
-addf estopNotActivated.not			servo-thread
-addf eStopButton.toggle		servo-thread
-addf eStopDrivers.not		servo-thread
-addf doEstop.and	servo-thread
-addf doEstopReset.and	servo-thread
-addf estopButtonPressed.oneshot servo-thread
-addf mPwr.timedelay		servo-thread
-addf zHoming.timedelay		servo-thread
-addf xHoming.timedelay		servo-thread
-addf mPwr.and			servo-thread
-addf programStart.oneshot	servo-thread
-addf programStartFromPaused.or		servo-thread
-addf programStartFromIdle.and		servo-thread
-addf programStartFromPaused.and		servo-thread
-addf programPause.oneshot	servo-thread
-addf runningIntoPause.and	servo-thread
-addf triggerEstop.or		servo-thread
-addf triggerEstopFromUserspace.or		servo-thread
-addf pauseFromButtonOrInterlock.or		servo-thread
-addf startButtonInterlockCheck.and servo-thread
-addf startFromButtonOrInterlock.or servo-thread
-addf interlockOpen.not servo-thread
-addf interlockClosedAndReleased.and servo-thread
-addf zHoming.and servo-thread
-addf xHoming.and servo-thread
-addf eStopOr.funct servo-thread
-addf motorFaultOr.funct servo-thread
+addf pro-estop.funct               servo-thread
 
 ### Motor Feedback
 
@@ -139,56 +55,56 @@ addf motorFaultOr.funct servo-thread
 setp hpg2.pwmread.00.max_time 2074689
 setp hpg2.pwmread.00.pin [POCKETNC_PINS]X_FEEDBACK_PIN
 
-net XDutyCycle hpg2.pwmread.00.duty_cycle
-net XDutyCycle torque.duty_cycle.x
+net x-duty-cycle hpg2.pwmread.00.duty_cycle
+net x-duty-cycle torque.duty_cycle.x
 setp torque.filter.x .999
 
-net XFault torque.fault.x
-net XFault motorFaultOr.in-00
+net x-fault torque.fault.x
+net x-fault pro-estop.x-fault
 
 # Y feedback
 setp hpg2.pwmread.01.max_time 2074689
 setp hpg2.pwmread.01.pin [POCKETNC_PINS]Y_FEEDBACK_PIN
 
-net YDutyCycle hpg2.pwmread.01.duty_cycle
-net YDutyCycle torque.duty_cycle.y
+net y-duty-cycle hpg2.pwmread.01.duty_cycle
+net y-duty-cycle torque.duty_cycle.y
 setp torque.filter.y .999
 
-net YFault torque.fault.y
-net YFault motorFaultOr.in-01
+net y-fault torque.fault.y
+net y-fault pro-estop.y-fault
 
 # Z feedback
 setp hpg2.pwmread.02.max_time 2074689
 setp hpg2.pwmread.02.pin [POCKETNC_PINS]Z_FEEDBACK_PIN
 
-net ZDutyCycle hpg2.pwmread.02.duty_cycle
-net ZDutyCycle torque.duty_cycle.z
+net z-duty-cycle hpg2.pwmread.02.duty_cycle
+net z-duty-cycle torque.duty_cycle.z
 setp torque.filter.z .999
 
-net ZFault torque.fault.z
-net ZFault motorFaultOr.in-02
+net z-fault torque.fault.z
+net z-fault pro-estop.z-fault
 
 # B feedback
 setp hpg2.pwmread.03.max_time 2074689
 setp hpg2.pwmread.03.pin [POCKETNC_PINS]B_FEEDBACK_PIN
 
-net BDutyCycle hpg2.pwmread.03.duty_cycle
-net BDutyCycle torque.duty_cycle.b
+net b-duty-cycle hpg2.pwmread.03.duty_cycle
+net b-duty-cycle torque.duty_cycle.b
 setp torque.filter.b .999
 
-net BFault torque.fault.b
-net BFault motorFaultOr.in-03
+net b-fault torque.fault.b
+net b-fault pro-estop.b-fault
 
 # C feedback
 setp hpg2.pwmread.04.max_time 2074689
 setp hpg2.pwmread.04.pin [POCKETNC_PINS]C_FEEDBACK_PIN
 
-net CDutyCycle hpg2.pwmread.04.duty_cycle
-net CDutyCycle torque.duty_cycle.c
+net c-duty-cycle hpg2.pwmread.04.duty_cycle
+net c-duty-cycle torque.duty_cycle.c
 setp torque.filter.c .999
 
-net CFault torque.fault.c
-net CFault motorFaultOr.in-04
+net c-fault torque.fault.c
+net c-fault pro-estop.c-fault
 
 setp hpg2.pwmread.05.pin [POCKETNC_PINS]SPINDLE_FEEDBACK_PIN
 
@@ -196,58 +112,29 @@ setp hpg2.pwmread.05.pin [POCKETNC_PINS]SPINDLE_FEEDBACK_PIN
 setp hpg2.pwmread.06.max_time 2074689
 setp hpg2.pwmread.06.pin [POCKETNC_PINS]TOOL_CHANGER_FEEDBACK_PIN
 
-net ToolChangerDutyCycle hpg2.pwmread.06.duty_cycle
-net ToolChangerDutyCycle torque.duty_cycle.t
+net tool-changer-duty-cycle hpg2.pwmread.06.duty_cycle
+net tool-changer-duty-cycle torque.duty_cycle.t
 
 # Setup pins and signals
-setp ledBlinkSignal.offset 1
 setp [POCKETNC_PINS]START_LED_INVERT
 
-net convertSignal		<= ledBlinkSignal.square
-net convertSignal		=> ledBlinkSignal.floatToS32.in
-net convertSignalMore	<= ledBlinkSignal.floatToS32.out
-net convertSignalMore	=> ledBlinkSignal.s32toBit.in
-net  tickTock			<= ledBlinkSignal.s32toBit.out
-net  tickTock			=> ledBlink.eStop.and.in0
-net  tickTock			=> ledBlink.mPwr.and.in0
-net  tickTock			=> ledBlink.pause.and.in0
-net eStopBlink			<= ledBlink.eStop.and.out
-net eStopBlink			=> ledBlink.eStop.or.in0
-net driversEnable		=> ledBlink.eStop.or.in1
-
-net eStopLed ledBlink.eStop.or.out
-net eStopLed [POCKETNC_PINS]ESTOP_LED_LONG
-
-net mPwrBlink			<= ledBlink.mPwr.and.out
-net mPwrBlink			=> ledBlink.mPwr.or.in0
-net mPwrLed				<= ledBlink.mPwr.or.out
-net pauseBlink			<= ledBlink.pause.and.out 
-net pauseBlink			=> ledBlink.pause.or.in0
-
-net pauseLed ledBlink.pause.or.out
-net pauseLed [POCKETNC_PINS]START_LED_LONG
-
-# ######################################################
-# Axis-of-motion Specific Configs (not the GUI)
-# ######################################################
-
+net estop-led [POCKETNC_PINS]ESTOP_LED_LONG
+net pause-led [POCKETNC_PINS]START_LED_LONG
 
 # ################
 # X [0] Axis
 # ################
 
 # axis enable chain
-newsig emcmot.00.enable bit
-sets emcmot.00.enable FALSE
-net emcmot.00.enable <= joint.0.amp-enable-out 
-net emcmot.00.enable => hpg3.stepgen.00.enable
+net x-enable joint.0.amp-enable-out 
+net x-enable hpg3.stepgen.00.enable
 
 # position command and feedback
-net emcmot.00.pos-cmd <= joint.0.motor-pos-cmd
-net emcmot.00.pos-cmd => hpg3.stepgen.00.position-cmd
-net motor.00.pos-fb <= hpg3.stepgen.00.position-fb
-net motor.00.pos-fb => joint.0.motor-pos-fb
+net x-cmd joint.0.motor-pos-cmd
+net x-cmd hpg3.stepgen.00.position-cmd
 
+net x-stepgen-feedback hpg3.stepgen.00.position-fb
+net x-stepgen-feedback joint.0.motor-pos-fb
 
 # timing parameters
 setp hpg3.stepgen.00.dirsetup        [JOINT_0]DIRSETUP
@@ -261,22 +148,19 @@ setp hpg3.stepgen.00.maxaccel        [JOINT_0]STEPGEN_MAX_ACC
 setp hpg3.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN
 setp hpg3.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN
 
-
 # ################
 # Y [1] Axis
 # ################
 
 # axis enable chain
-newsig emcmot.01.enable bit
-sets emcmot.01.enable FALSE
-net emcmot.01.enable <= joint.1.amp-enable-out 
-net emcmot.01.enable => hpg0.stepgen.01.enable
+net y-enable joint.1.amp-enable-out 
+net y-enable hpg0.stepgen.01.enable
 
 # position command and feedback
-net emcmot.01.pos-cmd <= joint.1.motor-pos-cmd
-net emcmot.01.pos-cmd => hpg0.stepgen.01.position-cmd
-net motor.01.pos-fb <= hpg0.stepgen.01.position-fb
-net motor.01.pos-fb => joint.1.motor-pos-fb
+net y-cmd joint.1.motor-pos-cmd
+net y-cmd hpg0.stepgen.01.position-cmd
+net y-stepgen-feedback hpg0.stepgen.01.position-fb
+net y-stepgen-feedback joint.1.motor-pos-fb
 
 # timing parameters
 setp hpg0.stepgen.01.dirsetup        [JOINT_1]DIRSETUP
@@ -290,22 +174,19 @@ setp hpg0.stepgen.01.maxaccel        [JOINT_1]STEPGEN_MAX_ACC
 setp hpg0.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN 
 setp hpg0.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN
 
-
 # ################
 # Z [2] Axis
 # ################
 
 # axis enable chain
-newsig emcmot.02.enable bit
-sets emcmot.02.enable FALSE
-net emcmot.02.enable <= joint.2.amp-enable-out 
-net emcmot.02.enable => hpg1.stepgen.00.enable
+net z-enable joint.2.amp-enable-out 
+net z-enable hpg1.stepgen.00.enable
 
 # position command and feedback
-net emcmot.02.pos-cmd <= joint.2.motor-pos-cmd
-net emcmot.02.pos-cmd => hpg1.stepgen.00.position-cmd
-net motor.02.pos-fb <= hpg1.stepgen.00.position-fb
-net motor.02.pos-fb => joint.2.motor-pos-fb
+net z-cmd joint.2.motor-pos-cmd
+net z-cmd hpg1.stepgen.00.position-cmd
+net z-stepgen-feedback hpg1.stepgen.00.position-fb
+net z-stepgen-feedback joint.2.motor-pos-fb
 
 # timing parameters
 setp hpg1.stepgen.00.dirsetup        [JOINT_2]DIRSETUP
@@ -319,22 +200,19 @@ setp hpg1.stepgen.00.maxaccel        [JOINT_2]STEPGEN_MAX_ACC
 setp hpg1.stepgen.00.steppin         [POCKETNC_PINS]Z_STEP_PIN
 setp hpg1.stepgen.00.dirpin          [POCKETNC_PINS]Z_DIR_PIN
 
-
 # ################
 # B [4] Axis
 # ################
 
 # axis enable chain
-newsig emcmot.03.enable bit
-sets emcmot.03.enable FALSE
-net emcmot.03.enable <= joint.3.amp-enable-out 
-net emcmot.03.enable => hpg1.stepgen.01.enable
+net b-enable joint.3.amp-enable-out 
+net b-enable hpg1.stepgen.01.enable
 
 # position command and feedback
-net emcmot.03.pos-cmd <= joint.3.motor-pos-cmd
-net emcmot.03.pos-cmd => hpg1.stepgen.01.position-cmd
-net motor.03.pos-fb <= hpg1.stepgen.01.position-fb
-net motor.03.pos-fb => joint.3.motor-pos-fb
+net b-cmd joint.3.motor-pos-cmd
+net b-cmd hpg1.stepgen.01.position-cmd
+net b-stepgen-feedback hpg1.stepgen.01.position-fb
+net b-stepgen-feedback joint.3.motor-pos-fb
 
 # timing parameters
 setp hpg1.stepgen.01.dirsetup        [JOINT_3]DIRSETUP
@@ -348,24 +226,19 @@ setp hpg1.stepgen.01.maxaccel        [JOINT_3]STEPGEN_MAX_ACC
 setp hpg1.stepgen.01.steppin         [POCKETNC_PINS]B_STEP_PIN
 setp hpg1.stepgen.01.dirpin          [POCKETNC_PINS]B_DIR_PIN
 
-
-
-
 # ################
 # C [5] Axis
 # ################
 
 # axis enable chain
-newsig emcmot.04.enable bit
-sets emcmot.04.enable FALSE
-net emcmot.04.enable <= joint.4.amp-enable-out 
-net emcmot.04.enable => hpg0.stepgen.00.enable
+net c-enable joint.4.amp-enable-out 
+net c-enable hpg0.stepgen.00.enable
 
 # position command and feedback
-net emcmot.04.pos-cmd <= joint.4.motor-pos-cmd
-net emcmot.04.pos-cmd => hpg0.stepgen.00.position-cmd
-net motor.04.pos-fb <= hpg0.stepgen.00.position-fb
-net motor.04.pos-fb => joint.4.motor-pos-fb
+net c-cmd joint.4.motor-pos-cmd
+net c-cmd hpg0.stepgen.00.position-cmd
+net c-stepgen-feedback hpg0.stepgen.00.position-fb
+net c-stepgen-feedback joint.4.motor-pos-fb
 
 # timing parameters
 setp hpg0.stepgen.00.dirsetup        [JOINT_4]DIRSETUP
@@ -393,213 +266,102 @@ net tool-change-loop	=> iocontrol.0.tool-changed
 ### Home and Limit switches ###
 # X axis
 #
-net XmaxAndHome	[POCKETNC_PINS]X_LIMIT_LONG
-net XmaxAndHome	joint.0.home-sw-in
+net x-max-and-home [POCKETNC_PINS]X_LIMIT_LONG
+net x-max-and-home joint.0.home-sw-in
 setp [POCKETNC_PINS]X_LIMIT_INVERT
 
-#net XHomingDelay xHoming.timedelay.in
-#net XHomingDelay joint.0.homing
-
-#net XHomingAndHLFB1 [POCKETNC_PINS]X_HLFB_LONG
-#net XHomingAndHLFB1 xHoming.and.in0
-
-#net XHomingAndHLFB2 xHoming.timedelay.out
-#net XHomingAndHLFB2 xHoming.and.in1
-
-#net XmaxAndHome xHoming.and.out
-#net XmaxAndHome joint.0.home-sw-in
-
 # Y axis
-net YmaxAndHome	[POCKETNC_PINS]Y_LIMIT_LONG
-net YmaxAndHome	joint.1.home-sw-in
+net y-max-and-home [POCKETNC_PINS]Y_LIMIT_LONG
+net y-max-and-home joint.1.home-sw-in
 setp [POCKETNC_PINS]Y_LIMIT_INVERT
 
 # Z axis
-net ZmaxAndHome	[POCKETNC_PINS]Z_LIMIT_LONG
-net ZmaxAndHome	joint.2.home-sw-in
+net z-max-and-home [POCKETNC_PINS]Z_LIMIT_LONG
+net z-max-and-home joint.2.home-sw-in
 setp [POCKETNC_PINS]Z_LIMIT_INVERT
-#net ZHomingDelay zHoming.timedelay.in
-#net ZHomingDelay joint.2.homing
-#
-#net ZHomingAndHLFB1 [POCKETNC_PINS]Z_HLFB_LONG
-#net ZHomingAndHLFB1 zHoming.and.in0
-#
-#net ZHomingAndHLFB2 zHoming.timedelay.out
-#net ZHomingAndHLFB2 zHoming.and.in1
-#
-#net ZmaxAndHome zHoming.and.out
-#net ZmaxAndHome joint.2.home-sw-in
-
 
 # B Axis Limit
-net BmaxAndHome [POCKETNC_PINS]B_LIMIT_LONG
-net BmaxAndHome joint.3.home-sw-in
+net b-min-and-home [POCKETNC_PINS]B_LIMIT_LONG
+net b-min-and-home joint.3.home-sw-in
 setp [POCKETNC_PINS]B_LIMIT_INVERT
 
-
 # C axis
-net ChomeAndIndex [POCKETNC_PINS]C_LIMIT_LONG
-net ChomeAndIndex => joint.4.home-sw-in
+net c-home-and-index [POCKETNC_PINS]C_LIMIT_LONG
+net c-home-and-index => joint.4.home-sw-in
 setp [POCKETNC_PINS]C_LIMIT_INVERT
 
-### Control Panel Buttons ###
 # eStop
-setp eStopButton.toggle.debounce 2
 setp [POCKETNC_PINS]ESTOP_LED_INVERT
 setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
-net estop-loop iocontrol.0.user-enable-out
+net estop-loop pro-estop.emc-enable
 net estop-loop iocontrol.0.emc-enable-in
 
-net estopPulse [POCKETNC_PINS]ESTOP_SIGNAL_LONG
-net estopPulse estopButtonPressed.oneshot.in
+net machine-on pro-estop.machine-on
+net machine-on halui.machine.on
 
-setp estopButtonPressed.oneshot.width .1
+net estop-user-enable iocontrol.0.user-enable-out
+net estop-user-enable pro-estop.user-enable
 
-net estopButtonPushed estopButtonPressed.oneshot.out
-net estopButtonPushed triggerEstop.or.in0
-net estopButtonPushed doEstopReset.and.in0
+net estop-user-requested-enable iocontrol.0.user-request-enable
+net estop-user-requested-enable pro-estop.user-request-enable
 
-net estopTriggered triggerEstop.or.out
-net estopTriggered doEstop.and.in0
-
-net estopNotActivated estopNotActivated.not.out
-net estopNotActivated doEstop.and.in1
-
-net estopIsActivated halui.estop.is-activated
-net estopIsActivated estopNotActivated.not.in
-net estopIsActivated doEstopReset.and.in1
-
-net resetEstop doEstopReset.and.out
-net resetEstop halui.estop.reset
-
-net eStopButtonSignal doEstop.and.out
-net eStopButtonSignal eStopOr.in-00
-
-net motorFaultSignal motorFaultOr.out
-net motorFaultSignal eStopOr.in-01
-
-setp spindleError.s32toBit.clamp 1
-net SpindleFault spindleError.s32toBit.out
-net SpindleFault eStopOr.in-02
-
-net SpindleModBusNotOk spindleModBus.not.out
-net SpindleModBusNotOk eStopOr.in-03
-
-#net toolChangerFaultSignal torque.fault.t
-#net toolChangerFaultSignal eStopOr.in-04
-
-net activateEstop eStopOr.out
-net activateEstop halui.estop.activate
-
-net estopIsActivated halui.estop.is-activated
-net estopIsActivated ledBlink.eStop.and.in1
-net estopIsActivated eStopDrivers.not.in
-
+net estop-button pro-estop.button
+net estop-button [POCKETNC_PINS]ESTOP_SIGNAL_LONG
 
 # Machine power
 setp [POCKETNC_PINS]ENABLE_INVERT
-net driversEnable eStopDrivers.not.out
-net driversEnable mPwr.timedelay.in
-net delayedEnable mPwr.timedelay.out
-net delayedEnable halui.machine.on
-net delayedEnable [POCKETNC_PINS]ENABLE_LONG
-net delayedEnable [POCKETNC_PINS]X_ENABLE_LONG
-net delayedEnable [POCKETNC_PINS]Y_ENABLE_LONG
-net delayedEnable [POCKETNC_PINS]Z_ENABLE_LONG
-net delayedEnable [POCKETNC_PINS]B_ENABLE_LONG
-net delayedEnable [POCKETNC_PINS]C_ENABLE_LONG
-net delayedEnable [POCKETNC_PINS]TOOL_CHANGER_ENABLE_LONG
-net delayedEnable ledBlink.mPwr.and.in1
-net delayedEnable mPwr.and.in0
 
+net motors-on pro-estop.power
+net motors-on [POCKETNC_PINS]ENABLE_LONG
+
+net x-motor-enable pro-estop.x-motor-enable
+net x-motor-enable [POCKETNC_PINS]X_ENABLE_LONG
+
+net y-motor-enable pro-estop.y-motor-enable
+net y-motor-enable [POCKETNC_PINS]Y_ENABLE_LONG
+
+net z-motor-enable pro-estop.z-motor-enable
+net z-motor-enable [POCKETNC_PINS]Z_ENABLE_LONG
+
+net b-motor-enable pro-estop.b-motor-enable
+net b-motor-enable [POCKETNC_PINS]B_ENABLE_LONG
+
+net c-motor-enable pro-estop.c-motor-enable
+net c-motor-enable [POCKETNC_PINS]C_ENABLE_LONG
 
 # Program start/run
 setp [POCKETNC_PINS]START_SIGNAL_INVERT
-setp programStart.oneshot.width 0.1
-net progStartButton [POCKETNC_PINS]START_SIGNAL_LONG
-net progStartButton		=> programStart.oneshot.in
-net progStart			<= programStart.oneshot.out
+net program-start-button [POCKETNC_PINS]START_SIGNAL_LONG
 
-net progStart			=> programStartFromIdle.and.in0
-net progStart			=> programStartFromPaused.and.in0
-net progStart			=> runningIntoPause.and.in0
-net progStartIdle		<= halui.program.is-idle
-net progStartIdle		=> programStartFromIdle.and.in1
-net progStartIdle		=> mPwr.and.in1
-net progStartFromIdle	<= programStartFromIdle.and.out
-net progStartFromIdle	=> halui.mode.auto
-net progStartFromIdle	=> halui.program.run
-net progStartPaused		<= halui.program.is-paused
-net progStartPaused		=> programStartFromPaused.and.in1
-net progStartPaused		=> ledBlink.pause.and.in1
-net progStartPaused		=> programStartFromPaused.or.in1
-net progStartFromPaused	<= programStartFromPaused.and.out
-net progStartFromPaused	=> halui.program.resume
-net progStarted			<= halui.program.is-running
-net progStarted			=> ledBlink.pause.or.in1
-net progStarted			=> runningIntoPause.and.in1
-net runLedLogic			<= mPwr.and.out
-net runLedLogic			=>  programStartFromPaused.or.in0
-net moreLedLogic		<= programStartFromPaused.or.out
-net moreLedLogic		=> ledBlink.mPwr.or.in1
-
-net progPauseLogic <= runningIntoPause.and.out
-net progPauseLogic => pauseFromButtonOrInterlock.or.in0
-net pauseSig <= pauseFromButtonOrInterlock.or.out
-net pauseSig => halui.program.pause
-
+net program-is-running halui.program.is-running
+net program-is-paused halui.program.is-paused
 
 # Probe
-net toolProbe [POCKETNC_PINS]PROBE_SIGNAL_LONG
-net toolProbe motion.probe-input
+net tool-probe [POCKETNC_PINS]PROBE_SIGNAL_LONG
+net tool-probe motion.probe-input
 setp [POCKETNC_PINS]PROBE_SIGNAL_INVERT
 
 ### Spindle ###
 
-net spindleEnable spindle.0.on
-#net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
-net spindleEnable spindle-vfd.spindle-on
-net spindleEnable mcp21.A.out-00
+net spindle-enable spindle.0.on
+net spindle-enable spindle-vfd.spindle-on
+# turn on air seal when spindle is enabled
+net spindle-enable mcp21.A.out-00 
 
-#net spindleDirection spindle.0.forward
-#net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
+net spindle-speed spindle.0.speed-out
+net spindle-speed spindle-vfd.speed-command
 
-net displaySpindleReverseButton	spindle.0.reverse
+net spindle-error spindle-vfd.error-code
+net spindle-error pro-estop.spindle-error-code
 
-net spindleSpeed spindle.0.speed-out
-net spindleSpeed spindle-vfd.speed-command
-net spindleError spindle-vfd.error-code
-net spindleError spindleError.s32toBit.in
-
-net spindleModBusOk spindle-vfd.modbus-ok
-net spindleModBusOk spindleModBus.not.in
+net spindle-modbus-ok spindle-vfd.modbus-ok
+net spindle-modbus-ok pro-estop.spindle-modbus-ok
 
 setp spindle-vfd.enable 1
-
-#net spindleSpeedDummy spindle.0.speed-out
-#net spindleSpeed spindle.0.speed-out-abs
-#net spindleSpeed spindle_speed.speed_in
-
-#net spindleSpeedMeasured spindle_speed.speed_measured
 
 # ##################################################
 # Features
 # ##################################################
-
-net estopTriggeredFromUserspace triggerEstopFromUserspace.or.out 
-net estopTriggeredFromUserspace triggerEstop.or.in1
-
-### High Speed Spindle ###
-
-# high speed spindle feature binds triggerEstopFromUserspace.or.in0 to a warm up check
-# to avoid turning on the spindle when it hasn't run for 
-# a while. For other machines, simply initialize to 0.
-setp triggerEstopFromUserspace.or.in0 0
-
-### Interlock ###
-
-# triggerEstopFromUserspace.or.in1 is set to True if an exception occurs in the interlock component. For other machines, initialize to 0
-setp triggerEstopFromUserspace.or.in1 0
 
 net kinstype-select motion.analog-out-03
 net kinstype-select motion.switchkins-type
@@ -628,19 +390,19 @@ net mist-coolant iocontrol.0.coolant-mist
 #setp hpg3.stepgen.01.enable 1
 
 # Feedrate calculation
-net XPos feedrate.x
-net XPos joint.0.pos-cmd
+net x-pos feedrate.x
+net x-pos joint.0.pos-cmd
 
-net YPos feedrate.y
-net YPos joint.1.pos-cmd
+net y-pos feedrate.y
+net y-pos joint.1.pos-cmd
 
-net ZPos feedrate.z
-net ZPos joint.2.pos-cmd
+net z-pos feedrate.z
+net z-pos joint.2.pos-cmd
 
 net tool-offset feedrate.tz
 
-net BPos feedrate.b
-net BPos joint.3.pos-cmd
+net b-pos feedrate.b
+net b-pos joint.3.pos-cmd
 
-net CPos feedrate.c
-net CPos joint.4.pos-cmd
+net c-pos feedrate.c
+net c-pos joint.4.pos-cmd

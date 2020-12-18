@@ -1,4 +1,4 @@
 loadusr -W ./features/run_time_clock/run_time_clock.py
 
-net progStarted run_time_clock.start
-net progStartPaused run_time_clock.pause
+net program-is-running run_time_clock.start
+net program-is-paused run_time_clock.pause
