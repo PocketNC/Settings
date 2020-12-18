@@ -1,5 +1,18 @@
 #!/usr/bin/python3
 
+#********************************************************************
+# Description:  d5next
+#               This file, 'd5next.py', is a HAL component that 
+#               has reads data from a D5 Next water cooler via
+#               I2C.
+#
+# Author: John Allwine <john@pocketnc.com>
+# License: GPL Version 2
+#    
+# Copyright (c) 2020 Pocket NC Company All rights reserved.
+#
+#*******************************************************************
+
 from smbus import SMBus
 import hal
 import time
