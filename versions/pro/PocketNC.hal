@@ -296,6 +296,9 @@ setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
 net estop-loop pro-estop.emc-enable
 net estop-loop iocontrol.0.emc-enable-in
 
+net reset-estop pro-estop.user-requested-enable
+net reset-estop halui.estop.reset
+
 net machine-on pro-estop.machine-on
 net machine-on halui.machine.on
 
