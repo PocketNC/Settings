@@ -62,6 +62,9 @@ setp torque.filter.x .999
 net x-fault torque.fault.x
 net x-fault pro-estop.x-fault
 
+net x-f-errored joint.0.f-errored
+net x-f-errored pro-estop.x-f-error
+
 # Y feedback
 setp hpg2.pwmread.01.max_time 2074689
 setp hpg2.pwmread.01.pin [POCKETNC_PINS]Y_FEEDBACK_PIN
@@ -72,6 +75,9 @@ setp torque.filter.y .999
 
 net y-fault torque.fault.y
 net y-fault pro-estop.y-fault
+
+net y-f-errored joint.1.f-errored
+net y-f-errored pro-estop.y-f-error
 
 # Z feedback
 setp hpg2.pwmread.02.max_time 2074689
@@ -84,6 +90,9 @@ setp torque.filter.z .999
 net z-fault torque.fault.z
 net z-fault pro-estop.z-fault
 
+net z-f-errored joint.2.f-errored
+net z-f-errored pro-estop.z-f-error
+
 # B feedback
 setp hpg2.pwmread.03.max_time 2074689
 setp hpg2.pwmread.03.pin [POCKETNC_PINS]B_FEEDBACK_PIN
@@ -95,6 +104,9 @@ setp torque.filter.b .999
 net b-fault torque.fault.b
 net b-fault pro-estop.b-fault
 
+net b-f-errored joint.3.f-errored
+net b-f-errored pro-estop.b-f-error
+
 # C feedback
 setp hpg2.pwmread.04.max_time 2074689
 setp hpg2.pwmread.04.pin [POCKETNC_PINS]C_FEEDBACK_PIN
@@ -105,6 +117,9 @@ setp torque.filter.c .999
 
 net c-fault torque.fault.c
 net c-fault pro-estop.c-fault
+
+net c-f-errored joint.4.f-errored
+net c-f-errored pro-estop.c-f-error
 
 setp hpg2.pwmread.05.pin [POCKETNC_PINS]SPINDLE_FEEDBACK_PIN
 
