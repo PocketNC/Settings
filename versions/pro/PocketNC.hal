@@ -311,6 +311,19 @@ setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
 net estop-loop pro-estop.emc-enable
 net estop-loop iocontrol.0.emc-enable-in
 
+# This should be done by setting VOLATILE_HOME (which we've done)
+# but it doesn't seem to work when E-Stopping due to a following 
+# error. The pro-estop component sets a delayed unhome signal 
+# after an E-Stop occurs to ensure the joints unhome.
+# This is a hack that should probably be fixed at a deeper level
+# in emc control code.
+net unhome pro-estop.unhome
+net unhome halui.joint.0.unhome
+net unhome halui.joint.1.unhome
+net unhome halui.joint.2.unhome
+net unhome halui.joint.3.unhome
+net unhome halui.joint.4.unhome
+
 net reset-estop pro-estop.user-requested-enable
 net reset-estop halui.estop.reset
 
