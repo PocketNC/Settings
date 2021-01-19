@@ -59,25 +59,29 @@ def crc16(data):
 
 try:
   while True:
-    data = b.read_i2c_block_data(0x1e, 0x00)
+    try:
+      data = b.read_i2c_block_data(0x1e, 0x00)
 
-    crc = ((data[23] << 8) | data[24])
-    if crc == crc16(data[0:23]):
-      h['fan.output'] = ((data[1] << 8) | data[2])/100    # in percentage
-      h['fan.voltage'] = ((data[3] << 8) | data[4])/100   # in volts
-      h['fan.current'] = ((data[5] << 8) | data[6])/1000  # in amps
-      h['fan.speed'] = ((data[7] << 8) | data[8])         # in RPM
-      h['fan.flags'] = data[9]
+      crc = ((data[23] << 8) | data[24])
+      if crc == crc16(data[0:23]):
+        h['fan.output'] = ((data[1] << 8) | data[2])/100    # in percentage
+        h['fan.voltage'] = ((data[3] << 8) | data[4])/100   # in volts
+        h['fan.current'] = ((data[5] << 8) | data[6])/1000  # in amps
+        h['fan.speed'] = ((data[7] << 8) | data[8])         # in RPM
+        h['fan.flags'] = data[9]
 
-      h['pump.output'] = ((data[10] << 8) | data[11])/100    # in percentage
-      h['pump.voltage'] = ((data[12] << 8) | data[13])/100   # in volts
-      h['pump.current'] = ((data[14] << 8) | data[15])/1000  # in amps
-      h['pump.speed'] = ((data[16] << 8) | data[17])         # in RPM
-      h['pump.flags'] = data[18]
+        h['pump.output'] = ((data[10] << 8) | data[11])/100    # in percentage
+        h['pump.voltage'] = ((data[12] << 8) | data[13])/100   # in volts
+        h['pump.current'] = ((data[14] << 8) | data[15])/1000  # in amps
+        h['pump.speed'] = ((data[16] << 8) | data[17])         # in RPM
+        h['pump.flags'] = data[18]
 
-      h['flow'] = ((data[19] << 8) | data[20])/10          # in liters / hour
-      h['temperature_c'] = ((data[21] << 8) | data[22])/100  # in degrees C
-      h['temperature_f'] = ((data[21] << 8) | data[22])/100*9./5+32  # in degrees F
+        h['flow'] = ((data[19] << 8) | data[20])/10          # in liters / hour
+        h['temperature_c'] = ((data[21] << 8) | data[22])/100  # in degrees C
+        h['temperature_f'] = ((data[21] << 8) | data[22])/100*9./5+32  # in degrees F
+
+    except:
+      pass
 
     time.sleep(1)
 except KeyboardInterrupt:
