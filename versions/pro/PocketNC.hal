@@ -18,8 +18,7 @@ loadrt [KINS]KINEMATICS
 # motion controller, get name and thread periods from ini file
 loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS 
 
-# load low-level drivers
-loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
+newinst bb_gpio init
 
 loadrt torque axes=xyzbct
 loadrt feedrate 
@@ -37,14 +36,14 @@ addf hpg0.capture-position         servo-thread
 addf hpg1.capture-position         servo-thread
 addf hpg2.capture-position         servo-thread
 addf hpg3.capture-position         servo-thread
-addf [POCKETNC_PINS]BB_GPIO_READ   servo-thread
+addf bb_gpio.read                  servo-thread
 addf motion-command-handler        servo-thread
 addf motion-controller             servo-thread
 addf hpg0.update                   servo-thread
 addf hpg1.update                   servo-thread
 addf hpg2.update                   servo-thread
 addf hpg3.update                   servo-thread
-addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
+addf bb_gpio.write                 servo-thread
 addf torque.funct                  servo-thread
 addf feedrate.funct                servo-thread
 addf pro-estop.funct               servo-thread
@@ -129,12 +128,6 @@ setp hpg2.pwmread.06.pin [POCKETNC_PINS]TOOL_CHANGER_FEEDBACK_PIN
 
 net tool-changer-duty-cycle hpg2.pwmread.06.duty_cycle
 net tool-changer-duty-cycle torque.duty_cycle.t
-
-# Setup pins and signals
-setp [POCKETNC_PINS]START_LED_INVERT
-
-net estop-led [POCKETNC_PINS]ESTOP_LED_LONG
-net pause-led [POCKETNC_PINS]START_LED_LONG
 
 # ################
 # X [0] Axis
@@ -281,33 +274,36 @@ net tool-change-loop	=> iocontrol.0.tool-changed
 ### Home and Limit switches ###
 # X axis
 #
-net x-max-and-home [POCKETNC_PINS]X_LIMIT_LONG
+newinst bb_gpio x-limit-pin pin=[POCKETNC_PINS]X_LIMIT_PIN direction=input
+setp x-limit-pin.invert 1
+net x-max-and-home x-limit-pin.in
 net x-max-and-home joint.0.home-sw-in
-setp [POCKETNC_PINS]X_LIMIT_INVERT
 
 # Y axis
-net y-max-and-home [POCKETNC_PINS]Y_LIMIT_LONG
+newinst bb_gpio y-limit-pin pin=[POCKETNC_PINS]Y_LIMIT_PIN direction=input
+setp y-limit-pin.invert 1
+net y-max-and-home y-limit-pin.in
 net y-max-and-home joint.1.home-sw-in
-setp [POCKETNC_PINS]Y_LIMIT_INVERT
 
 # Z axis
-net z-max-and-home [POCKETNC_PINS]Z_LIMIT_LONG
+newinst bb_gpio z-limit-pin pin=[POCKETNC_PINS]Z_LIMIT_PIN direction=input
+setp z-limit-pin.invert 1
+net z-max-and-home z-limit-pin.in
 net z-max-and-home joint.2.home-sw-in
-setp [POCKETNC_PINS]Z_LIMIT_INVERT
 
 # B Axis Limit
-net b-min-and-home [POCKETNC_PINS]B_LIMIT_LONG
+newinst bb_gpio b-limit-pin pin=[POCKETNC_PINS]B_LIMIT_PIN direction=input
+setp b-limit-pin.invert 1
+net b-min-and-home b-limit-pin.in
 net b-min-and-home joint.3.home-sw-in
-setp [POCKETNC_PINS]B_LIMIT_INVERT
 
 # C axis
-net c-home-and-index [POCKETNC_PINS]C_LIMIT_LONG
+newinst bb_gpio c-limit-pin pin=[POCKETNC_PINS]C_LIMIT_PIN direction=input
+setp c-limit-pin.invert 1
+net c-home-and-index c-limit-pin.in
 net c-home-and-index => joint.4.home-sw-in
-setp [POCKETNC_PINS]C_LIMIT_INVERT
 
 # eStop
-setp [POCKETNC_PINS]ESTOP_LED_INVERT
-setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
 net estop-loop pro-estop.emc-enable
 net estop-loop iocontrol.0.emc-enable-in
 
@@ -336,41 +332,45 @@ net estop-user-enable pro-estop.user-enable
 net estop-user-requested-enable iocontrol.0.user-request-enable
 net estop-user-requested-enable pro-estop.user-request-enable
 
+newinst bb_gpio estop-button-pin pin=[POCKETNC_PINS]ESTOP_BUTTON_PIN direction=input
+setp estop-button-pin.invert 1
 net estop-button pro-estop.button
-net estop-button [POCKETNC_PINS]ESTOP_SIGNAL_LONG
+net estop-button estop-button-pin.in
 
 # Machine power
-setp [POCKETNC_PINS]ENABLE_INVERT
-
+newinst bb_gpio enable-pin pin=[POCKETNC_PINS]ENABLE_PIN direction=output
 net motors-on pro-estop.power
-net motors-on [POCKETNC_PINS]ENABLE_LONG
+net motors-on enable-pin.out
 
+newinst bb_gpio x-enable-pin pin=[POCKETNC_PINS]X_ENABLE_PIN direction=output
 net x-motor-enable pro-estop.x-motor-enable
-net x-motor-enable [POCKETNC_PINS]X_ENABLE_LONG
+net x-motor-enable x-enable-pin.out
 
+newinst bb_gpio y-enable-pin pin=[POCKETNC_PINS]Y_ENABLE_PIN direction=output
 net y-motor-enable pro-estop.y-motor-enable
-net y-motor-enable [POCKETNC_PINS]Y_ENABLE_LONG
+net y-motor-enable y-enable-pin.out
 
+newinst bb_gpio z-enable-pin pin=[POCKETNC_PINS]Z_ENABLE_PIN direction=output
 net z-motor-enable pro-estop.z-motor-enable
-net z-motor-enable [POCKETNC_PINS]Z_ENABLE_LONG
+net z-motor-enable z-enable-pin.out
 
+newinst bb_gpio b-enable-pin pin=[POCKETNC_PINS]B_ENABLE_PIN direction=output
 net b-motor-enable pro-estop.b-motor-enable
-net b-motor-enable [POCKETNC_PINS]B_ENABLE_LONG
+net b-motor-enable b-enable-pin.out
 
+newinst bb_gpio c-enable-pin pin=[POCKETNC_PINS]C_ENABLE_PIN direction=output
 net c-motor-enable pro-estop.c-motor-enable
-net c-motor-enable [POCKETNC_PINS]C_ENABLE_LONG
+net c-motor-enable c-enable-pin.out
 
 # Program start/run
-setp [POCKETNC_PINS]START_SIGNAL_INVERT
-net program-start-button [POCKETNC_PINS]START_SIGNAL_LONG
-
 net program-is-running halui.program.is-running
 net program-is-paused halui.program.is-paused
 
 # Probe
-net tool-probe [POCKETNC_PINS]PROBE_SIGNAL_LONG
+newinst bb_gpio probe-pin pin=[POCKETNC_PINS]PROBE_PIN direction=input
+setp probe-pin.invert 1
+net tool-probe probe-pin.in
 net tool-probe motion.probe-input
-setp [POCKETNC_PINS]PROBE_SIGNAL_INVERT
 
 ### Spindle ###
 
