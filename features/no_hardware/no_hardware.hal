@@ -1,1 +1,1 @@
-setp pro-estop.ignore-com-errors 1
+setp solo-estop.ignore-com-errors 1

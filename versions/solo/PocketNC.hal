@@ -3,7 +3,7 @@ loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,
 loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
 
 # Spindle VFD control over serial
-loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/pro/vfd.ini -S SPINDLEVFD -r
+loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/solo/vfd.ini -S SPINDLEVFD -r
 
 # D5 Next water cooler data
 loadusr -Wn d5next ./d5next.py
@@ -22,7 +22,7 @@ newinst bb_gpio init
 
 loadrt torque axes=xyzbct
 loadrt feedrate 
-loadrt pro-estop
+loadrt solo-estop
 
 newinst hal_pru_generic hpg0 [PRUCONF]PRUCODE pru=0 num_stepgens=2 num_pwmreads=0 pru_period=800
 newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 num_pwmreads=0 pru_period=800
@@ -46,7 +46,7 @@ addf hpg3.update                   servo-thread
 addf bb_gpio.write                 servo-thread
 addf torque.funct                  servo-thread
 addf feedrate.funct                servo-thread
-addf pro-estop.funct               servo-thread
+addf solo-estop.funct               servo-thread
 
 ### Motor Feedback
 
@@ -59,10 +59,10 @@ net x-duty-cycle torque.duty_cycle.x
 setp torque.filter.x .999
 
 net x-fault torque.fault.x
-net x-fault pro-estop.x-fault
+net x-fault solo-estop.x-fault
 
 net x-f-errored joint.0.f-errored
-net x-f-errored pro-estop.x-f-error
+net x-f-errored solo-estop.x-f-error
 
 # Y feedback
 setp hpg2.pwmread.01.max_time 2074689
@@ -73,10 +73,10 @@ net y-duty-cycle torque.duty_cycle.y
 setp torque.filter.y .999
 
 net y-fault torque.fault.y
-net y-fault pro-estop.y-fault
+net y-fault solo-estop.y-fault
 
 net y-f-errored joint.1.f-errored
-net y-f-errored pro-estop.y-f-error
+net y-f-errored solo-estop.y-f-error
 
 # Z feedback
 setp hpg2.pwmread.02.max_time 2074689
@@ -87,10 +87,10 @@ net z-duty-cycle torque.duty_cycle.z
 setp torque.filter.z .999
 
 net z-fault torque.fault.z
-net z-fault pro-estop.z-fault
+net z-fault solo-estop.z-fault
 
 net z-f-errored joint.2.f-errored
-net z-f-errored pro-estop.z-f-error
+net z-f-errored solo-estop.z-f-error
 
 # B feedback
 setp hpg2.pwmread.03.max_time 2074689
@@ -101,10 +101,10 @@ net b-duty-cycle torque.duty_cycle.b
 setp torque.filter.b .999
 
 net b-fault torque.fault.b
-net b-fault pro-estop.b-fault
+net b-fault solo-estop.b-fault
 
 net b-f-errored joint.3.f-errored
-net b-f-errored pro-estop.b-f-error
+net b-f-errored solo-estop.b-f-error
 
 # C feedback
 setp hpg2.pwmread.04.max_time 2074689
@@ -115,10 +115,10 @@ net c-duty-cycle torque.duty_cycle.c
 setp torque.filter.c .999
 
 net c-fault torque.fault.c
-net c-fault pro-estop.c-fault
+net c-fault solo-estop.c-fault
 
 net c-f-errored joint.4.f-errored
-net c-f-errored pro-estop.c-f-error
+net c-f-errored solo-estop.c-f-error
 
 setp hpg2.pwmread.05.pin [POCKETNC_PINS]SPINDLE_FEEDBACK_PIN
 
@@ -304,62 +304,62 @@ net c-home-and-index c-limit-pin.in
 net c-home-and-index => joint.4.home-sw-in
 
 # eStop
-net estop-loop pro-estop.emc-enable
+net estop-loop solo-estop.emc-enable
 net estop-loop iocontrol.0.emc-enable-in
 
 # This should be done by setting VOLATILE_HOME (which we've done)
 # but it doesn't seem to work when E-Stopping due to a following 
-# error. The pro-estop component sets a delayed unhome signal 
+# error. The solo-estop component sets a delayed unhome signal 
 # after an E-Stop occurs to ensure the joints unhome.
 # This is a hack that should probably be fixed at a deeper level
 # in emc control code.
-net unhome pro-estop.unhome
+net unhome solo-estop.unhome
 net unhome halui.joint.0.unhome
 net unhome halui.joint.1.unhome
 net unhome halui.joint.2.unhome
 net unhome halui.joint.3.unhome
 net unhome halui.joint.4.unhome
 
-net reset-estop pro-estop.user-requested-enable
+net reset-estop solo-estop.user-requested-enable
 net reset-estop halui.estop.reset
 
-net machine-on pro-estop.machine-on
+net machine-on solo-estop.machine-on
 net machine-on halui.machine.on
 
 net estop-user-enable iocontrol.0.user-enable-out
-net estop-user-enable pro-estop.user-enable
+net estop-user-enable solo-estop.user-enable
 
 net estop-user-requested-enable iocontrol.0.user-request-enable
-net estop-user-requested-enable pro-estop.user-request-enable
+net estop-user-requested-enable solo-estop.user-request-enable
 
 newinst bb_gpio estop-button-pin pin=[POCKETNC_PINS]ESTOP_BUTTON_PIN direction=input
 setp estop-button-pin.invert 1
-net estop-button pro-estop.button
+net estop-button solo-estop.button
 net estop-button estop-button-pin.in
 
 # Machine power
 newinst bb_gpio enable-pin pin=[POCKETNC_PINS]ENABLE_PIN direction=output
-net motors-on pro-estop.power
+net motors-on solo-estop.power
 net motors-on enable-pin.out
 
 newinst bb_gpio x-enable-pin pin=[POCKETNC_PINS]X_ENABLE_PIN direction=output
-net x-motor-enable pro-estop.x-motor-enable
+net x-motor-enable solo-estop.x-motor-enable
 net x-motor-enable x-enable-pin.out
 
 newinst bb_gpio y-enable-pin pin=[POCKETNC_PINS]Y_ENABLE_PIN direction=output
-net y-motor-enable pro-estop.y-motor-enable
+net y-motor-enable solo-estop.y-motor-enable
 net y-motor-enable y-enable-pin.out
 
 newinst bb_gpio z-enable-pin pin=[POCKETNC_PINS]Z_ENABLE_PIN direction=output
-net z-motor-enable pro-estop.z-motor-enable
+net z-motor-enable solo-estop.z-motor-enable
 net z-motor-enable z-enable-pin.out
 
 newinst bb_gpio b-enable-pin pin=[POCKETNC_PINS]B_ENABLE_PIN direction=output
-net b-motor-enable pro-estop.b-motor-enable
+net b-motor-enable solo-estop.b-motor-enable
 net b-motor-enable b-enable-pin.out
 
 newinst bb_gpio c-enable-pin pin=[POCKETNC_PINS]C_ENABLE_PIN direction=output
-net c-motor-enable pro-estop.c-motor-enable
+net c-motor-enable solo-estop.c-motor-enable
 net c-motor-enable c-enable-pin.out
 
 # Program start/run
@@ -383,10 +383,10 @@ net spindle-speed spindle.0.speed-out
 net spindle-speed spindle-vfd.speed-command
 
 net spindle-error spindle-vfd.error-code
-net spindle-error pro-estop.spindle-error-code
+net spindle-error solo-estop.spindle-error-code
 
 net spindle-modbus-ok spindle-vfd.modbus-ok
-net spindle-modbus-ok pro-estop.spindle-modbus-ok
+net spindle-modbus-ok solo-estop.spindle-modbus-ok
 
 setp spindle-vfd.enable 1
 
