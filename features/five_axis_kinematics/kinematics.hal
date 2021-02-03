@@ -1,8 +1,0 @@
-net tool-offset motion.tooloffset.z
-net tool-offset pocketnckins.tool-z-offset
- 
-net space-change motion.carte-space-changed
-net space-change pocketnckins.carte-space-changed
-
-net space-change-ok motion.carte-space-change-ok
-net space-change-ok pocketnckins.carte-space-change-ok
