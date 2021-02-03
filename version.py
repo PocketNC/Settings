@@ -16,8 +16,34 @@
 #    the EEPROM chip at address 0x50, which was installed on v2revR.
 
 import sys
+from smbus import SMBus
 import os
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+
+from enum import Enum
+
+class Versions(Enum):
+  V1REVH = "v1revH"
+  V2REVP = "v2revP"
+  V2REVR = "v2revR"
+
+class DeviceModel(Enum):
+  UNKNOWN = -1
+  BBB = 0
+  BBAI = 1
+
+def getProcDeviceModel():
+  with open("/proc/device-tree/model") as deviceModel:
+    return deviceModel.read().strip()
+
+def getDeviceModel():
+  device = getProcDeviceModel()
+  if "AI" in device:
+    return DeviceModel.BBAI
+  elif "Black" in device:
+    return DeviceModel.BBB
+  else:
+    return DeviceModel.UNKNOWN
 
 def getVersion():
   version = "v2revP" # default version if we don't find another using the version file or i2c
@@ -26,52 +52,20 @@ def getVersion():
     with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
       version = versionFile.read().strip();
   except:
-    # Adafruit_I2C calls output text to stdout when an error occurs.
-    # We only want to know that there was an error. We don't want the error output
-    # to stdout as this script outputs only the version of this machine.
-    # So, we need to capture stdout when running i2c calls.
+    device = getDeviceModel()
+    if device == DeviceModel.BBAI:
+      bus = 3
+    elif device == DeviceModel.BBB:
+      bus = 2
 
-    # Capturing class for capturing stdout 
-    # taken from https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
-    from cStringIO import StringIO
-    import sys
-
-    class Capturing(list):
-      def __enter__(self):
-        self._stdout = sys.stdout
-        sys.stdout = self._stringio = StringIO()
-        return self
-      def __exit__(self, *args):
-        self.extend(self._stringio.getvalue().splitlines())
-        del self._stringio    # free up some memory
-        sys.stdout = self._stdout
-
+    b = SMBus(bus)
     try:
-      from Adafruit_GPIO.I2C import Device
-
-      try:
-        i2c = Device(0x50, 2)
-        test = i2c.readU8(0)
-        # TODO put version information on EEPROM chip.
-        version = "v2revR"
-      except:
-        pass
+      b.read_byte(0x50)
+      version = Versions.V2REVR.value
     except:
-      # Older machines have an old version of Adafruit_I2C.
-      # Adafruit_I2C was replaced by Adafruit_GPIO on newer
-      # machines.
-      from Adafruit_I2C import Adafruit_I2C
-      i2c = Adafruit_I2C(0x50)
-
-      # TODO put version information on EEPROM chip.
-      # An EEPRROM chip is included on the v2revR board at i2c address (0x50)
-      # but we aren't currently using it. For now, just checking if we can
-      # read from it.
-      with Capturing() as output:
-        test = i2c.readU8(0)
-
-      if test != -1:
-        version = "v2revR"
+      pass
+    else:
+      raise ValueError("Unsupported device model: %s" % getProcDeviceModel())
 
   return version
 
