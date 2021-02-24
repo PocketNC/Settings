@@ -1,5 +1,9 @@
 o<dynamic-work-offsets-v2> SUB
 
+M70
+
+G20
+
 #<_x0> = #[5221+20*[#5220-1]]
 #<_y0> = #[5222+20*[#5220-1]]
 #<_z0> = #[5223+20*[#5220-1]]
@@ -20,4 +24,5 @@ o<dynamic-work-offsets-v2> SUB
 
 G10 L2 P#<P> X#<_x0> Y[ #<_yl> * #<_CA> - #<_zl> * #<_SA> ] Z[ #<_yl>*#<_SA> + #<_zl>*#<_CA> ] A0 B#<_b0>
 
+M72
 O<dynamic-work-offsets-v2> ENDSUB
