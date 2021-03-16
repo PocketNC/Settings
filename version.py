@@ -16,34 +16,18 @@
 #    the EEPROM chip at address 0x50, which was installed on v2revR.
 
 import sys
-from smbus import SMBus
 import os
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
 
+from device import getProcDeviceModel
 from enum import Enum
+from i2c import bus
 
 class Versions(Enum):
   V1REVH = "v1revH"
   V2REVP = "v2revP"
   V2REVR = "v2revR"
 
-class DeviceModel(Enum):
-  UNKNOWN = -1
-  BBB = 0
-  BBAI = 1
-
-def getProcDeviceModel():
-  with open("/proc/device-tree/model") as deviceModel:
-    return deviceModel.read().strip()
-
-def getDeviceModel():
-  device = getProcDeviceModel()
-  if "AI" in device:
-    return DeviceModel.BBAI
-  elif "Black" in device:
-    return DeviceModel.BBB
-  else:
-    return DeviceModel.UNKNOWN
 
 def getVersion():
   version = "v2revP" # default version if we don't find another using the version file or i2c
@@ -52,19 +36,10 @@ def getVersion():
     with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
       version = versionFile.read().strip();
   except:
-    device = getDeviceModel()
-    if device == DeviceModel.BBAI:
-      bus = 3
-    elif device == DeviceModel.BBB:
-      bus = 2
-
-    b = SMBus(bus)
     try:
-      b.read_byte(0x50)
+      bus.read_byte(0x50)
       version = Versions.V2REVR.value
     except:
-      pass
-    else:
       raise ValueError("Unsupported device model: %s" % getProcDeviceModel())
 
   return version

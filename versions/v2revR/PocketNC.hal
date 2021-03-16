@@ -8,16 +8,15 @@ loadusr -Wn spindle_speed ./spindle_speed_voltage.py
 # ###################################
 
 # kinematics
-loadrt [POCKETNC]KINEMATICS
-loadrt tp
+loadrt [KINS]KINEMATICS
 
 # motion controller, get name and thread periods from ini file
-loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES tp=tp kins=[POCKETNC]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
 
+newinst bb_gpio init
+newinst hal_pru_generic hpg [PRUCONF]PRUCODE pru=1 num_stepgens=5
 
 # load low-level drivers
-loadrt [POCKETNC_PINS]BB_GPIO_CONFIG
-loadrt [PRUCONF](DRIVER) [PRUCONF](CONFIG)
 loadrt siggen names=ledBlinkSignal
 loadrt conv_float_s32 names=ledBlinkSignal.floatToS32
 loadrt conv_s32_bit names=ledBlinkSignal.s32toBit
@@ -33,11 +32,10 @@ loadrt oneshot names=programStart.oneshot,programPause.oneshot,estopButtonPresse
 # THREADS
 # ################################################
 addf hpg.capture-position          servo-thread
-addf [POCKETNC_PINS]BB_GPIO_READ   servo-thread
+addf bb_gpio.read                  servo-thread
 addf motion-command-handler        servo-thread
 addf motion-controller             servo-thread
 addf hpg.update                    servo-thread
-addf [POCKETNC_PINS]BB_GPIO_WRITE  servo-thread
 
 
 ######################
@@ -78,7 +76,6 @@ addf interlockClosedAndReleased.and servo-thread
 
 # Setup pins and signals
 setp ledBlinkSignal.offset 1
-setp [POCKETNC_PINS]START_LED_INVERT
 
 net convertSignal		<= ledBlinkSignal.square
 net convertSignal		=> ledBlinkSignal.floatToS32.in
@@ -92,8 +89,9 @@ net eStopBlink			<= ledBlink.eStop.and.out
 net eStopBlink			=> ledBlink.eStop.or.in0
 net driversEnable		=> ledBlink.eStop.or.in1
 
+newinst bb_gpio estop-led-pin pin=[POCKETNC_PINS]ESTOP_LED_PIN direction=output
 net eStopLed ledBlink.eStop.or.out
-net eStopLed [POCKETNC_PINS]ESTOP_LED_LONG
+net eStopLed estop-led-pin.out
 
 net mPwrBlink			<= ledBlink.mPwr.and.out
 net mPwrBlink			=> ledBlink.mPwr.or.in0
@@ -101,8 +99,9 @@ net mPwrLed				<= ledBlink.mPwr.or.out
 net pauseBlink			<= ledBlink.pause.and.out 
 net pauseBlink			=> ledBlink.pause.or.in0
 
+newinst bb_gpio start-led-pin pin=[POCKETNC_PINS]START_LED_PIN direction=output
 net pauseLed ledBlink.pause.or.out
-net pauseLed [POCKETNC_PINS]START_LED_LONG
+net pauseLed start-led-pin.out
 
 # ######################################################
 # Axis-of-motion Specific Configs (not the GUI)
@@ -114,17 +113,15 @@ net pauseLed [POCKETNC_PINS]START_LED_LONG
 # ################
 
 # axis enable chain
-newsig emcmot.00.enable bit
-sets emcmot.00.enable FALSE
-net emcmot.00.enable <= axis.0.amp-enable-out 
-net emcmot.00.enable => hpg.stepgen.00.enable
+net x-enable joint.0.amp-enable-out
+net x-enable hpg.stepgen.00.enaable
 
 # position command and feedback
-net emcmot.00.pos-cmd <= axis.0.motor-pos-cmd
-net emcmot.00.pos-cmd => hpg.stepgen.00.position-cmd
-net motor.00.pos-fb <= hpg.stepgen.00.position-fb
-net motor.00.pos-fb => axis.0.motor-pos-fb
+net x-cmd joint.0.motor-pos-cmd
+net x-cmd hpg.stepgen.00.position-cmd
 
+net x-stepgen-feedback hpg.stepgen.00.position-fb
+net x-stepgen-feedback joint.0.motor-pos-fb
 
 # timing parameters
 setp hpg.stepgen.00.dirsetup        [AXIS_0]DIRSETUP
@@ -135,8 +132,8 @@ setp hpg.stepgen.00.position-scale  [AXIS_0]SCALE
 setp hpg.stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
 setp hpg.stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN # = 0x93 - should be 927
-setp hpg.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN # = 0x8F - should be 929
+setp hpg.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN
+setp hpg.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN
 
 
 # ################
@@ -144,16 +141,14 @@ setp hpg.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN # = 0x8F - should b
 # ################
 
 # axis enable chain
-newsig emcmot.01.enable bit
-sets emcmot.01.enable FALSE
-net emcmot.01.enable <= axis.1.amp-enable-out 
-net emcmot.01.enable => hpg.stepgen.01.enable
+net y-enable joint.1.amp-enable-out
+net y-enable hpg.stepgen.01.enable
 
 # position command and feedback
-net emcmot.01.pos-cmd <= axis.1.motor-pos-cmd
-net emcmot.01.pos-cmd => hpg.stepgen.01.position-cmd
-net motor.01.pos-fb <= hpg.stepgen.01.position-fb
-net motor.01.pos-fb => axis.1.motor-pos-fb
+net y-cmd joint.1.motor-pos-cmd
+net y-cmd hpg.stepgen.01.position-cmd
+net y-stepgen-feedback hpg.stepgen.01.position-fb
+net y-stepgen-feedback joint.1.motor-pos-fb
 
 # timing parameters
 setp hpg.stepgen.01.dirsetup        [AXIS_1]DIRSETUP
@@ -164,8 +159,8 @@ setp hpg.stepgen.01.position-scale  [AXIS_1]SCALE
 setp hpg.stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
 setp hpg.stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN # = 0x51 - should be 923 - https://github.com/machinekit/machinekit/blob/master/src/hal/drivers/hal_pru_generic/beaglebone_pinmap.h
-setp hpg.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN # should be 915
+setp hpg.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN
+setp hpg.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN
 
 
 # ################
@@ -173,16 +168,14 @@ setp hpg.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN # should be 915
 # ################
 
 # axis enable chain
-newsig emcmot.02.enable bit
-sets emcmot.02.enable FALSE
-net emcmot.02.enable <= axis.2.amp-enable-out 
-net emcmot.02.enable => hpg.stepgen.02.enable
+net z-enable joint.2.amp-enable-out
+net z-enable hpg.stepgen.02.enable
 
 # position command and feedback
-net emcmot.02.pos-cmd <= axis.2.motor-pos-cmd
-net emcmot.02.pos-cmd => hpg.stepgen.02.position-cmd
-net motor.02.pos-fb <= hpg.stepgen.02.position-fb
-net motor.02.pos-fb => axis.2.motor-pos-fb
+net z-cmd joint.2.motor-pos-cmd
+net z-cmd hpg.stepgen.02.position-cmd
+net z-stepgen-feedback hpg.stepgen.02.position-fb
+net z-stepgen-feedback joint.2.motor-pos-fb
 
 # timing parameters
 setp hpg.stepgen.02.dirsetup        [AXIS_2]DIRSETUP
@@ -193,8 +186,8 @@ setp hpg.stepgen.02.position-scale  [AXIS_2]SCALE
 setp hpg.stepgen.02.maxvel          [AXIS_2]STEPGEN_MAX_VEL
 setp hpg.stepgen.02.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.02.steppin         [POCKETNC_PINS]Z_STEP_PIN # = 0x4E - should be 816
-setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN # = 0x4F should be 815
+setp hpg.stepgen.02.steppin         [POCKETNC_PINS]Z_STEP_PIN
+setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN
 
 
 # ################
@@ -202,16 +195,14 @@ setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN # = 0x4F should be 
 # ################
 
 # axis enable chain
-newsig emcmot.03.enable bit
-sets emcmot.03.enable FALSE
-net emcmot.03.enable <= axis.3.amp-enable-out 
-net emcmot.03.enable => hpg.stepgen.03.enable
+net a-enable joint.3.amp-enable-out
+net a-enable hpg.stepgen.03.enable
 
 # position command and feedback
-net emcmot.03.pos-cmd <= axis.3.motor-pos-cmd
-net emcmot.03.pos-cmd => hpg.stepgen.03.position-cmd
-net motor.03.pos-fb <= hpg.stepgen.03.position-fb
-net motor.03.pos-fb => axis.3.motor-pos-fb
+net a-cmd joint.3.motor-pos-cmd
+net a-cmd hpg.stepgen.03.position-cmd
+net a-stepgen-feedback hpg.stepgen.03.position-fb
+net a-stepgen-feedback joint.3.motor-pos-fb
 
 # timing parameters
 setp hpg.stepgen.03.dirsetup        [AXIS_3]DIRSETUP
@@ -222,27 +213,22 @@ setp hpg.stepgen.03.position-scale  [AXIS_3]SCALE
 setp hpg.stepgen.03.maxvel          [AXIS_3]STEPGEN_MAX_VEL
 setp hpg.stepgen.03.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.03.steppin         [POCKETNC_PINS]A_STEP_PIN # = 0x90 - should be 930
-setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]A_DIR_PIN # = 0x91 - should be 928
-
-
-
+setp hpg.stepgen.03.steppin         [POCKETNC_PINS]A_STEP_PIN
+setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]A_DIR_PIN
 
 # ################
 # B [4] Axis
 # ################
 
 # axis enable chain
-newsig emcmot.04.enable bit
-sets emcmot.04.enable FALSE
-net emcmot.04.enable <= axis.4.amp-enable-out 
-net emcmot.04.enable => hpg.stepgen.04.enable
+net b-enable joint.4.aamp-enable-out
+net b-enable hpg.stepgen.04.enable
 
 # position command and feedback
-net emcmot.04.pos-cmd <= axis.4.motor-pos-cmd
-net emcmot.04.pos-cmd => hpg.stepgen.04.position-cmd
-net motor.04.pos-fb <= hpg.stepgen.04.position-fb
-net motor.04.pos-fb => axis.4.motor-pos-fb
+net b-cmd joint.4.motor-pos-cmd
+net b-cmd hpg.stepgen.04.position-cmd
+net b-stepgen-feedback hpg.stepgen.04.position-fb
+net b-stepgen-feedback joint.4.motor-pos-fb
 
 # timing parameters
 setp hpg.stepgen.04.dirsetup        [AXIS_4]DIRSETUP
@@ -253,8 +239,8 @@ setp hpg.stepgen.04.position-scale  [AXIS_4]SCALE
 setp hpg.stepgen.04.maxvel          [AXIS_4]STEPGEN_MAX_VEL
 setp hpg.stepgen.04.maxaccel        [AXIS_4]STEPGEN_MAX_ACC
 
-setp hpg.stepgen.04.steppin         [POCKETNC_PINS]B_STEP_PIN # = 0x4C - should be 812
-setp hpg.stepgen.04.dirpin          [POCKETNC_PINS]B_DIR_PIN # = 0x4D - should be 811
+setp hpg.stepgen.04.steppin         [POCKETNC_PINS]B_STEP_PIN
+setp hpg.stepgen.04.dirpin          [POCKETNC_PINS]B_DIR_PIN
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -269,42 +255,47 @@ net tool-change-loop	=> iocontrol.0.tool-changed
 
 ### Home and Limit switches ###
 # X axis
-net XmaxAndHome	[POCKETNC_PINS]X_LIMIT_LONG
-net XmaxAndHome	axis.0.home-sw-in
-setp [POCKETNC_PINS]X_LIMIT_INVERT
+#
+newinst bb_gpio x-limit-pin pin=[POCKETNC_PINS]X_LIMIT_PIN direction=input
+setp x-limit-pin.invert 1
+net x-max-and-home x-limit-pin.in
+net x-max-and-home joint.0.home-sw-in
 
 # Y axis
-net YmaxAndHome	[POCKETNC_PINS]Y_LIMIT_LONG
-net YmaxAndHome	axis.1.home-sw-in
-setp [POCKETNC_PINS]Y_LIMIT_INVERT
+newinst bb_gpio y-limit-pin pin=[POCKETNC_PINS]Y_LIMIT_PIN direction=input
+setp y-limit-pin.invert 1
+net y-max-and-home y-limit-pin.in
+net y-max-and-home joint.1.home-sw-in
 
 # Z axis
-net ZmaxAndHome [POCKETNC_PINS]Z_LIMIT_LONG
-net ZmaxAndHome axis.2.home-sw-in
-setp [POCKETNC_PINS]Z_LIMIT_INVERT
+newinst bb_gpio z-limit-pin pin=[POCKETNC_PINS]Z_LIMIT_PIN direction=input
+setp z-limit-pin.invert 1
+net z-max-and-home z-limit-pin.in
+net z-max-and-home joint.2.home-sw-in
 
 
 # A Axis Limit
-net AmaxAndHome [POCKETNC_PINS]A_LIMIT_LONG
-net AmaxAndHome axis.3.home-sw-in
-setp [POCKETNC_PINS]A_LIMIT_INVERT
-
+newinst bb_gpio a-limit-pin pin=[POCKETNC_PINS]A_LIMIT_PIN direction=input
+setp a-limit-pin.invert 1
+net a-max-and-home a-limit-pin.in
+net a-max-and-home joint.3.home-sw-in
 
 # B axis
-net BhomeAndIndex [POCKETNC_PINS]B_LIMIT_LONG
-net BhomeAndIndex => axis.4.home-sw-in
-setp [POCKETNC_PINS]B_LIMIT_INVERT
+newinst bb_gpio b-limit-pin pin=[POCKETNC_PINS]B_LIMIT_PIN direction=input
+setp b-limit-pin.invert 1
+net b-home-and-index b-limit-pin.in
+net b-home-and-index joint.4.home-sw-in
 
 ### Control Panel Buttons ###
 # eStop
 setp eStopButton.toggle.debounce 2
-setp [POCKETNC_PINS]ESTOP_LED_INVERT
-setp [POCKETNC_PINS]ESTOP_SIGNAL_INVERT
 net estop-loop iocontrol.0.user-enable-out
 net estop-loop iocontrol.0.emc-enable-in
 
-net estopPulse [POCKETNC_PINS]ESTOP_SIGNAL_LONG
-net estopPulse estopButtonPressed.oneshot.in
+newinst bb_gpio estop-button-pin pin=[POCKETNC_PINS]ESTOP_BUTTON_PIN direction=input
+setp estop-button-pin.invert 1
+net estop-pulse estop-button-pin.in
+net estop-pulse estopButtonPressed.oneshot.in
 
 setp estopButtonPressed.oneshot.width .1
 
@@ -334,22 +325,23 @@ net estopIsActivated eStopDrivers.not.in
 
 
 # Machine power
-setp [POCKETNC_PINS]ENABLE_INVERT
+newinst bb_gpio enable-pin pin=[POCKETNC_PINS]ENABLE_PIN direction=output
 net driversEnable eStopDrivers.not.out
 net driversEnable mPwr.timedelay.in
 net delayedEnable mPwr.timedelay.out
 net delayedEnable halui.machine.on
-net delayedEnable [POCKETNC_PINS]ENABLE_LONG
+net delayedEnable enable-pin.out
 net delayedEnable ledBlink.mPwr.and.in1
 net delayedEnable mPwr.and.in0
 
 
 # Program start/run
-setp [POCKETNC_PINS]START_SIGNAL_INVERT
+newinst bb_gpio start-button-pin pin=[POCKETNC_PINS]START_BUTTON_PIN direction=input
+setp start-button-pin.invert 1
 setp programStart.oneshot.width 0.1
-net progStartButton [POCKETNC_PINS]START_SIGNAL_LONG
-net progStartButton		=> programStart.oneshot.in
-net progStart			<= programStart.oneshot.out
+net progStartButton start-button-pin.in
+net progStartButton programStart.oneshot.in
+net progStart       programStart.oneshot.out
 
 net progStart			=> programStartFromIdle.and.in0
 net progStart			=> programStartFromPaused.and.in0
@@ -381,19 +373,20 @@ net pauseSig => halui.program.pause
 
 
 # Probe
-net toolProbe [POCKETNC_PINS]PROBE_SIGNAL_LONG
+newinst bb_gpio probe-signal-pin pin=[POCKETNC_PINS]PROBE_SIGNAL_PIN direction=input
+setp probe-signal-pin.invert 1
+net toolProbe probe-signal-pin.in
 net toolProbe motion.probe-input
-setp [POCKETNC_PINS]PROBE_SIGNAL_INVERT
 
 ### Spindle ###
-setp [POCKETNC_PINS]SPINDLE_DIR_INVERT
-setp [POCKETNC_PINS]SPINDLE_ON_INVERT
+newinst bb_gpio spindle-dir-pin pin=[POCKETNC_PINS]SPINDLE_DIR_PIN direction=output
+newinst bb_gpio spindle-on-pin pin=[POCKETNC_PINS]SPINDLE_ON_PIN direction=output
 
 net spindleEnable motion.spindle-on
-net spindleEnable [POCKETNC_PINS]SPINDLE_ON_LONG
+net spindleEnable spindle-on-pin.out
 
 net spindleDirection motion.spindle-forward
-net spindleDirection [POCKETNC_PINS]SPINDLE_DIR_LONG
+net spindleDirection spindle-dir-pin.out
 
 net displaySpindleReverseButton	motion.spindle-reverse
 net spindleSpeedDummy motion.spindle-speed-out

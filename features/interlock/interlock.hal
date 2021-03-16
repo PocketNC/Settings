@@ -1,6 +1,8 @@
 loadusr -Wn interlock ./features/interlock/interlock.py
 
-net interlockOpen <= [POCKETNC_PINS]INTERLOCK_OPEN_LONG
+newinst bb_gpio interlock-open-pin pin=[POCKETNC_PINS]INTERLOCK_OPEN_PIN direction=input
+setp interlock-open-pin.invert 1
+net interlockOpen <= interlock-open-pin.in
 net interlockOpen => interlockOpen.not.in
 net interlockClosed <= interlockOpen.not.out
 net interlockClosed => interlock.closed

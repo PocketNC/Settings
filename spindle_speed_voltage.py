@@ -9,37 +9,20 @@ INI_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/PocketNC.ini")
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
 from ini import read_ini_data, get_parameter
-
-import Adafruit_BBIO.GPIO as GPIO
-
-try:
-  from Adafruit_GPIO.I2C import Device
-  i2c = Device(0x60, 2)
-except:
-  from Adafruit_I2C import Adafruit_I2C
-  i2c = Adafruit_I2C(0x60)
+from i2c import bus
 
 import hal
 import time
 
 iniData = read_ini_data(INI_FILE)
-spindleClockPinParam = get_parameter(iniData,"POCKETNC_PINS", "SPINDLE_CLOCK_PIN")
+#spindleClockPinParam = get_parameter(iniData,"POCKETNC_PINS", "SPINDLE_CLOCK_PIN")
 
 resetTime = time.time()
 pulses = 0
-def countPulses(x):
-  global pulses
-  pulses += 1
 
-def resetPulses():
-  global resetTime
-  global pulses
-  resetTime = time.time()
-  pulses = 0
-
-if spindleClockPinParam:
-  GPIO.setup(spindleClockPinParam["values"]["value"], GPIO.IN)
-  GPIO.add_event_detect(spindleClockPinParam["values"]["value"], GPIO.RISING, countPulses)
+#if spindleClockPinParam:
+#  GPIO.setup(spindleClockPinParam["values"]["value"], GPIO.IN)
+#  GPIO.add_event_detect(spindleClockPinParam["values"]["value"], GPIO.RISING, countPulses)
 
 h = hal.component("spindle_speed")
 h.newpin("speed_in", hal.HAL_FLOAT, hal.HAL_IN)
@@ -79,7 +62,7 @@ try:
 
       combined = (lo << 8) | hi
 
-      i2c.write16(64, combined)
+      bus.write_word_data(0x60, 64, combined)
       lastRPM = currentRPM
     time.sleep(.1)
 
