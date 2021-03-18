@@ -70,7 +70,8 @@ try:
     duration = now-resetTime
     if duration > 1:
         rpmMeasured = pulses/pulsesPerRevolution/duration*60
-        resetPulses()
+        resetTime = now
+        #resetPulses()
         h['speed_measured'] = rpmMeasured
 
 except KeyboardInterrupt:

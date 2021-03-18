@@ -1,0 +1,5 @@
+#!/bin/bash
+
+VERSION=`./version.py`
+
+./features/configure_cape_universal/versions/$VERSION/configure_pins.sh

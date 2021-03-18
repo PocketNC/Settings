@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from enum import Enum
 
 class DeviceModel(Enum):
@@ -17,3 +19,6 @@ def getDeviceModel():
     return DeviceModel.BBB
   else:
     return DeviceModel.UNKNOWN
+
+if __name__ == "__main__":
+  print(str(getDeviceModel()).split(".")[1])
