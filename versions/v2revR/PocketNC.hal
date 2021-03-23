@@ -2,6 +2,7 @@
 # so that it can issue i2c commands to change the
 # voltage.
 loadusr -Wn spindle_speed ./spindle_speed_voltage.py
+loadusr -Wn spindle_clock /home/pocketnc/pin_speed/pin_speed [POCKETNC_PINS]SPINDLE_CLOCK_CHIP [POCKETNC_PINS]SPINDLE_CLOCK_LINE spindle_clock
 
 # ###################################
 # Core EMC/HAL Loads
@@ -382,6 +383,7 @@ net toolProbe probe-signal-pin.in
 net toolProbe motion.probe-input
 
 ### Spindle ###
+
 newinst bb_gpio spindle-dir-pin pin=[POCKETNC_PINS]SPINDLE_DIR_PIN direction=output
 newinst bb_gpio spindle-on-pin pin=[POCKETNC_PINS]SPINDLE_ON_PIN direction=output
 
@@ -396,7 +398,25 @@ net spindleSpeedDummy spindle.0.speed-out
 net spindleSpeed spindle.0.speed-out-abs
 net spindleSpeed spindle_speed.speed_in
 
-net spindleSpeedMeasured spindle_speed.speed_measured
+# can use PRU to measure spindle clock pin once it's moved to a direct pru input pin
+#setp hpg.pwmread.00.max_time 1000000000
+#setp hpg.pwmread.00.pin [POCKETNC_PINS]SPINDLE_CLOCK_PIN
+
+net spindle-clock-frequency spindle_speed.spindle_clock_frequency
+#net spindle-clock-frequency hpg.pwmread.00.frequency
+net spindle-clock-frequency spindle_clock.frequency
+
+net measured-spindle-speed spindle_speed.speed_measured
+
+
+newsig measured-spindle-voltage float
+sets measured-spindle-voltage 0
+
+newsig measured-spindle-current float
+sets measured-spindle-current 0
+
+newsig spindle-max-speed float
+sets spindle-max-speed 10000
 
 # ##################################################
 # Features
@@ -435,3 +455,5 @@ net a-pos joint.3.pos-cmd
 
 net b-pos feedrate-v2.b
 net b-pos joint.4.pos-cmd
+
+net calculated-feedrate feedrate-v2.feedrate

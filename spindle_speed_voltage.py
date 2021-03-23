@@ -15,16 +15,9 @@ import hal
 import time
 
 iniData = read_ini_data(INI_FILE)
-#spindleClockPinParam = get_parameter(iniData,"POCKETNC_PINS", "SPINDLE_CLOCK_PIN")
-
-resetTime = time.time()
-pulses = 0
-
-#if spindleClockPinParam:
-#  GPIO.setup(spindleClockPinParam["values"]["value"], GPIO.IN)
-#  GPIO.add_event_detect(spindleClockPinParam["values"]["value"], GPIO.RISING, countPulses)
 
 h = hal.component("spindle_speed")
+h.newpin("spindle_clock_frequency", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("speed_in", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("speed_measured", hal.HAL_FLOAT, hal.HAL_OUT)
 h.ready()
@@ -44,15 +37,19 @@ loRPM = float(loRPMParam["values"]["value"]) if loRPMParam else 764.15
 hiVoltage = float(hiVoltageParam["values"]["value"]) if hiVoltageParam else 2.49
 hiRPM = float(hiRPMParam["values"]["value"]) if hiRPMParam else 10000.0
 
+maxVoltage = 3
+
 lastRPM = 0
 lastSpindleOn = False
 
 try:
+  rpmMeasured = 0
+  currentRPM = 0
   while True:
     if h['speed_in'] != lastRPM:
       currentRPM = h['speed_in']
-      t = (currentRPM-loRPM)/(hiRPM-loRPM)
-      currentVoltage = max(min(loVoltage+(hiVoltage-loVoltage)*t, hiVoltage), loVoltage)
+      t = ((currentRPM)-loRPM)/(hiRPM-loRPM)
+      currentVoltage = max(min(loVoltage+(hiVoltage-loVoltage)*t, maxVoltage), loVoltage)
       currentDAC = int(currentVoltage/4.9*4095)
 
       i = min(max(currentDAC, 0), 4095)
@@ -62,17 +59,19 @@ try:
 
       combined = (lo << 8) | hi
 
-      bus.write_word_data(0x60, 64, combined)
+      try:
+        bus.write_word_data(0x60, 64, combined)
+      except:
+        print("Failed to command spindle")
+        
       lastRPM = currentRPM
-    time.sleep(.1)
 
-    now = time.time()
-    duration = now-resetTime
-    if duration > 1:
-        rpmMeasured = pulses/pulsesPerRevolution/duration*60
-        resetTime = now
-        #resetPulses()
-        h['speed_measured'] = rpmMeasured
+    rpmMeasured = h["spindle_clock_frequency"]/pulsesPerRevolution*60
+    if rpmMeasured <= 15:
+      rpmMeasured = 0
+    h["speed_measured"] = rpmMeasured
+
+    time.sleep(.1)
 
 except KeyboardInterrupt:
   raise SystemExit

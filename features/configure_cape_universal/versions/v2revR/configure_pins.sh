@@ -25,6 +25,7 @@ P8.17   out     # E-Stop LED
 P8.18   in+     # Z Limit
 P8.19   in+     # B Limit
 P8.26   in+     # Start Signal
+#P8.40   pruin
 P9.11   out+    # Spindle Dir
 P9.12   out+    # Enable
 P9.14   out-    # Start LED

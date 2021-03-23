@@ -29,6 +29,8 @@ newinst hal_pru_generic hpg1 [PRUCONF]PRUCODE pru=1 num_stepgens=2 num_pwmreads=
 newinst hal_pru_generic hpg2 [PRUCONF]PRUCODE pru=2 num_stepgens=0 num_pwmreads=7 pru_period=10000
 newinst hal_pru_generic hpg3 [PRUCONF]PRUCODE pru=3 num_stepgens=2 num_pwmreads=0 pru_period=800
 
+loadrt mult2 count=1
+
 # ################################################
 # THREADS
 # ################################################
@@ -46,7 +48,8 @@ addf hpg3.update                   servo-thread
 addf bb_gpio.write                 servo-thread
 addf torque.funct                  servo-thread
 addf feedrate.funct                servo-thread
-addf solo-estop.funct               servo-thread
+addf solo-estop.funct              servo-thread
+addf mult2.0                       servo-thread
 
 ### Motor Feedback
 
@@ -374,6 +377,15 @@ net tool-probe motion.probe-input
 
 ### Spindle ###
 
+net needs-correcting-spindle-current spindle-vfd.output-current
+net needs-correcting-spindle-current mult2.0.in0
+setp mult2.0.in1 .1
+
+net measured-spindle-current mult2.0.out
+net measured-spindle-voltage spindle-vfd.output-voltage
+net measured-spindle-speed spindle-vfd.motor-RPM
+net spindle-max-speed spindle-vfd.max-rpm
+
 net spindle-enable spindle.0.on
 net spindle-enable spindle-vfd.spindle-on
 # turn on air seal when spindle is enabled
@@ -437,3 +449,5 @@ net b-pos joint.3.pos-cmd
 
 net c-pos feedrate.c
 net c-pos joint.4.pos-cmd
+
+net calculated-feedrate feedrate.feedrate

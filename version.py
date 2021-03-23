@@ -40,7 +40,7 @@ def getVersion():
       bus.read_byte(0x50)
       version = Versions.V2REVR.value
     except:
-      raise ValueError("Unsupported device model: %s" % getProcDeviceModel())
+      pass
 
   return version
 
