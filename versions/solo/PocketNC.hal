@@ -7,6 +7,7 @@ loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/solo/vfd.ini -S SPIN
 
 # D5 Next water cooler data
 loadusr -Wn d5next ./d5next.py
+net spindle-temperature d5next.temperature_f
 
 # ###################################
 # Core EMC/HAL Loads
@@ -374,6 +375,11 @@ newinst bb_gpio probe-pin pin=[POCKETNC_PINS]PROBE_PIN direction=input
 setp probe-pin.invert 1
 net tool-probe probe-pin.in
 net tool-probe motion.probe-input
+
+## Air
+
+net tool-released mcp21.A.out-01
+net vice-released mcp21.A.out-02
 
 ### Spindle ###
 

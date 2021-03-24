@@ -457,3 +457,12 @@ net b-pos feedrate-v2.b
 net b-pos joint.4.pos-cmd
 
 net calculated-feedrate feedrate-v2.feedrate
+
+newsig spindle-temperature float
+sets spindle-temperature -99999
+
+newsig vice-released bit
+sets vice-released 0
+
+newsig tool-released bit
+sets tool-released 0
