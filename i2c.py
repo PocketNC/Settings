@@ -1,5 +1,6 @@
 from device import getDeviceModel, DeviceModel
 from smbus import SMBus
+import Adafruit_GPIO.I2C
 
 model = getDeviceModel()
 
@@ -9,3 +10,7 @@ elif model == DeviceModel.BBB:
   busNum = 2
 
 bus = SMBus(busNum)
+
+class I2C(Adafruit_GPIO.I2C.Device):
+  def __init__(self, address):
+    super().__init__(address, busNum)
