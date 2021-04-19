@@ -1,0 +1,4 @@
+#!/bin/bash
+
+halcmd setp motion.closest-rotary $1
+halcmd setp motion.reset-rotary 4

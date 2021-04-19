@@ -1,0 +1,5 @@
+;M999
+o<reset-rotary>sub
+   M110 P#<P>
+   G0 B#<P>
+o<reset-rotary>endsub
