@@ -49,7 +49,7 @@ def checkWarmupNeeded():
 lastSpindleOn = False
 abort = False
 
-print "Initializing hss_warmup!"
+print("Initializing hss_warmup!")
 h = hal.component("hss_warmup")
 
 lastSpindleOff = datetime.datetime.strptime(readLastSpindleOffFromDisk(), "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -107,6 +107,11 @@ try:
 
     h['abort'] = abort
     if not h['program_running'] and not h['program_paused']:
+      # if the warm up sequence is terminated by a change in task_mode, 
+      # the spindle doesn't stop automatically
+      if h['spindle_on'] and (h['warmup_needed'] or h['performing_warmup']):
+        h['abort'] = True
+        h['aborted'] = True
       # if the warm up sequence is canceled, then the performing_warmup
       # pin won't properly be turned off, so if a program isn't running (and it isn't paused)
       # turn it off here

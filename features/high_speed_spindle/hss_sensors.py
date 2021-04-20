@@ -108,7 +108,7 @@ def readTemperature():
   except:
     return SENSOR_READ_FAIL_VALUE
 
-print "Initializing hss_sensors!"
+print("Initializing hss_sensors!")
 h = hal.component("hss_sensors")
 
 h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)

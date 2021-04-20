@@ -94,4 +94,6 @@ if __name__ == "__main__":
       }
     });
 
+  merged = merge_ini_data(merged, overlay)
+
   write_ini_data(merged, INI_FILE);
