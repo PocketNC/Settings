@@ -8,17 +8,17 @@ import struct
 import sys
 sys.path.append('/home/pocketnc/pocketnc/Settings')
 import eeprom
+import constants
 
-
-START_IDX = 3 # The boundaries of the continuous chunk of EEPROM used by this component.
-END_IDX = 102 
-PAGE_SIZE = 32 # EEPROM page size
-TAG_SIZE = 1 # Number of bytes for a tag
-DATA_SIZE = 4 # Number of bytes for each runtime written to EEPROM
-BUCKET_SIZE = TAG_SIZE + DATA_SIZE
-MAX_DATA_VAL = pow(2, DATA_SIZE * 8)
-WRITE_PERIOD = 10 # Minimum number of seconds between EEPROM writes
-
+START_IDX = constants.START_IDX
+END_IDX = constants.END_IDX
+PAGE_SIZE = constants.PAGE_SIZE
+TAG_SIZE = constants.TAG_SIZE
+DATA_SIZE = constants.DATA_SIZE
+BUCKET_SIZE = constants.BUCKET_SIZE
+MAX_DATA_VAL = constants.MAX_DATA_VAL
+WRITE_PERIOD = constants.WRITE_PERIOD
+TOTAL_SIZE = constants.TOTAL_SIZE
 
 def BytesToRuntime(bytes_arr):
   if(len(bytes_arr) != BUCKET_SIZE - TAG_SIZE):
@@ -106,17 +106,3 @@ try:
 except KeyboardInterrupt:
   raise SystemExit
 
-
-'''
-try:
-  for i in list(range(0,102,4)):
-    print(e.WriteBytes(i,[255]*4))
-    print(i)
-    time.sleep(0.1)
-except IOError as ex:
-  print('io error')
-  print(ex)
-except Exception as ex:
-  print('gen error')
-  print(ex)
-'''
