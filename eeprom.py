@@ -164,16 +164,16 @@ class EEPROM:
 
 if __name__ == "__main__":
   eeprom = EEPROM()
-  print eeprom.ReadBoardRevision()
+  print(eeprom.ReadBoardRevision())
 #  eeprom.EnableWriteProtection()
 #  eeprom.EnableWriteProtectionAndLockConfigurationRegisters()
-#  print eeprom.isLocked()
-#  print eeprom.isWriteProtected()
+#  print(eeprom.isLocked())
+#  print(eeprom.isWriteProtected())
 #  eeprom.ClearWriteProtection()
 #  time.sleep(.1)
 #  eeprom.WriteBytes(1016, [ ord(c) for c in "This is a string" ])
 #  time.sleep(.1)
-#  print eeprom.ReadBytes(1000, 6)
+#  print(eeprom.ReadBytes(1000, 6))
 
 #  eeprom.ReadToFile("/tmp/blah")
 #  eeprom.WriteFile("/tmp/test")

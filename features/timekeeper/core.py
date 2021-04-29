@@ -9,8 +9,8 @@ import sys
 sys.path.append('/home/pocketnc/pocketnc/Settings')
 import eeprom
 
-START_IDX = 3 # The boundaries of the continuous chunk of EEPROM used by this component.
-END_IDX = 102 
+START_IDX = 13 # The boundaries of the continuous chunk of EEPROM used by this component.
+END_IDX = 112 
 TOTAL_SIZE = END_IDX - START_IDX + 1
 
 DATA_SIZE = 4 # Number of bytes for each runtime written to EEPROM
@@ -29,7 +29,7 @@ def bytes_to_runtime(bytes_arr):
   r = 0
   i = 0
   for b in bytes_arr:
-    r += b * pow(256,i)
+    r += b << (i*8)
     i += 1
   return r
 
@@ -43,9 +43,6 @@ def runtime_to_bytes(runtime):
   return arr
 
 class EEPROMInterface:
-  def isTicking(self):
-    return self._isTicking
-
   def __init__(self):
     self.ee = eeprom.EEPROM()
     self.latestBucketIdx = None
