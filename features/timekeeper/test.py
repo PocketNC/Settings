@@ -1,28 +1,21 @@
 #!/usr/bin/python
 import unittest
 import time
-import logging
-import logging.config
-import uuid
-import os
-import struct
-import sys
-sys.path.append('/home/pocketnc/pocketnc/Settings')
 import eeprom
-import core
+import timekeeper_core
 
 unittest.TestLoader.sortTestMethodsUsing = None
 
-START_IDX = core.START_IDX
-END_IDX = core.END_IDX
-PAGE_SIZE = core.PAGE_SIZE
-TAG_SIZE = core.TAG_SIZE
-DATA_SIZE = core.DATA_SIZE
-BUCKET_SIZE = core.BUCKET_SIZE
-MAX_DATA_VAL = core.MAX_DATA_VAL
-WRITE_PERIOD = 0.1 # = core.WRITE_PERIOD
-REST_PERIOD = core.REST_PERIOD
-TOTAL_SIZE = core.TOTAL_SIZE
+START_IDX = timekeeper_core.START_IDX
+END_IDX = timekeeper_core.END_IDX
+PAGE_SIZE = timekeeper_core.PAGE_SIZE    
+TAG_SIZE = timekeeper_core.TAG_SIZE
+DATA_SIZE = timekeeper_core.DATA_SIZE
+BUCKET_SIZE = timekeeper_core.BUCKET_SIZE
+MAX_DATA_VAL = timekeeper_core.MAX_DATA_VAL
+WRITE_PERIOD = 0.1 # = timekeeper_core.WRITE_PERIOD
+REST_PERIOD = timekeeper_core.REST_PERIOD
+TOTAL_SIZE = timekeeper_core.TOTAL_SIZE
 
 ee = eeprom.EEPROM()
 
@@ -30,13 +23,13 @@ class TestTimekeeper(unittest.TestCase):
   maxDiff = None
 
   def test_1_bytes_conversion(self):
-    self.assertEqual( [0] * DATA_SIZE, core.runtime_to_bytes(0) )
-    self.assertEqual( 0, core.bytes_to_runtime( [0] * DATA_SIZE) )
-    self.assertEqual( pow(2,8 * DATA_SIZE) - 1, core.bytes_to_runtime([255] * DATA_SIZE) )
-    self.assertEqual( 0, core.bytes_to_runtime( core.runtime_to_bytes(0) ) )
-    self.assertEqual( 1, core.bytes_to_runtime( core.runtime_to_bytes(1) ) )
-    self.assertEqual( 255, core.bytes_to_runtime( core.runtime_to_bytes(255) ) )
-    self.assertEqual( 256, core.bytes_to_runtime( core.runtime_to_bytes(256) ) )
+    self.assertEqual( [0] * DATA_SIZE, timekeeper_core.runtime_to_bytes(0) )
+    self.assertEqual( 0, timekeeper_core.bytes_to_runtime( [0] * DATA_SIZE) )
+    self.assertEqual( pow(2,8 * DATA_SIZE) - 1, timekeeper_core.bytes_to_runtime([255] * DATA_SIZE) )
+    self.assertEqual( 0, timekeeper_core.bytes_to_runtime( timekeeper_core.runtime_to_bytes(0) ) )
+    self.assertEqual( 1, timekeeper_core.bytes_to_runtime( timekeeper_core.runtime_to_bytes(1) ) )
+    self.assertEqual( 255, timekeeper_core.bytes_to_runtime( timekeeper_core.runtime_to_bytes(255) ) )
+    self.assertEqual( 256, timekeeper_core.bytes_to_runtime( timekeeper_core.runtime_to_bytes(256) ) )
 
   def test_2_eeprom_module_read(self):
     try:
@@ -71,14 +64,14 @@ class TestTimekeeper(unittest.TestCase):
     except Exception as ex:
       self.fail("Resetting EEPROM to 1s raised exception unexpectedly! {0}".format(ex))
     try:
-      interface = core.EEPROMInterface()
+      interface = timekeeper_core.EEPROMInterface()
       self.assertEqual([0] * BUCKET_SIZE, ee.ReadBytes(START_IDX,BUCKET_SIZE))
     except Exception as ex:
       self.fail("Initializing interface raised exception unexpectedly! {0}".format(ex))
 
   def test_5_start_and_write_once(self):
     try:
-      interface = core.EEPROMInterface()
+      interface = timekeeper_core.EEPROMInterface()
       time.sleep(REST_PERIOD)
       interface.write_next(1)
       time.sleep(REST_PERIOD)
@@ -109,7 +102,7 @@ class TestTimekeeper(unittest.TestCase):
     If the final position is the right-most bucket, all flags will have the same value
     '''
     try:
-      interface = core.EEPROMInterface()
+      interface = timekeeper_core.EEPROMInterface()
       time.sleep(REST_PERIOD)
       for i in list(range(2,150 + 2)):
         interface.write_next(i)  
@@ -121,11 +114,12 @@ class TestTimekeeper(unittest.TestCase):
       finalBytes = []
       listOfBucketsWithFirstBucketFlag = list(enumerate(range(finalBucketIdx, START_IDX -1, -BUCKET_SIZE)))
       for i, bucketIdx in listOfBucketsWithFirstBucketFlag:
-        finalBytes = [finalFlagFirstBucket] + core.runtime_to_bytes(150 + 1 - i) + finalBytes
+        finalBytes = [finalFlagFirstBucket] + timekeeper_core.runtime_to_bytes(150 + 1 - i) + finalBytes
       if finalBucketIdx < (END_IDX - BUCKET_SIZE):
         otherFinalFlag = 0 if finalFlagFirstBucket == 1 else 1
         for i, bucketIdx in list(enumerate(range(finalBucketIdx + BUCKET_SIZE, END_IDX, BUCKET_SIZE))):
-          finalBytes = finalBytes + [otherFinalFlag] + core.runtime_to_bytes(150 + 2 - numBuckets + i)
+          finalBytes = finalBytes + [otherFinalFlag] + timekeeper_core.runtime_to_bytes(150 + 2 - numBuckets + i)
+
       self.assertEqual(
         finalBytes,
         ee.ReadBytes(START_IDX, TOTAL_SIZE)

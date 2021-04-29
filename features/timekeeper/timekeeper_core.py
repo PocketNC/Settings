@@ -1,12 +1,5 @@
 #!/usr/bin/python
 import hal, time
-import logging
-import logging.config
-import uuid
-import os
-import struct
-import sys
-sys.path.append('/home/pocketnc/pocketnc/Settings')
 import eeprom
 
 START_IDX = 13 # The boundaries of the continuous chunk of EEPROM used by this component.
@@ -17,9 +10,9 @@ DATA_SIZE = 4 # Number of bytes for each runtime written to EEPROM
 TAG_SIZE = 1 # Number of bytes for a tag
 BUCKET_SIZE = TAG_SIZE + DATA_SIZE
 
-MAX_DATA_VAL = pow(2, DATA_SIZE * 8)
+MAX_DATA_VAL = 1 << (DATA_SIZE * 8)  - 1
 
-WRITE_PERIOD = 1 # Minimum number of seconds between EEPROM writes
+WRITE_PERIOD = 10 # Minimum number of seconds between EEPROM writes
 REST_PERIOD = 0.01 # Use this to set sleep duration after EEPROM read/writes
 PAGE_SIZE = 32 # EEPROM page size
 
@@ -72,7 +65,7 @@ class EEPROMInterface:
 
   def write_next(self, timeVal):
     try:
-      bucketIdx = (self.latestBucketIdx + BUCKET_SIZE) % ((END_IDX + 1) - START_IDX)
+      bucketIdx = (self.latestBucketIdx + BUCKET_SIZE - START_IDX) % (TOTAL_SIZE) + START_IDX
       flag = self.ee.ReadBytes(bucketIdx,1)[0]
       time.sleep(REST_PERIOD)
       newFlag = 1 if flag == 0 else 0
