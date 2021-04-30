@@ -11,8 +11,14 @@ h = hal.component("timekeeper")
 h.newpin("spindle-on", hal.HAL_BIT, hal.HAL_IN)
 h.ready()
 
-interface = timekeeper_core.EEPROMInterface()
-runtime = interface.runtime
+try:
+  interface = timekeeper_core.EEPROMInterface()
+  runtime = interface.runtime
+except IOError as e:
+  print("Timekeeper: main EEPROM not detected, falling back to filesystem write.")
+  interface = timekeeper_core.FilesystemInterface()
+
+
 
 try:
   while True:

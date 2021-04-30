@@ -85,7 +85,7 @@ class EEPROMInterface:
 
 class FilesystemInterface:
   def __init__(self):
-    self.runtime = get_runtime()
+    self.runtime = self.get_runtime()
 
   def get_runtime(self):
     with open("./.time","wb+") as f:
@@ -96,3 +96,4 @@ class FilesystemInterface:
     with open("./.time","wb") as f:
       writeVal = int(timeVal)
       f.write(bin(writeVal))
+      self.runtime = timeVal
