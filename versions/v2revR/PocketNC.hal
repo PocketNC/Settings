@@ -2,7 +2,7 @@
 # so that it can issue i2c commands to change the
 # voltage.
 loadusr -Wn spindle_speed ./spindle_speed_voltage.py
-loadusr -Wn spindle_clock /home/pocketnc/pin_speed/pin_speed [POCKETNC_PINS]SPINDLE_CLOCK_CHIP [POCKETNC_PINS]SPINDLE_CLOCK_LINE spindle_clock
+loadusr -Wn spindle_clock pin_speed [POCKETNC_PINS]SPINDLE_CLOCK_CHIP [POCKETNC_PINS]SPINDLE_CLOCK_LINE spindle_clock
 
 # ###################################
 # Core EMC/HAL Loads
