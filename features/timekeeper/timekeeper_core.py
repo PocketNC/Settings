@@ -1,5 +1,5 @@
-#!/usr/bin/python
-import hal, time
+#!/usr/bin/python3
+import hal, os, time
 import eeprom
 
 START_IDX = 13 # The boundaries of the continuous chunk of EEPROM used by this component.
@@ -88,12 +88,13 @@ class FilesystemInterface:
     self.runtime = self.get_runtime()
 
   def get_runtime(self):
-    with open("./.time","wb+") as f:
+    mode = 'rb' if os.path.exists('./.time') else 'wb'
+    with open("./.time",mode) as f:
       fc = f.read()
-      self.runTime = int(fc,2) if len(fc) > 0 else 0
+      return int.from_bytes(fc,'little') if len(fc) > 0 else 0
 
   def write_next(self, timeVal):
     with open("./.time","wb") as f:
       writeVal = int(timeVal)
-      f.write(bin(writeVal))
-      self.runtime = timeVal
+      f.write((writeVal).to_bytes(4, byteorder='little', signed=False))
+      self.runtime = writeVal

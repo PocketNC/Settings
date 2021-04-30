@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import hal, time
 import eeprom
 import timekeeper_core
@@ -13,12 +13,11 @@ h.ready()
 
 try:
   interface = timekeeper_core.EEPROMInterface()
-  runtime = interface.runtime
 except IOError as e:
   print("Timekeeper: main EEPROM not detected, falling back to filesystem write.")
   interface = timekeeper_core.FilesystemInterface()
 
-
+runtime = interface.runtime
 
 try:
   while True:
