@@ -82,3 +82,17 @@ class EEPROMInterface:
       self.runtime = int(timeVal)
     except IOError as e:
       print(e)
+
+class FilesystemInterface:
+  def __init__(self):
+    self.runtime = get_runtime()
+
+  def get_runtime(self):
+    with open("./.time","wb+") as f:
+      fc = f.read()
+      self.runTime = int(fc,2) if len(fc) > 0 else 0
+
+  def write_next(self, timeVal):
+    with open("./.time","wb") as f:
+      writeVal = int(timeVal)
+      f.write(bin(writeVal))
