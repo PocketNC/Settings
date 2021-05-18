@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import traceback
 import hal
 import os
 import time
@@ -135,7 +136,7 @@ try:
         h['release'] = False
 
     except Exception as e:
-      print 'Exception in interlock component: %s' % (e)
+      print('Exception in interlock component: %s' % traceback.format_exc())
       h['exception'] = True
       h['exception-alert'] = True
     time.sleep(.01)
