@@ -10,20 +10,24 @@ loadusr -Wn spindle_speed ./spindle_speed_dummy.py
 loadrt [KINS]KINEMATICS
 
 # motion controller, get name and thread periods from ini file
-loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES tp=tp kins=[POCKETNC]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
 
 newinst bb_gpio init
-newinst hal_pru_generic hpg prucode=/usr/lib/machinekit/prubin/pru_generic.bin pru=1 num_stepgens=5
+newinst hal_pru_generic hpg prucode=/usr/lib/machinekit/prubin/pru_generic.bin pru=1 num_stepgens=5 num_pwmgens=1
 
 # load low-level drivers
 loadrt feedrate-v2
-loadrt and2 names=mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
-loadrt or2 names=programStartFromPaused.or,triggerEstop.or
+#loadrt and2 names=mPwr.and,programStartFromIdle.and,programStartFromPaused.and,runningIntoPause.and
+#loadrt or2 names=programStartFromPaused.or,triggerEstop.or
+loadrt and2 names=[HAL]AND_COMPONENTS
+loadrt or2 names=[HAL]OR_COMPONENTS
 loadrt timedelay names=mPwr.timedelay
 loadrt oneshot names=programStart.oneshot,programPause.oneshot
 loadrt sum2 names=spindleMath
 loadrt scale names=spindleScale
 loadrt limit1 names=spindleLimit
+loadrt toggle names=eStopButton.toggle
+loadrt not names=estopNotActivated.not,eStopState.not,eStopDrivers.not,interlockOpen.not
 
 
 # ################################################
@@ -41,6 +45,12 @@ addf feedrate-v2.funct                servo-thread
 ######################
 # Testing
 ######################
+addf estopNotActivated.not			servo-thread
+addf eStopState.not			servo-thread
+addf eStopButton.toggle		servo-thread
+addf eStopDrivers.not		servo-thread
+addf doEstop.and	servo-thread
+addf doEstopReset.and	servo-thread
 addf mPwr.timedelay		servo-thread
 addf mPwr.and			servo-thread
 addf programStart.oneshot	servo-thread
@@ -52,6 +62,13 @@ addf spindleScale	servo-thread
 addf spindleLimit	servo-thread
 addf spindleMath	servo-thread
 addf runningIntoPause.and	servo-thread
+addf triggerEstop.or servo-thread
+addf triggerEstopFromUserspace.or servo-thread
+addf pauseFromButtonOrInterlock.or		servo-thread
+addf startButtonInterlockCheck.and servo-thread
+addf startFromButtonOrInterlock.or servo-thread
+addf interlockOpen.not servo-thread
+addf interlockClosedAndReleased.and servo-thread
 
 # ######################################################
 # Axis-of-motion Specific Configs (not the GUI)
@@ -239,16 +256,41 @@ net b-home-and-index joint.4.home-sw-in
 
 ### Control Panel Buttons ###
 # eStop
-net estop-loop			<= iocontrol.0.user-enable-out
-net estop-loop			=> iocontrol.0.emc-enable-in
+net estop-loop iocontrol.0.user-enable-out
+net estop-loop iocontrol.0.emc-enable-in
+
+
+net estopTriggered triggerEstop.or.out
+net estopTriggered doEstop.and.in0
+
+net estopNotActivated estopNotActivated.not.out
+net estopNotActivated doEstop.and.in1
+
+net estopIsActivated halui.estop.is-activated
+net estopIsActivated estopNotActivated.not.in
+net estopIsActivated doEstopReset.and.in1
+
+net resetEstop doEstopReset.and.out
+net resetEstop halui.estop.reset
+
+net activateEstop doEstop.and.out
+net activateEstop halui.estop.activate
+
+net estopIsActivated halui.estop.is-activated
+net estopIsActivated ledBlink.eStop.and.in1
+net estopIsActivated eStopDrivers.not.in
+
 
 # Machine power
 newinst bb_gpio enable-pin pin=[POCKETNC_PINS]ENABLE_PIN direction=output
-#setp [POCKETNC_PINS]ENABLE_INVERT #TODO MAY 2021 remove?
-setp halui.machine.on 1
-setp halui.estop.reset 1
-#net driversEnable halui.machine.is-on => [POCKETNC_PINS]ENABLE_LONG #TODO MAY 2021 remove?
+net driversEnable eStopDrivers.not.out
+net driversEnable mPwr.timedelay.in
+net delayedEnable mPwr.timedelay.out
+net delayedEnable halui.machine.on
 net delayedEnable enable-pin.out
+#net delayedEnable ledBlink.mPwr.and.in1
+net delayedEnable mPwr.and.in0
+
 
 # Program start/run
 newinst bb_gpio start-button-pin pin=[POCKETNC_PINS]START_BUTTON_PIN direction=input
@@ -314,9 +356,9 @@ setp hpg.pwmgen.00.out.00.enable    1
 #setp hpg.pwmread.00.max_time 1000000000
 #setp hpg.pwmread.00.pin [POCKETNC_PINS]SPINDLE_CLOCK_PIN
 
-net spindle-clock-frequency spindle_speed.spindle_clock_frequency
+#net spindle-clock-frequency spindle_speed.spindle_clock_frequency
 #net spindle-clock-frequency hpg.pwmread.00.frequency
-net spindle-clock-frequency spindle_clock.frequency
+#net spindle-clock-frequency spindle_clock.frequency
 
 net measured-spindle-speed spindle_speed.speed_measured
 
