@@ -27,7 +27,7 @@ loadrt sum2 names=spindleMath
 loadrt scale names=spindleScale
 loadrt limit1 names=spindleLimit
 loadrt toggle names=eStopButton.toggle
-loadrt not names=estopNotActivated.not,eStopState.not,eStopDrivers.not,interlockOpen.not
+loadrt not names=estopNotActivated.not,eStopState.not,eStopDrivers.not
 
 
 # ################################################
@@ -64,11 +64,6 @@ addf spindleMath	servo-thread
 addf runningIntoPause.and	servo-thread
 addf triggerEstop.or servo-thread
 addf triggerEstopFromUserspace.or servo-thread
-addf pauseFromButtonOrInterlock.or		servo-thread
-addf startButtonInterlockCheck.and servo-thread
-addf startFromButtonOrInterlock.or servo-thread
-addf interlockOpen.not servo-thread
-addf interlockClosedAndReleased.and servo-thread
 
 # ######################################################
 # Axis-of-motion Specific Configs (not the GUI)
@@ -277,7 +272,6 @@ net activateEstop doEstop.and.out
 net activateEstop halui.estop.activate
 
 net estopIsActivated halui.estop.is-activated
-net estopIsActivated ledBlink.eStop.and.in1
 net estopIsActivated eStopDrivers.not.in
 
 
@@ -288,7 +282,6 @@ net driversEnable mPwr.timedelay.in
 net delayedEnable mPwr.timedelay.out
 net delayedEnable halui.machine.on
 net delayedEnable enable-pin.out
-#net delayedEnable ledBlink.mPwr.and.in1
 net delayedEnable mPwr.and.in0
 
 
