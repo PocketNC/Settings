@@ -329,6 +329,7 @@ net reset-estop halui.estop.reset
 
 net machine-on solo-estop.machine-on
 net machine-on halui.machine.on
+net machine-on mcp22.B.out-02
 
 net estop-user-enable iocontrol.0.user-enable-out
 net estop-user-enable solo-estop.user-enable
