@@ -421,24 +421,6 @@ net tool-offset xyzbc-trt-kins.tool-offset
 net mist-coolant mcp22.B.out-06
 net mist-coolant iocontrol.0.coolant-mist 
 
-####################################################
-# Tool Changer
-####################################################
-
-#setp hpg3.stepgen.01.dirsetup        [TOOL_CHANGER]DIRSETUP
-#setp hpg3.stepgen.01.dirhold         [TOOL_CHANGER]DIRHOLD
-#setp hpg3.stepgen.01.steplen         [TOOL_CHANGER]STEPLEN
-#setp hpg3.stepgen.01.stepspace       [TOOL_CHANGER]STEPSPACE
-#setp hpg3.stepgen.01.position-scale  [TOOL_CHANGER]SCALE
-#setp hpg3.stepgen.01.maxvel          [TOOL_CHANGER]STEPGEN_MAX_VEL
-#setp hpg3.stepgen.01.maxaccel        [TOOL_CHANGER]STEPGEN_MAX_ACC
-#
-#setp hpg3.stepgen.01.steppin         [POCKETNC_PINS]TOOL_CHANGER_STEP_PIN
-#setp hpg3.stepgen.01.dirpin          [POCKETNC_PINS]TOOL_CHANGER_DIR_PIN
-#
-#setp hpg3.stepgen.01.control-type 1
-#setp hpg3.stepgen.01.enable 1
-
 # Feedrate calculation
 net x-pos feedrate.x
 net x-pos joint.0.pos-cmd
@@ -458,3 +440,52 @@ net c-pos feedrate.c
 net c-pos joint.4.pos-cmd
 
 net calculated-feedrate feedrate.feedrate
+
+####################################################
+# Tool Changer
+####################################################
+loadusr -Wn solo-tool-changer solo_tool_changer/hal-component.py
+
+net x-pos solo-tool-changer.x-position
+net y-pos solo-tool-changer.y-position
+net z-pos solo-tool-changer.z-position
+net b-pos solo-tool-changer.b-position
+
+net x-homed joint.0.homed
+net x-homed solo-tool-changer.x-homed
+
+net y-homed joint.1.homed
+net y-homed solo-tool-changer.y-homed
+
+net z-homed joint.2.homed
+net z-homed solo-tool-changer.z-homed
+
+net b-homed joint.3.homed
+net b-homed solo-tool-changer.b-homed
+
+newinst bb_gpio tool-changer-opened-pin pin=827 direction=input
+newinst bb_gpio tool-changer-closed-pin pin=828 direction=input
+setp tool-changer-opened-pin.invert 1
+setp tool-changer-closed-pin.invert 1
+
+net closed-sensor tool-changer-closed-pin.in
+net closed-sensor solo-tool-changer.closed-sensor
+
+net opened-sensor tool-changer-opened-pin.in
+net opened-sensor solo-tool-changer.opened-sensor
+
+net open-tool-changer mcp22.B.out-04
+net open-tool-changer solo-tool-changer.open-out
+
+net close-tool-changer mcp21.A.out-03
+net close-tool-changer solo-tool-changer.close-out
+
+net inhibit-feed motion.feed-inhibit
+net inhibit-feed solo-tool-changer.inhibit-feed
+
+net inhibit-homing motion.homing-inhibit
+net inhibit-homing solo-tool-changer.inhibit-homing
+
+setp solo-tool-changer.enabled 1
+
+# See more solo-tool-changer connections in PocketNC_PostMillTask.hal

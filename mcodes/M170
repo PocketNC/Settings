@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Open tool changer
+halcmd setp solo-tool-changer.open-cmd 1
+sleep 4
