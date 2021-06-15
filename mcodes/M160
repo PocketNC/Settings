@@ -1,4 +1,9 @@
 #!/bin/bash
 
-halcmd setp mcp21.A.out-01 1
+# Release tool
+
+# Tool change air on
+halcmd sets tool-released 1
+
+# Taper Air Purge on
 halcmd setp mcp22.B.out-07 1

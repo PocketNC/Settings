@@ -1,4 +1,9 @@
 #!/bin/bash
 
-halcmd setp mcp21.A.out-01 0
+# Clamp tool
+
+# Tool change air off
+halcmd sets tool-released 0
+
+# Taper Air Purge off
 halcmd setp mcp22.B.out-07 0
