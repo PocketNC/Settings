@@ -14,25 +14,15 @@
 #*******************************************************************
 import hal
 import time
-from state_machine import SoloToolChangerState
+from state_machine import SoloToolChangerState, SAFE_Z, SAFE_X, EPS, B_MIN, B_MAX, X_MIN, X_MAX, Y_MIN, Y_MAX, Z_MIN
+from tool_info import is_over_tool_slot
 
 h = hal.component("solo-tool-changer")
 
-## set true to override outputs
-#h.newpin("override", hal.HAL_BIT, hal.HAL_IN)
-#
-## when override is true, outputs are set with these pins
-#h.newpin("override-open", hal.HAL_BIT, hal.HAL_IN)
-#h.newpin("override-close", hal.HAL_BIT, hal.HAL_IN)
-#h.newpin("override-inhibit-feed", hal.HAL_BIT, hal.HAL_IN)
-#h.newpin("override-inhibit-homing", hal.HAL_BIT, hal.HAL_IN)
-#
-## control for opening and closing tool changer
-## when override is false
-
-# used to open the tool changer via a program
+# used to open the tool changer
 h.newpin("open-cmd", hal.HAL_BIT, hal.HAL_IN)
 
+# used to allow everything to initialize before enabling
 h.newpin("enabled", hal.HAL_BIT, hal.HAL_IN)
 
 # pin for user to indicate it's safe to close tool changer when machine is not homed
@@ -63,8 +53,14 @@ h.newpin("inhibit-homing", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("fault", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("fault-reason", hal.HAL_S32, hal.HAL_OUT)
 
-# the minimum B limit, which changes when the door is open to avoid collisions
+# limits which change when the drawer is open to avoid collisions
+h.newpin("b-max", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("b-min", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("z-min", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("x-max", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("x-min", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("y-max", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("y-min", hal.HAL_FLOAT, hal.HAL_OUT)
 
 # debugging pin to show the internal state machine state
 h.newpin("state", hal.HAL_S32, hal.HAL_OUT)
@@ -82,7 +78,13 @@ h["b-position"] = -90
 h["x-position"] = 4.5
 h["y-position"] = 0
 h["z-position"] = -6
-h["b-min"] = -135
+h["b-max"] = B_MAX
+h["b-min"] = B_MIN
+h["x-max"] = X_MAX
+h["x-min"] = X_MIN
+h["y-max"] = Y_MAX
+h["y-min"] = Y_MIN
+h["z-min"] = Z_MIN 
 
 h["x-homed"] = False
 h["y-homed"] = False
@@ -102,6 +104,8 @@ h["inhibit-homing"] = True
 h["fault"] = False
 h["fault-reason"] = False
 
+# state for ensuring drawer safely opens and closes
+# also limits ability to home if the drawer isn't closed
 state = SoloToolChangerState(h)
 
 try:
@@ -111,6 +115,32 @@ try:
   while True:
     state.next()
     state.incrementTime(pollTime)
+
+# helps prevent accidental collisions when tool changer drawer is open
+    if (
+      not h["closed-sensor"] and 
+      h["x-homed"] and
+      h["y-homed"] and
+      h["z-homed"] and
+      h["b-homed"]
+    ):
+      # Drawer isn't closed and axes are homed
+
+      if h["x-position"] <= SAFE_X+EPS:
+        # Spindle not over tool changing drawer, full Z movement OK
+        h["z-min"] = Z_MIN-EPS
+
+        if h["z-position"] <= SAFE_Z+EPS:
+          # Z is lower than is safe when over the drawer, so limit X
+          h["x-max"] = SAFE_X+EPS
+        else:
+          # Z is at safe height to be over drawer, so allow full X movement
+          h["x-max"] = X_MAX
+      else:
+        # Spindle is over open tool changer drawer
+        if is_over_tool_slot(h["x-position"], h["y-position"]):
+          pass
+      
     time.sleep(pollTime)
 
     while not h["enabled"]:

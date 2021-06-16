@@ -1,0 +1,4 @@
+O<solo-tool-change> SUB
+M6 T[#<T>]
+(debug, Loading #<T>)
+O<solo-tool-change> ENDSUB

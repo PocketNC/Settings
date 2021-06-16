@@ -4,3 +4,21 @@
 
 net b-min ini.3.min_limit
 net b-min solo-tool-changer.b-min
+
+net b-max ini.3.max_limit
+net b-max solo-tool-changer.b-max
+
+net x-min ini.0.min_limit
+net x-min solo-tool-changer.x-min
+
+net x-max ini.0.max_limit
+net x-max solo-tool-changer.x-max
+
+net y-min ini.1.min_limit
+net y-min solo-tool-changer.y-min
+
+net y-max ini.1.max_limit
+net y-max solo-tool-changer.y-max
+
+net z-min ini.2.min_limit
+net z-min solo-tool-changer.z-min

@@ -1,10 +1,19 @@
 from transitions import Machine
 from enum import Enum, auto
 
+# TODO - get these from configuration
+X_MIN = -3.3736
+X_MAX = 6.2312 
+Y_MIN = -3.6487
+Y_MAX = 3.4557
+Z_MIN = -6.8746
+B_MIN = -135
+B_MAX = 45
+
 EPS = .000001
-SAFE_Z = 0-EPS
-SAFE_B = 0-EPS
-SAFE_X = 1+EPS
+SAFE_Z = 0
+SAFE_B = 0
+SAFE_X = 1
 TIME_ALLOWED_TO_OPEN_OR_CLOSE = 4
 
 FAULT_FAILED_TO_CLOSE = -1
@@ -125,7 +134,7 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = False
     self.h["fault"] = False
     self.h["fault-reason"] = 0
-    self.h["b-min"] = -135 # TODO -- pull this out of config?
+    self.h["b-min"] = B_MIN
 
   def on_enter_OK_TO_OPEN(self):
     print("OK_TO_OPEN")
@@ -136,7 +145,7 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = False
     self.h["fault"] = False
     self.h["fault-reason"] = 0
-    self.h["b-min"] = -135 # TODO -- pull this out of config?
+    self.h["b-min"] = B_MIN
 
   def on_enter_NOT_SAFE_TO_OPEN(self):
     print("NOT_SAFE_TO_OPEN")
@@ -147,7 +156,7 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = False
     self.h["fault"] = False
     self.h["fault-reason"] = 0
-    self.h["b-min"] = -135 # TODO -- pull this out of config?
+    self.h["b-min"] = B_MIN
 
   def on_enter_OK_TO_CLOSE(self):
     print("OK_TO_CLOSE")
@@ -236,9 +245,9 @@ class SoloToolChangerState(object):
       self.h["y-homed"] and
       self.h["z-homed"] and
       self.h["b-homed"] and
-      (self.h["x-position"] <= SAFE_X or
-       self.h["z-position"] >= SAFE_Z) and
-      self.h["b-position"] >= SAFE_B
+      (self.h["x-position"] <= SAFE_X+EPS or
+       self.h["z-position"] >= SAFE_Z-EPS) and
+      self.h["b-position"] >= SAFE_B-EPS
     )
 
   @property
