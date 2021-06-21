@@ -1,9 +1,10 @@
 import math
+from state_machine import EPS
 
 # these are taken from and must match the tool change G code subroutines
-TOOL_1_X = 6.2093
-TOOL_1_Y = 2.9180
-TOOL_1_Z = -6.2277
+TOOL_1_X = 6.2153
+TOOL_1_Y = 2.9225
+TOOL_1_Z = -6.2170
 TOOL_DIST = 40.75 / 25.4
 MIDDLE_OFFSET_X =  math.sqrt(3) * .5 * TOOL_DIST
 MIDDLE_OFFSET_Y = .5 * TOOL_DIST

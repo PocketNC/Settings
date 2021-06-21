@@ -1,6 +1,6 @@
 #!/bin/bash
 
 # Close tool changer
-halcmd setp solo-tool-changer.open-cmd 0
+halcmd sets tool-changer-open-cmd  0
 
 sleep 4

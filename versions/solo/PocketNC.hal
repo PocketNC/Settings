@@ -1,6 +1,6 @@
 # IO Expanders
 loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
-loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A01,A02,A03,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07
+loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07 -ip A01,A02,A03
 
 # Spindle VFD control over serial
 loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/solo/vfd.ini -S SPINDLEVFD -r
@@ -467,6 +467,8 @@ newinst bb_gpio tool-changer-opened-pin pin=827 direction=input
 newinst bb_gpio tool-changer-closed-pin pin=828 direction=input
 setp tool-changer-opened-pin.invert 1
 setp tool-changer-closed-pin.invert 1
+
+net tool-changer-open-cmd solo-tool-changer.open-cmd
 
 net closed-sensor tool-changer-closed-pin.in
 net closed-sensor solo-tool-changer.closed-sensor

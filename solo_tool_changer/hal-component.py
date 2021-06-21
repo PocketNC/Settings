@@ -130,7 +130,7 @@ try:
         # Spindle not over tool changing drawer, full Z movement OK
         h["z-min"] = Z_MIN-EPS
 
-        if h["z-position"] <= SAFE_Z+EPS:
+        if h["z-position"] <= SAFE_Z-EPS:
           # Z is lower than is safe when over the drawer, so limit X
           h["x-max"] = SAFE_X+EPS
         else:
