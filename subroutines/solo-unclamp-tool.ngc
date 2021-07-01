@@ -1,0 +1,13 @@
+o<solo-unclamp-tool> SUB
+
+M64 P59
+M66 P59 L3 Q1.5
+M65 P59
+
+o100 if [ ABS[ #5399 +1 ] LT .000001 ]
+  (debug,ERROR: Failed to unclamp tool.)
+  M66  E0 L0
+  M2
+o100 endif
+
+o<solo-unclamp-tool> ENDSUB

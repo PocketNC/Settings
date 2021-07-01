@@ -4,7 +4,7 @@ O<solo-tool-change> SUB
 
 #<_tool1X> = 6.2153
 #<_tool1Y> = 2.9225
-#<_tool1Z> = -6.2170
+#<_tool1Z> = -6.1170
 
 #<_toolDist> = [ 40.75 / 25.4 ]
 #<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
@@ -21,8 +21,7 @@ o100 endif
 o200 if [ #<_oldTool> EQ #<_newTool> ]
   O<solo-tool-change> return
 o200 endif
-
-M6 T[#<T>]
+(debug, Tool #<T>)
 
 M70                                            ( save current modal state )
 
@@ -34,14 +33,17 @@ G40
 
 G53 G1 Z0 F#<_RapidFeed>
 G53 G1 B0 F#<_RapidFeedRotary>
-M170
+M270
 
 o[#<_oldTool> + 7000] call
 o[#<_newTool> + 8000] call
 
-M171
+M6 T[#<T>]
+
+M271
 
 M72                                          ( restore modal state )
+
 O<solo-tool-change> ENDSUB
 
 ; tool 1
@@ -110,16 +112,24 @@ o7013 sub
 o7013 endsub
 
 o<local-place-tool> sub
+  M66 P60 L0
+  o7100 if [ #5399 NE 1 ]
+    (debug,ERROR: No tool in spindle.)
+    o<local-sync> call
+    M2
+  o7100 endif
+
   #<_toolX> = #1
   #<_toolY> = #2
   #<_toolZ> = #3
   #<_placeFeed> = 300
   G53 G1 F#<_placeFeed> X#<_toolX> Y#<_toolY>
+  ;O<local-sync> call
   G53 G1 F#<_placeFeed> Z#<_toolZ>
-  M160
-  G4 P1
+  M260
 
   G53 G1 F#<_placeFeed> Z[ #<_toolZ> + 1 ]
+  ;O<local-sync> call
 o<local-place-tool> endsub
 
 ; tool 1
@@ -192,9 +202,16 @@ o<local-pick-up-tool> sub
   #<_toolY> = #2
   #<_toolZ> = #3
   #<_pickupFeed> = 300
+  ;O<local-sync> call
   G53 G1 F#<_pickupFeed> X#<_toolX> Y#<_toolY>
+  ;O<local-sync> call
   G53 G1 F#<_pickupFeed> Z#<_toolZ>
-  M161
-  G4 P1
+  M261
   G53 G1 F#<_pickupFeed> Z0
+  ;O<local-sync> call
 o<local-pick-up-tool> endsub
+
+o<local-sync> sub
+;  G4 P.2
+  M66  E0 L0
+o<local-sync> endsub

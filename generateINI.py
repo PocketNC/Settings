@@ -17,6 +17,7 @@ from ini import read_ini_data, merge_ini_data, write_ini_data, append_ini_data
 INI_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/PocketNC.ini")
 INI_DEFAULT_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/versions/%s/PocketNC.ini" % VERSION)
 CALIBRATION_OVERLAY_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/CalibrationOverlay.inc")
+LAST_TOOL_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/LastTool.inc")
 FEATURES_DIR = os.path.join(POCKETNC_DIRECTORY, "Settings/features")
 
 if __name__ == "__main__":
@@ -95,5 +96,13 @@ if __name__ == "__main__":
     });
 
   merged = merge_ini_data(merged, overlay)
+
+  if os.path.isfile(LAST_TOOL_FILE):
+    last_tool = read_ini_data(LAST_TOOL_FILE)
+  else:
+    last_tool = { 'parameters': [],
+                'sections': {} }
+
+  merged = merge_ini_data(merged, last_tool)
 
   write_ini_data(merged, INI_FILE);

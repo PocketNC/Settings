@@ -17,7 +17,7 @@ net spindle-temperature d5next.temperature_f
 loadrt [KINS]KINEMATICS
 
 # motion controller, get name and thread periods from ini file
-loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS 
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=64
 
 newinst bb_gpio init
 
@@ -268,13 +268,6 @@ setp hpg0.stepgen.00.dirpin          [POCKETNC_PINS]C_DIR_PIN
 # Standard I/O - EStop, Enables, Limit Switches, Etc
 # ##################################################
 
-# create signals for tool loading loopback
-net tool-prep-loop		<= iocontrol.0.tool-prepare
-net tool-prep-loop		=> iocontrol.0.tool-prepared
-net tool-change-loop	<= iocontrol.0.tool-change
-net tool-change-loop	=> iocontrol.0.tool-changed
-
-
 ### Home and Limit switches ###
 # X axis
 #
@@ -379,7 +372,6 @@ net tool-probe motion.probe-input
 
 ## Air
 
-net tool-released mcp21.A.out-01
 net vice-released mcp21.A.out-02
 
 ### Spindle ###
@@ -446,6 +438,25 @@ net calculated-feedrate feedrate.feedrate
 ####################################################
 loadusr -Wn solo-tool-changer solo_tool_changer/hal-component.py
 
+# No tool prep necessary
+net tool-prep-loop		<= iocontrol.0.tool-prepare
+net tool-prep-loop		=> iocontrol.0.tool-prepared
+
+net tool-change-loop		<= iocontrol.0.tool-change
+net tool-change-loop		=> iocontrol.0.tool-changed
+
+net new-tool iocontrol.0.tool-prep-number
+net new-tool solo-tool-changer.new-tool
+
+net old-tool iocontrol.0.tool-number
+net old-tool solo-tool-changer.old-tool
+
+#net tool-change-requested iocontrol.0.tool-change
+#net tool-change-requested solo-tool-changer.tool-change-cmd
+
+#net tool-change-completed solo-tool-changer.tool-change-complete
+#net tool-change-completed iocontrol.0.tool-changed
+
 net x-pos solo-tool-changer.x-position
 net y-pos solo-tool-changer.y-position
 net z-pos solo-tool-changer.z-position
@@ -463,18 +474,57 @@ net z-homed solo-tool-changer.z-homed
 net b-homed joint.3.homed
 net b-homed solo-tool-changer.b-homed
 
-newinst bb_gpio tool-changer-opened-pin pin=827 direction=input
-newinst bb_gpio tool-changer-closed-pin pin=828 direction=input
+newinst bb_gpio tool-changer-opened-pin pin=[POCKETNC_PINS]TOOL_CHANGER_OPENED_PIN direction=input
+newinst bb_gpio tool-changer-closed-pin pin=[POCKETNC_PINS]TOOL_CHANGER_CLOSED_PIN direction=input
 setp tool-changer-opened-pin.invert 1
 setp tool-changer-closed-pin.invert 1
 
 net tool-changer-open-cmd solo-tool-changer.open-cmd
+net tool-changer-open-cmd motion.digital-out-63
 
-net closed-sensor tool-changer-closed-pin.in
-net closed-sensor solo-tool-changer.closed-sensor
+net tool-changer-close-cmd solo-tool-changer.close-cmd
+net tool-changer-close-cmd motion.digital-out-62
 
 net opened-sensor tool-changer-opened-pin.in
 net opened-sensor solo-tool-changer.opened-sensor
+net opened-sensor motion.digital-in-63
+
+net closed-sensor tool-changer-closed-pin.in
+net closed-sensor solo-tool-changer.closed-sensor
+net closed-sensor motion.digital-in-62
+
+newinst debounce clamped-tool-debounce pincount=1
+newinst debounce clamped-notool-debounce pincount=1
+addf clamped-tool-debounce.funct servo-thread
+addf clamped-notool-debounce.funct servo-thread
+
+setp clamped-tool-debounce.delay 300
+setp clamped-notool-debounce.delay 300
+
+net clamped-no-tool-raw mcp22.A.in-01
+net clamped-no-tool-raw clamped-notool-debounce.0.in
+
+setp mcp22.A.in-01.invert 1
+setp mcp22.A.in-01.pullup 1
+net clamped-no-tool clamped-notool-debounce.0.out
+net clamped-no-tool motion.digital-in-61
+net clamped-no-tool solo-tool-changer.clamped-no-tool
+
+net tool-clamped-raw mcp22.A.in-02
+net tool-clamped-raw clamped-tool-debounce.0.in
+
+setp mcp22.A.in-02.invert 1
+setp mcp22.A.in-02.pullup 1
+net tool-clamped clamped-tool-debounce.0.out
+net tool-clamped motion.digital-in-60
+net tool-clamped solo-tool-changer.clamped-with-tool
+
+setp mcp22.A.in-03.invert 1
+setp mcp22.A.in-03.pullup 1
+
+net tool-unclamped mcp22.A.in-03
+net tool-unclamped motion.digital-in-59
+net tool-unclamped solo-tool-changer.unclamped
 
 net open-tool-changer mcp22.B.out-04
 net open-tool-changer solo-tool-changer.open-out
@@ -490,4 +540,17 @@ net inhibit-homing solo-tool-changer.inhibit-homing
 
 setp solo-tool-changer.enabled 1
 
+net tool-released solo-tool-changer.unclamp-out
+net tool-released mcp21.A.out-01
+#net tool-released mcp22.B.out-07 
+
+net unclamp-cmd solo-tool-changer.unclamp-cmd
+net unclamp-cmd motion.digital-out-59
+
+net clamp-cmd solo-tool-changer.clamp-cmd
+net clamp-cmd motion.digital-out-60
+
 # See more solo-tool-changer connections in PocketNC_PostMillTask.hal
+
+net tool-changer-fault solo-tool-changer.fault
+net tool-changer-fault halui.abort
