@@ -1,0 +1,3 @@
+o<store-switchkins> sub
+#<_switchkins> = #<_hal[motion.switchkins-type]>
+o<store-switchkins> endsub

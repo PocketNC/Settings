@@ -1,0 +1,46 @@
+o<machine-cmd> sub
+; command the given axis, 0 = X, 1 = Y, 2 = Z, A = 3, B = 4, C = 5
+; ensuring that TCPC is off and no offsets are used
+
+#<axisNumber> = #1
+#<feedRate> = #2
+#<axisPosition> = #3
+
+o200 if [ #<feedRate> LT .00001 ]
+  #<feedRate> = 30
+o200 endif
+
+M70
+G20
+G90
+G94
+M429
+
+o[7000 + #<axisNumber>] call [#<feedRate>] [#<axisPosition>]
+
+M72
+o<machine-cmd> endsub
+
+o7000 sub
+  G53 G1 F#1 X#2
+o7000 endsub
+
+o7001 sub
+  G53 G1 F#1 Y#2
+o7001 endsub
+
+o7002 sub
+  G53 G1 F#1 Z#2
+o7002 endsub
+
+o7003 sub
+  G53 G1 F#1 A#2
+o7003 endsub
+
+o7004 sub
+  G53 G1 F#1 B#2
+o7004 endsub
+
+o7005 sub
+  G53 G1 F#1 C#2
+o7005 endsub
