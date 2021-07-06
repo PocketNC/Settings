@@ -42,6 +42,8 @@ O<tool-probe> SUB
 
 M70                                            ( save current modal state )
 
+M429
+
 M5                                             ( turn off spindle, cannot be on during the probe )
 G[21 - #<_UseInches>]                          ( use inches or millimeters as required here, units will be restored on return )
 G30.1                                          ( save current position in #5181-#5185... )
