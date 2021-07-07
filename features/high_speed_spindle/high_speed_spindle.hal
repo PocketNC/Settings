@@ -19,3 +19,6 @@ net hssAborted pauseHssWarmupOrSensors.or.out
 net hssAborted triggerEstopFromUserspace.or.in0
 
 sets spindle-max-speed 50000
+
+net spindle-temperature hss_sensors.temperature
+net spindle-pressure hss_sensors.pressure

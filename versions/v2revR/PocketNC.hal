@@ -458,9 +458,6 @@ net b-pos joint.4.pos-cmd
 
 net calculated-feedrate feedrate-v2.feedrate
 
-newsig spindle-temperature float
-sets spindle-temperature -99999
-
 newsig vice-released bit
 sets vice-released 0
 
@@ -470,3 +467,8 @@ sets tool-released 0
 net kinstype-select motion.analog-out-03
 net kinstype-select motion.switchkins-type
 net tool-offset xyzab-trt-kins.tool-offset  
+
+newsig spindle-temperature float
+newsig spindle-pressure float
+sets spindle-temperature -999
+sets spindle-pressure -999

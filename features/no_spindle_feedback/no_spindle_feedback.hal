@@ -1,0 +1,5 @@
+unlinkp spindle_speed.speed_measured
+newinst abs spindle-speed-noop
+addf spindle-speed-noop.funct servo-thread
+net spindleSpeed spindle-speed-noop.in 
+net measured-spindle-speed spindle-speed-noop.out

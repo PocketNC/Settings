@@ -4,6 +4,7 @@ import hal
 import os
 import datetime
 import time
+from i2c import I2C
 
 POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
 DETECT_SCRIPT = os.path.join(POCKETNC_DIRECTORY, "Settings/features/high_speed_spindle/detect_hss_mprls.py")
@@ -33,13 +34,7 @@ SENSOR_READ_FAIL_VALUE = -999
 # Returns pressure reading in MPa
 def readPressure():
   try:
-    i2c = None
-    try:
-      from Adafruit_GPIO.I2C import Device
-      i2c = Device(MPRLS_I2CADDR, 2)
-    except:
-      from Adafruit_I2C import Adafruit_I2C
-      i2c = Adafruit_I2C(MPRLS_I2CADDR, 1)
+    i2c = I2C(MPRLS_I2CADDR)
     
     time.sleep(0.1)
     
@@ -62,13 +57,7 @@ def readPressure():
 # Returns temperature reading in degrees Celsius
 def readTemperature():
   try:
-    i2c = None
-    try:
-      from Adafruit_GPIO.I2C import Device
-      i2c = Device(MCP9808_I2CADDR, 2)
-    except:
-      from Adafruit_I2C import Adafruit_I2C
-      i2c = Adafruit_I2C(MCP9808_I2CADDR, 1)
+    i2c = I2C(MPRLS_I2CADDR)
     
     # Begin
     result = i2c.write16(MCP9808_REG_CONFIG, 0x0)
@@ -90,11 +79,7 @@ def readTemperature():
     time.sleep(0.250)
     
     # Read
-    raw = None
-    try:
-      raw = (i2c.readU16BE(MCP9808_REG_AMBIENT_TEMP))
-    except:
-      raw = i2c.reverseByteOrder(i2c.readU16(MCP9808_REG_AMBIENT_TEMP))
+    raw = (i2c.readU16(MCP9808_REG_AMBIENT_TEMP))
     temp = raw & 0x0FFF
     temp /= 16.0
     if (raw & 0x1000):

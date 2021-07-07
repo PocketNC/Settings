@@ -7,7 +7,10 @@ loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/solo/vfd.ini -S SPIN
 
 # D5 Next water cooler data
 loadusr -Wn d5next ./d5next.py
-net spindle-temperature d5next.temperature_f
+net spindle-temperature d5next.temperature_c
+
+newsig spindle-pressure float
+sets spindle-pressure -999
 
 # ###################################
 # Core EMC/HAL Loads

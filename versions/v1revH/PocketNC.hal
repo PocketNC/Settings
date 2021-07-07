@@ -364,3 +364,8 @@ sets measured-spindle-current 0
 
 newsig spindle-max-speed float
 sets spindle-max-speed 10000
+
+newsig spindle-temperature float
+newsig spindle-pressure float
+sets spindle-temperature -999
+sets spindle-pressure -999
