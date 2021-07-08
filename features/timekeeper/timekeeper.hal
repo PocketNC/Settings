@@ -1,3 +1,3 @@
 loadusr -W ./features/timekeeper/timekeeper.py
 
-net spindleEnable timekeeper.spindle-on
+net spindle-enable timekeeper.spindle-on

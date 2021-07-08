@@ -3,14 +3,14 @@ loadusr -Wn hss_warmup ./features/high_speed_spindle/hss_warmup.py
 net progStarted hss_warmup.program_running
 net progStartPaused hss_warmup.program_paused
 
-net spindleEnable hss_warmup.spindle_on
+net spindle-enable hss_warmup.spindle_on
 
 net hssWarmupAbort hss_warmup.abort
 net hssWarmupAbort pauseHssWarmupOrSensors.or.in0
 
 loadusr -Wn hss_sensors ./features/high_speed_spindle/hss_sensors.py
 
-net spindleEnable hss_sensors.spindle_on
+net spindle-enable hss_sensors.spindle_on
 
 net hssSensorsAbort hss_sensors.abort
 net hssSensorsAbort pauseHssWarmupOrSensors.or.in1
