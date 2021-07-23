@@ -1,7 +1,0 @@
-#!/bin/bash
-
-for i in {0..7}
-  do
-    sudo mkdir -p "/media/usb$i"
-  done
-

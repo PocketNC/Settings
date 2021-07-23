@@ -1,4 +1,0 @@
-#!/bin/bash
-
-/home/pocketnc/pocketnc/Settings/features/usb_drive/uninstallUsbmount.py $1
-
