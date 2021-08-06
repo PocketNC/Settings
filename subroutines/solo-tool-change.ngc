@@ -2,9 +2,10 @@ O<solo-tool-change> SUB
 #<_RapidFeed> = 300
 #<_RapidFeedRotary> = 600
 
-#<_tool1X> = 6.2153
-#<_tool1Y> = 2.9225
-#<_tool1Z> = -6.1170
+#<_tool1X> = 6.5646
+#<_tool1Y> = 3.2154
+#<_tool1Z> = -6.1570
+#<_safeZ> = -1
 
 #<_toolDist> = [ 40.75 / 25.4 ]
 #<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
@@ -31,7 +32,7 @@ G90
 G94
 G40
 
-G53 G1 Z0 F#<_RapidFeed>
+G53 G1 Z#<_safeZ> F#<_RapidFeed>
 G53 G1 B0 F#<_RapidFeedRotary>
 M270
 
@@ -207,7 +208,7 @@ o<local-pick-up-tool> sub
   ;O<local-sync> call
   G53 G1 F#<_pickupFeed> Z#<_toolZ>
   M261
-  G53 G1 F#<_pickupFeed> Z0
+  G53 G1 F#<_pickupFeed> Z#<_safeZ>
   ;O<local-sync> call
 o<local-pick-up-tool> endsub
 

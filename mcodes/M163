@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Schunk Mini90 close
-halcmd setp mcp21.A.out-02 0
+halcmd sets vice-released 0

@@ -545,7 +545,7 @@ setp solo-tool-changer.enabled 1
 
 net tool-released solo-tool-changer.unclamp-out
 net tool-released mcp21.A.out-01
-#net tool-released mcp22.B.out-07 
+net tool-released mcp22.B.out-07 
 
 net unclamp-cmd solo-tool-changer.unclamp-cmd
 net unclamp-cmd motion.digital-out-59

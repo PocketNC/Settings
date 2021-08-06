@@ -5,7 +5,7 @@ from enum import Enum, auto
 X_MIN = -3.3736
 X_MAX = 6.2312 
 Y_MIN = -3.6487
-Y_MAX = 3.4557
+Y_MAX = 3.7486
 Z_MIN = -6.8746
 B_MIN = -135
 B_MAX = 45
