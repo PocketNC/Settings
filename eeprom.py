@@ -6,7 +6,7 @@ import time
 import collections
 import os
 
-POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc/"
+POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
 eepromReadWPRExecutable = os.path.join(POCKETNC_DIRECTORY, "Settings/eepromReadWPR")
 
 Version = collections.namedtuple("Version", ["major", "minor", "patch"])

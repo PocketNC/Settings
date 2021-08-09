@@ -8,7 +8,7 @@ import sys
 from version import getVersion
 import subprocess
 
-POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
 VERSION = getVersion()
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));

@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
 FEATURES_DIR = os.path.join(POCKETNC_DIRECTORY, "Settings/features")
 
 for feature in os.listdir(FEATURES_DIR):

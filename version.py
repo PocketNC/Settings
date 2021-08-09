@@ -17,7 +17,7 @@
 
 import sys
 import os
-POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
 
 from device import getProcDeviceModel
 from enum import Enum

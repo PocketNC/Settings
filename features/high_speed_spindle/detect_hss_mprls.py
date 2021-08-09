@@ -3,7 +3,8 @@ import os
 import time
 import sys
 
-POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
+
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Settings"))
 
 from i2c import bus

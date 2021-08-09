@@ -6,7 +6,7 @@ import datetime
 import time
 from i2c import I2C
 
-POCKETNC_DIRECTORY = "/home/pocketnc/pocketnc"
+POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
 DETECT_SCRIPT = os.path.join(POCKETNC_DIRECTORY, "Settings/features/high_speed_spindle/detect_hss_mprls.py")
 
 # MPRLS is pressure sensor
