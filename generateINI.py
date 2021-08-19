@@ -9,15 +9,16 @@ from version import getVersion
 import subprocess
 
 POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
+POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
 VERSION = getVersion()
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
 from ini import read_ini_data, merge_ini_data, write_ini_data, append_ini_data
-
-INI_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/PocketNC.ini")
 INI_DEFAULT_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/versions/%s/PocketNC.ini" % VERSION)
-CALIBRATION_OVERLAY_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/CalibrationOverlay.inc")
-LAST_TOOL_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/LastTool.inc")
+
+INI_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini")
+CALIBRATION_OVERLAY_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "CalibrationOverlay.inc")
+LAST_TOOL_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "LastTool.inc")
 FEATURES_DIR = os.path.join(POCKETNC_DIRECTORY, "Settings/features")
 
 if __name__ == "__main__":

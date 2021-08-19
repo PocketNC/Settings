@@ -2,6 +2,8 @@
 import hal, os, time
 import eeprom
 
+POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
+
 START_IDX = 13 # The boundaries of the continuous chunk of EEPROM used by this component.
 END_IDX = 112 
 TOTAL_SIZE = END_IDX - START_IDX + 1
@@ -86,15 +88,16 @@ class EEPROMInterface:
 class FilesystemInterface:
   def __init__(self):
     self.runtime = self.get_runtime()
+    self.filepath = os.path.join(POCKETNC_VAR_DIRECTORY, ".time")
 
   def get_runtime(self):
-    mode = 'rb' if os.path.exists('./.time') else 'wb'
-    with open("./.time",mode) as f:
+    mode = 'rb' if os.path.exists(self.filepath) else 'wb'
+    with open(self.filepath, mode) as f:
       fc = f.read()
       return int.from_bytes(fc,'little') if len(fc) > 0 else 0
 
   def write_next(self, timeVal):
-    with open("./.time","wb") as f:
+    with open(self.filepath, "wb") as f:
       writeVal = int(timeVal)
       f.write((writeVal).to_bytes(4, byteorder='little', signed=False))
       self.runtime = writeVal

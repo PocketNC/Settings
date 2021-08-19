@@ -1,4 +1,4 @@
-loadusr -W ./features/run_time_clock/run_time_clock.py
+loadusr -W /opt/pocketnc/Settings/features/run_time_clock/run_time_clock.py
 
 net program-is-running run_time_clock.start
 net program-is-paused run_time_clock.pause

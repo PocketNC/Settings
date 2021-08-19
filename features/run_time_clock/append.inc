@@ -1,2 +1,2 @@
 [HAL]
-HALFILE=./features/run_time_clock/run_time_clock.hal
+HALFILE=/opt/pocketnc/Settings/features/run_time_clock/run_time_clock.hal

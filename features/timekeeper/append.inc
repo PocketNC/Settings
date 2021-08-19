@@ -1,2 +1,2 @@
 [HAL]
-HALFILE=./features/timekeeper/timekeeper.hal
+HALFILE=/opt/pocketnc/Settings/features/timekeeper/timekeeper.hal
