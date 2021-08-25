@@ -87,8 +87,8 @@ class EEPROMInterface:
 
 class FilesystemInterface:
   def __init__(self):
-    self.runtime = self.get_runtime()
     self.filepath = os.path.join(POCKETNC_VAR_DIRECTORY, ".time")
+    self.runtime = self.get_runtime()
 
   def get_runtime(self):
     mode = 'rb' if os.path.exists(self.filepath) else 'wb'
