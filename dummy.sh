@@ -6,7 +6,7 @@
 # work offset status values: g5x_index, g5x_offset, g92_offset
 # It is run here so that this always occurs during linuxcnc startup
 # but after all other startup steps have finished.
-linuxcnc-python reset_interpreter.py
+linuxcnc-python ${POCKETNC_DIRECTORY}/Settings/reset_interpreter.py
 
 echo Started dummy display!
 sleep infinity
