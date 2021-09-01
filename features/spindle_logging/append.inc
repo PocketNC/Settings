@@ -1,2 +1,2 @@
 [HAL]
-HALFILE=./features/spindle_logging/spindle_logging.hal
+HALFILE=/opt/pocketnc/Settings/features/spindle_logging/spindle_logging.hal

@@ -1,2 +1,2 @@
 [HAL]
-HALFILE=./features/interlock/interlock.hal
+HALFILE=/opt/pocketnc/Settings/features/interlock/interlock.hal

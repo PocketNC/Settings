@@ -1,4 +1,4 @@
-loadusr -W ./features/spindle_logging/spindle_logging.py
+loadusr -W /opt/pocketnc/Settings/features/spindle_logging/spindle_logging.py
 
 net spindleSpeed spindle_logging.speed_in
 net spindleSpeedMeasured spindle_logging.speed_measured 

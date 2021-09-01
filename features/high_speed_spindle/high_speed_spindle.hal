@@ -1,4 +1,4 @@
-loadusr -Wn hss_warmup ./features/high_speed_spindle/hss_warmup.py
+loadusr -Wn hss_warmup /opt/pocketnc/Settings/features/high_speed_spindle/hss_warmup.py
 
 net progStarted hss_warmup.program_running
 net progStartPaused hss_warmup.program_paused
@@ -8,7 +8,7 @@ net spindle-enable hss_warmup.spindle_on
 net hssWarmupAbort hss_warmup.abort
 net hssWarmupAbort pauseHssWarmupOrSensors.or.in0
 
-loadusr -Wn hss_sensors ./features/high_speed_spindle/hss_sensors.py
+loadusr -Wn hss_sensors /opt/pocketnc/Settings/features/high_speed_spindle/hss_sensors.py
 
 net spindle-enable hss_sensors.spindle_on
 
