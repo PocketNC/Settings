@@ -57,7 +57,7 @@ def readPressure():
 # Returns temperature reading in degrees Celsius
 def readTemperature():
   try:
-    i2c = I2C(MCP9808_REG_CONFIG)
+    i2c = I2C(MCP9808_I2CADDR)
     
     # Begin
     result = i2c.write16(MCP9808_REG_CONFIG, 0x0)
@@ -69,10 +69,7 @@ def readTemperature():
 
     # Wake up
     conf_reg = None
-    try:
-      conf_reg = (i2c.readU16BE(MCP9808_REG_CONFIG))
-    except:
-      conf_reg = i2c.reverseByteOrder(i2c.readU16(MCP9808_REG_CONFIG))
+    conf_reg = (i2c.readU16BE(MCP9808_REG_CONFIG))
 
     conf_wake = conf_reg & ~MCP9808_REG_CONFIG_SHUTDOWN
     i2c.write16(MCP9808_REG_CONFIG, conf_wake)
