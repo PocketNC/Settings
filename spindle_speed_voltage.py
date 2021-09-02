@@ -5,8 +5,9 @@ import sys
 import datetime
 
 POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
+POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
 
-INI_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/PocketNC.ini")
+INI_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini")
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
 from ini import read_ini_data, get_parameter
