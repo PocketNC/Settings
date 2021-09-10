@@ -6,7 +6,7 @@ import datetime
 import time
 
 POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
-LAST_SPINDLE_OFF_FILE = os.path.join(POCKETNC_DIRECTORY, "last-spindle-off-time.txt")
+LAST_SPINDLE_OFF_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "last-spindle-off-time.txt")
 
 def readLastSpindleOffFromDisk():
   try:
