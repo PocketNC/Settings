@@ -17,7 +17,8 @@
 
 import sys
 import os
-POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
+POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
+VERSION_FILE_PATH = os.path.join(POCKETNC_VAR_DIRECTORY, "version")
 
 from device import getProcDeviceModel
 from enum import Enum
@@ -33,7 +34,7 @@ def getVersion():
   version = "v2revP" # default version if we don't find another using the version file or i2c
 
   try:
-    with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
+    with open(VERSION_FILE_PATH, 'r') as versionFile:
       version = versionFile.read().strip();
   except:
     try:
@@ -45,19 +46,19 @@ def getVersion():
   return version
 
 def writeVersionFile(version):
-  with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'w') as versionFile:
+  with open(VERSION_FILE_PATH, 'w') as versionFile:
     versionFile.write(version)
     versionFile.write("\n")
 
 def hasVersionFile():
   try:
-    with open(os.path.join(POCKETNC_DIRECTORY, "Settings/version"), 'r') as versionFile:
+    with open(VERSION_FILE_PATH, 'r') as versionFile:
       return true
   except:
     return false
 
 def clearVersionFile():
-  os.remove(os.path.join(POCKETNC_DIRECTORY, "Settings/version"))
+  os.remove(VERSION_FILE_PATH)
 
 if __name__ == "__main__":
   print(getVersion())
