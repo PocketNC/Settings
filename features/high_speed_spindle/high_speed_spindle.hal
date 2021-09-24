@@ -1,7 +1,7 @@
 loadusr -Wn hss_warmup /opt/pocketnc/Settings/features/high_speed_spindle/hss_warmup.py
 
-net progStarted hss_warmup.program_running
-net progStartPaused hss_warmup.program_paused
+net program-is-running hss_warmup.program_running
+net program-is-paused hss_warmup.program_paused
 
 net spindle-enable hss_warmup.spindle_on
 

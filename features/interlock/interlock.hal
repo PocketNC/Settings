@@ -46,8 +46,8 @@ net resumeProgram => halui.program.resume
 net currentVel <= motion.current-vel
 net currentVel => interlock.current-vel
 
-net progStarted => interlock.program-running
-net progStartPaused => interlock.program-is-paused
+net program-is-running => interlock.program-running
+net program-is-paused => interlock.program-is-paused
 
 net isSpindleEnabled <= halui.spindle.0.is-on
 net isSpindleEnabled => interlock.spindle-is-enabled
