@@ -1,6 +1,6 @@
 # Create a dummy spindle_speed component so we can assume it's there on 
 # old machines that don't actually use it.
-loadusr -Wn spindle_speed ./spindle_speed_dummy.py
+loadusr -Wn spindle_speed /opt/pocketnc/Settings/spindle_speed_dummy.py
 
 # ###################################
 # Core EMC/HAL Loads
