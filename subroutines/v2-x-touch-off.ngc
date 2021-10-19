@@ -1,0 +1,6 @@
+o<v2-x-touch-off> sub
+M70
+G20
+(X TOUCH OFF) G0 G90 M3 S5000 X.36 Y0 Z-2.95 B180 A90
+M72
+o<v2-x-touch-off> endsub

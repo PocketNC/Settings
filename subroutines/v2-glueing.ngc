@@ -1,0 +1,6 @@
+o<v2-glueing> sub
+M70
+G20
+(GLUEING) G0 G90 X0 Y-2 A80
+M72
+o<v2-glueing> endsub

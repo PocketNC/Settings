@@ -1,0 +1,5 @@
+o<v2-spindle-test-10k> sub
+
+(SPINDLE TEST) M3 S10000
+
+o<v2-spindle-test-10k> endsub
