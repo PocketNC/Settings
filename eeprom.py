@@ -7,7 +7,7 @@ import collections
 import os
 
 POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
-eepromReadWPRExecutable = os.path.join(POCKETNC_DIRECTORY, "Settings/eepromReadWPR")
+eepromReadWPRExecutable = "eepromReadWPR" # must be installed to a directory in your path
 
 Version = collections.namedtuple("Version", ["major", "minor", "patch"])
 
@@ -134,7 +134,7 @@ class EEPROM:
 
   def isWriteProtected(self):
     try:
-      wpr = int(subprocess.check_output([ eepromReadWPRExecutable ]))
+      wpr = int(subprocess.check_output([ eepromReadWPRExecutable, "/dev/i2c-%s" % self._bus ]))
 
       return (wpr & 0b1110) == 0b1110
     except:
@@ -143,7 +143,7 @@ class EEPROM:
 # Returns whether the EEPROM configuration registers have been locked
   def isLocked(self):
     try:
-      wpr = int(subprocess.check_output([ eepromReadWPRExecutable ]))
+      wpr = int(subprocess.check_output([ eepromReadWPRExecutable, "/dev/i2c-%s" % self._bus ]))
 
       return (wpr & 0b00000001) == 1
     except:
@@ -164,10 +164,10 @@ class EEPROM:
 
 if __name__ == "__main__":
   eeprom = EEPROM()
-  print(eeprom.ReadBoardRevision())
+#  print(eeprom.ReadBoardRevision())
 #  eeprom.EnableWriteProtection()
 #  eeprom.EnableWriteProtectionAndLockConfigurationRegisters()
-#  print(eeprom.isLocked())
+  print("isLocked", eeprom.isLocked())
 #  print(eeprom.isWriteProtected())
 #  eeprom.ClearWriteProtection()
 #  time.sleep(.1)
