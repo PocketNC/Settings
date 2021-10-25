@@ -1,7 +1,7 @@
 loadusr -Wn interlock /opt/pocketnc/Settings/features/interlock/interlock.py
 
 newinst bb_gpio interlock-open-pin pin=[POCKETNC_PINS]INTERLOCK_OPEN_PIN direction=input
-setp interlock-open-pin.invert 1
+setp interlock-open-pin.invert 0
 net interlockOpen <= interlock-open-pin.in
 net interlockOpen => interlockOpen.not.in
 net interlockClosed <= interlockOpen.not.out
