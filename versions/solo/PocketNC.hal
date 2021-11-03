@@ -3,10 +3,10 @@ loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,
 loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07 -ip A01,A02,A03
 
 # Spindle VFD control over serial
-loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I versions/solo/vfd.ini -S SPINDLEVFD -r
+loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I /opt/pocketnc/Settings/versions/solo/vfd.ini -S SPINDLEVFD -r
 
 # D5 Next water cooler data
-loadusr -Wn d5next ./d5next.py
+loadusr -Wn d5next /opt/pocketnc/Settings/d5next.py
 net spindle-temperature d5next.temperature_c
 
 newsig spindle-pressure float
@@ -439,7 +439,7 @@ net calculated-feedrate feedrate.feedrate
 ####################################################
 # Tool Changer
 ####################################################
-loadusr -Wn solo-tool-changer solo_tool_changer/hal-component.py
+loadusr -Wn solo-tool-changer /opt/pocketnc/Settings/solo_tool_changer/hal-component.py
 
 # No tool prep necessary
 net tool-prep-loop		<= iocontrol.0.tool-prepare
