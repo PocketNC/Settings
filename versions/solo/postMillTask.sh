@@ -1,4 +1,4 @@
 #!/bin/bash
 
 sleep 1
-halcmd -f versions/solo/PocketNC_PostMillTask.hal
+halcmd -f /opt/pocketnc/Settings/versions/solo/PocketNC_PostMillTask.hal
