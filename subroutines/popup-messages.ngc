@@ -1,0 +1,7 @@
+O<popup-messages> SUB
+
+o100 if [ EXISTS[#<T>] ]
+  ;py,this.execute("(debug, Load tool %s, then press cycle/start.)" % (int(this.params["T"]),))
+o100 endif
+
+O<popup-messages> ENDSUB
