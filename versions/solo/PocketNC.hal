@@ -63,6 +63,9 @@ setp hpg2.pwmread.00.pin [POCKETNC_PINS]X_FEEDBACK_PIN
 
 net x-duty-cycle hpg2.pwmread.00.duty_cycle
 net x-duty-cycle torque.duty_cycle.x
+
+net x-frequency hpg2.pwmread.00.frequency
+net x-frequency torque.frequency.x
 setp torque.filter.x .999
 
 net x-fault torque.fault.x
@@ -77,6 +80,9 @@ setp hpg2.pwmread.01.pin [POCKETNC_PINS]Y_FEEDBACK_PIN
 
 net y-duty-cycle hpg2.pwmread.01.duty_cycle
 net y-duty-cycle torque.duty_cycle.y
+
+net y-frequency hpg2.pwmread.01.frequency
+net y-frequency torque.frequency.y
 setp torque.filter.y .999
 
 net y-fault torque.fault.y
@@ -91,6 +97,9 @@ setp hpg2.pwmread.02.pin [POCKETNC_PINS]Z_FEEDBACK_PIN
 
 net z-duty-cycle hpg2.pwmread.02.duty_cycle
 net z-duty-cycle torque.duty_cycle.z
+
+net z-frequency hpg2.pwmread.02.frequency
+net z-frequency torque.frequency.z
 setp torque.filter.z .999
 
 net z-fault torque.fault.z
@@ -105,6 +114,9 @@ setp hpg2.pwmread.03.pin [POCKETNC_PINS]B_FEEDBACK_PIN
 
 net b-duty-cycle hpg2.pwmread.03.duty_cycle
 net b-duty-cycle torque.duty_cycle.b
+
+net b-frequency hpg2.pwmread.03.frequency
+net b-frequency torque.frequency.b
 setp torque.filter.b .999
 
 net b-fault torque.fault.b
@@ -119,6 +131,9 @@ setp hpg2.pwmread.04.pin [POCKETNC_PINS]C_FEEDBACK_PIN
 
 net c-duty-cycle hpg2.pwmread.04.duty_cycle
 net c-duty-cycle torque.duty_cycle.c
+
+net c-frequency hpg2.pwmread.04.frequency
+net c-frequency torque.frequency.c
 setp torque.filter.c .999
 
 net c-fault torque.fault.c
@@ -325,7 +340,9 @@ net reset-estop halui.estop.reset
 
 net machine-on solo-estop.machine-on
 net machine-on halui.machine.on
-net machine-on mcp22.B.out-02
+
+# Z brake
+net machine-on mcp21.A.out-02
 
 net estop-user-enable iocontrol.0.user-enable-out
 net estop-user-enable solo-estop.user-enable
@@ -375,7 +392,8 @@ net tool-probe motion.probe-input
 
 ## Air
 
-net vice-released mcp21.A.out-02
+# Schunk Mini90 open
+net vice-released mcp21.A.out-06
 
 ### Spindle ###
 
@@ -391,7 +409,7 @@ net spindle-max-speed spindle-vfd.max-rpm
 net spindle-enable spindle.0.on
 net spindle-enable spindle-vfd.spindle-on
 # turn on air seal when spindle is enabled
-net spindle-enable mcp21.A.out-00 
+net spindle-enable mcp22.B.out-03 
 
 net spindle-speed spindle.0.speed-out
 net spindle-speed spindle-vfd.speed-command
@@ -413,7 +431,7 @@ net kinstype-select motion.switchkins-type
 net tool-offset motion.tooloffset.z
 net tool-offset xyzbc-trt-kins.tool-offset  
 
-net mist-coolant mcp22.B.out-06
+#net mist-coolant mcp22.B.out-06
 net mist-coolant iocontrol.0.coolant-mist 
 
 # Feedrate calculation
@@ -545,7 +563,7 @@ setp solo-tool-changer.enabled 1
 
 net tool-released solo-tool-changer.unclamp-out
 net tool-released mcp21.A.out-01
-net tool-released mcp22.B.out-07 
+net tool-released mcp21.A.out-04
 
 net unclamp-cmd solo-tool-changer.unclamp-cmd
 net unclamp-cmd motion.digital-out-59
