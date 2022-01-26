@@ -4,3 +4,4 @@ G20
 (GLUING) G0 G90 X0 Y-2 A80
 M72
 o<v2-gluing> endsub
+M2

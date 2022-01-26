@@ -1,0 +1,6 @@
+#!/bin/bash
+
+LAST_TOOL_PATH=/var/opt/pocketnc/LastTool.inc
+
+echo "[PENTA]" > $LAST_TOOL_PATH
+echo "LAST_TOOL=$1" >> $LAST_TOOL_PATH

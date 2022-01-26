@@ -30,3 +30,4 @@ G10 L2 P#<P> X[ #<_x1>*#<_CB1>*#<_CC1> - #<_y1>*#<_SC1>*#<_CB1> + #<_z1>*#<_SB1>
 
 M72
 O<rotated-work-offsets-solo> ENDSUB
+M2

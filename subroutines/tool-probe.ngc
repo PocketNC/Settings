@@ -85,3 +85,4 @@ G53 G1 F[#<_TravelFeed>] Z[#5183]            ( return to where we were in Z )
 M72                                          ( restore modal state )
 
 O<tool-probe> ENDSUB
+M2

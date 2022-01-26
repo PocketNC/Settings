@@ -44,3 +44,4 @@ o7004 endsub
 o7005 sub
   G53 G1 F#1 C#2
 o7005 endsub
+M2

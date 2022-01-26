@@ -2,10 +2,13 @@ O<solo-tool-change> SUB
 #<_RapidFeed> = 300
 #<_RapidFeedRotary> = 600
 
-#<_tool1X> = 6.5646
-#<_tool1Y> = 3.2154
-#<_tool1Z> = -6.1570
-#<_safeZ> = -1
+;#<_tool1X> = 6.5646
+;#<_tool1Y> = 3.2154
+;#<_tool1Z> = -6.1570
+#<_tool1X> = 6
+#<_tool1Y> = 3
+#<_tool1Z> = -2
+#<_safeZ> = 0
 
 #<_toolDist> = [ 40.75 / 25.4 ]
 #<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
@@ -22,7 +25,6 @@ o100 endif
 o200 if [ #<_oldTool> EQ #<_newTool> ]
   O<solo-tool-change> return
 o200 endif
-(debug, Tool #<T>)
 
 M70                                            ( save current modal state )
 
@@ -36,8 +38,19 @@ G53 G1 Z#<_safeZ> F#<_RapidFeed>
 G53 G1 B0 F#<_RapidFeedRotary>
 M270
 
-o[#<_oldTool> + 7000] call
+M66 P60 L0
+o300 if [ #5399 EQ 1 ]
+  ; if we have a tool loaded, put it back in its slot
+  o[#<_oldTool> + 7000] call
+o300 else  
+  ; else unclamp tool for only picking up
+  M260
+o300 endif
+
 o[#<_newTool> + 8000] call
+
+; write last tool to disk 
+M199 P[#<T>]
 
 M6 T[#<T>]
 
@@ -115,9 +128,8 @@ o7013 endsub
 o<local-place-tool> sub
   M66 P60 L0
   o7100 if [ #5399 NE 1 ]
-    (debug,ERROR: No tool in spindle.)
     o<local-sync> call
-    M2
+    (abort,No tool in spindle.)
   o7100 endif
 
   #<_toolX> = #1
@@ -216,3 +228,4 @@ o<local-sync> sub
 ;  G4 P.2
   M66  E0 L0
 o<local-sync> endsub
+M2

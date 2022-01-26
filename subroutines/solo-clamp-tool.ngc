@@ -5,9 +5,9 @@ M66 P60 L3 Q1.5
 M65 P60
 
 o100 if [ ABS[ #5399 +1 ] LT .000001 ]
-  (debug,ERROR: Failed to clamp tool.)
   M66  E0 L0                           ; force synch
-  M2
+  (abort,Failed to clamp tool.)
 o100 endif
 
 o<solo-clamp-tool> ENDSUB
+M2

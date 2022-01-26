@@ -3,3 +3,4 @@ o<v2-spindle-test-30k> sub
 (SPINDLE TEST) M3 S30000
 
 o<v2-spindle-test-30k> endsub
+M2

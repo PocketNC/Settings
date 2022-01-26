@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# Open tool changer
-halcmd sets tool-changer-open-cmd 1
-sleep 4

@@ -5,19 +5,18 @@ o<429remap>sub
 
 o1 if [exists [#<_hal[motion.switchkins-type]>]]
 o1 else
-     (debug,M429:Missing [RS274NGC]FEATURE==8)
      M66  E0 L0                           ; force synch
-     M2
+     (abort,M429:Missing [RS274NGC]FEATURE==8)
 o1 endif
 
    M68  E#<SWITCHKINS_PIN> Q#<kinstype> ; set kinstype value
    M66  E0 L0                           ; force synch
 
 o2 if [[#<_task> EQ 1] AND [#<_hal[motion.switchkins-type]> NE #<kinstype>]]
-     (debug,M429:Wrong motion.switchkins-type or missing hal net to analog-out-0x)
      M66  E0 L0                           ; force synch
-     M2
+     (abort,M429:Missing [RS274NGC]FEATURE==8)
 o2 else
 o2 endif
 
 o<429remap>endsub
+M2

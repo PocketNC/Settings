@@ -4,3 +4,4 @@ G20
 (SHIPPING) G0 G90 M5 X1.26 Y2.51 Z-3.33 A90 B0
 M72
 o<v2-shipping> endsub
+M2

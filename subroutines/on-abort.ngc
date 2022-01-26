@@ -1,4 +1,5 @@
 o<on-abort> sub
+(debug, in on abort #1)
 
 G54
 G17
@@ -12,3 +13,4 @@ M9
 M429
 
 o<on-abort> endsub
+M2

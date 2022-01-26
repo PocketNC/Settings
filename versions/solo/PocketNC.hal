@@ -318,6 +318,9 @@ setp c-limit-pin.invert 1
 net c-home-and-index c-limit-pin.in
 net c-home-and-index => joint.4.home-sw-in
 
+newinst bb_gpio spindle-neutral-pin pin=[POCKETNC_PINS]SPINDLE_NEUTRAL_PIN direction=input
+setp spindle-neutral-pin.invert 1
+
 # eStop
 net estop-loop solo-estop.emc-enable
 net estop-loop iocontrol.0.emc-enable-in
