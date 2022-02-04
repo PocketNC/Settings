@@ -1,0 +1,39 @@
+o<probe-relative> sub
+
+M70
+
+G90
+
+#<startX> = #5420
+#<startY> = #5421
+#<startZ> = #5422
+
+#<cmdX> = [ #<startX>+#1 ]
+#<cmdY> = [ #<startY>+#2 ]
+#<cmdZ> = [ #<startZ>+#3 ]
+
+#<feedFast> = #4
+#<feedSlow> = #5
+
+G38.2 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
+
+#<fastTrippedX> = #5061
+#<fastTrippedY> = #5062
+#<fastTrippedZ> = #5063
+
+G38.4 F#<feedFast> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
+G38.2 F#<feedSlow> X[ #<fastTrippedX> ] Y[ #<fastTrippedY> ] Z[ #<fastTrippedZ> ]
+
+#<_probedG5X_X> = #5061
+#<_probedG5X_Y> = #5062
+#<_probedG5X_Z> = #5063
+
+#<_probedRelativeX> = [ #5061 - #<startX> ]
+#<_probedRelativeY> = [ #5062 - #<startY> ]
+#<_probedRelativeZ> = [ #5063 - #<startZ> ]
+
+G1 F#<feedFast> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
+
+M72
+o<probe-relative> endsub
+

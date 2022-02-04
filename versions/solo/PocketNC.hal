@@ -387,10 +387,15 @@ net c-motor-enable c-enable-pin.out
 net program-is-running halui.program.is-running
 net program-is-paused halui.program.is-paused
 
-# Probe
-newinst bb_gpio probe-pin pin=[POCKETNC_PINS]PROBE_PIN direction=input
-setp probe-pin.invert 1
-net tool-probe probe-pin.in
+# Tool Probe
+newinst bb_gpio tool-probe-pin pin=[POCKETNC_PINS]TOOL_PROBE_PIN direction=input
+newinst bb_gpio tool-probe-error-pin pin=[POCKETNC_PINS]TOOL_PROBE_ERROR_PIN direction=input
+
+setp tool-probe-pin.invert 1
+setp tool-probe-error-pin.invert 1
+net tool-probe-error tool-probe-error-pin.in
+
+net tool-probe tool-probe-pin.in
 net tool-probe motion.probe-input
 
 ## Air
