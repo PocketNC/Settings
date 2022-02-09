@@ -1,8 +1,0 @@
-o<add_point_probe_relative> sub
-
-o<probe-relative> call [#1] [#2] [#3] [#4] [#5]
-
-o<add_point> call [#<_probedRelativeX>] [#<_probedRelativeY>] [#<_probedRelativeZ>]
-
-o<add_point_probe_relative> endsub
-

@@ -13,7 +13,8 @@ G90
 #<cmdZ> = [ #<startZ>+#3 ]
 
 #<feedFast> = #4
-#<feedSlow> = #5
+#<feedBack> = #5
+#<feedSlow> = #6
 
 G38.2 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
 
@@ -21,7 +22,8 @@ G38.2 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
 #<fastTrippedY> = #5062
 #<fastTrippedZ> = #5063
 
-G38.4 F#<feedFast> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
+G38.4 F#<feedBack> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
+G4 P.002
 G38.2 F#<feedSlow> X[ #<fastTrippedX> ] Y[ #<fastTrippedY> ] Z[ #<fastTrippedZ> ]
 
 #<_probedG5X_X> = #5061

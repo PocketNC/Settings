@@ -1,0 +1,13 @@
+o<add-points-probe-relative-repeatedly> sub
+
+#<numProbes> = #7
+#<curProbe> = 0
+
+o100 while [ #<curProbe> LT #<numProbes> ]
+o<probe-relative> call [#1] [#2] [#3] [#4] [#5] [#6]
+
+o<add_point> call [#<_probedRelativeX>] [#<_probedRelativeY>] [#<_probedRelativeZ>]
+#<curProbe> = [ #<curProbe> + 1 ]
+o100 endwhile
+
+o<add-points-probe-relative-repeatedly> endsub
