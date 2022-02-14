@@ -1,5 +1,6 @@
 # module for interacting with the Pocket NC's EEPROM chip
 
+from i2c import busNum
 from smbus import SMBus
 import subprocess
 import time
@@ -12,7 +13,7 @@ eepromReadWPRExecutable = "eepromReadWPR" # must be installed to a directory in 
 Version = collections.namedtuple("Version", ["major", "minor", "patch"])
 
 class EEPROM:
-  def __init__(self, driver="24c64", addr=0x50, bus=2):
+  def __init__(self, driver="24c64", addr=0x50, bus=busNum):
     self._driver = driver
     self._addr = addr
     self._bus = bus
