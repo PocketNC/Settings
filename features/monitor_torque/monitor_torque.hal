@@ -1,0 +1,13 @@
+loadusr -Wn monitor_torque /var/opt/work/bin/monitor_torque /var/opt/pocketnc/torque.trq monitor_torque
+
+net axis-x-cmd axis.x.pos-cmd monitor_torque.x
+net axis-y-cmd axis.y.pos-cmd monitor_torque.y
+net axis-z-cmd axis.z.pos-cmd monitor_torque.z
+net axis-b-cmd axis.b.pos-cmd monitor_torque.b
+net axis-c-cmd axis.c.pos-cmd monitor_torque.c
+
+net torque-x torque.x monitor_torque.torquex
+net torque-y torque.y monitor_torque.torquey
+net torque-z torque.z monitor_torque.torquez
+net torque-b torque.b monitor_torque.torqueb
+net torque-c torque.c monitor_torque.torquec

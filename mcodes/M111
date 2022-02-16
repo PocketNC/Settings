@@ -1,0 +1,4 @@
+#!/bin/bash
+
+halcmd setp monitor_torque.delay 10
+halcmd setp monitor_torque.record 1

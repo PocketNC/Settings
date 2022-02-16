@@ -1,0 +1,5 @@
+#!/bin/bash
+
+halcmd setp monitor_torque.record 0
+sleep 1
+cp /var/opt/pocketnc/torque.trq /var/opt/pocketnc/torque-`date +%Y-%m-%d-%H-%M-%S`.trq

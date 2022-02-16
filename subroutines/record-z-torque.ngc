@@ -1,0 +1,20 @@
+o<record-z-torque> sub
+
+M70
+
+G20 G94 G90
+
+G53 G1 F60 Z0
+
+M111
+
+G53 G1 F60 Z-6
+G53 G1 F60 Z0
+
+M112
+
+M72
+
+o<record-z-torque> endsub
+
+M2
