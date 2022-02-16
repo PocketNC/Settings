@@ -1,4 +1,4 @@
-print("in toplevel.py changed asdf")
+print("in toplevel.py")
 
 from importlib import reload
 
@@ -6,11 +6,12 @@ import remap
 import os
 import oword
 import namedparams
-
+import probe
 import metrology
 
 reload(oword)
 reload(metrology)
+reload(probe)
 reload(namedparams)
 
 def __init__(self):

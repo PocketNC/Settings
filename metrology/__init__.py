@@ -2,6 +2,12 @@ import numpy
 from enum import Enum
 import metrology.leastSquaresCircle
 
+_DEBUG = True
+
+def setDebug(d):
+  global _DEBUG
+  _DEBUG = d
+
 def bestFitPlane(pts):
   pts_array = numpy.array(pts)
   mean = numpy.mean(pts_array, axis=0)
@@ -15,7 +21,8 @@ def bestFitLine(pts):
   mean = numpy.mean(pts_array, axis=0)
   svd = numpy.linalg.svd(pts_array-mean)
 
-  print("SVD", svd)
+  if _DEBUG:
+    print("SVD", svd)
 
   # return tuple with (pt on line, direction of line)
   return (mean, svd[2][0])
@@ -41,44 +48,51 @@ class Feature:
       self._points = numpy.append(self._points, numpy.array([[x,y,z]]), axis=0)
     self.makeDirty()
 
-    print("Points: ", self._points)
+    if _DEBUG:
+      print("Points: ")
+      for p in self._points:
+        print("%s\t%s\t%s" % ( p[0], p[1], p[2] ))
 
   def clearPoints(self):
     self._points = numpy.array([])
     self.makeDirty()
 
-    print("Cleared points!")
+    if _DEBUG:
+      print("Cleared points!")
 
   def points(self):
     return self._points
 
   def average(self):
-    if self._average == None:
+    if self._average is None:
       self._average = self._points.mean(axis=0)
 
-    print("Average: ", self._average)
+    if _DEBUG:
+      print("Average: ", self._average)
 
     return self._average
 
   def plane(self):
-    if self._plane == None:
+    if self._plane is None:
       self._plane = bestFitPlane(self._points)
 
     return self._plane
 
   def line(self):
-    if self._line == None:
+    if self._line is None:
       self._line = bestFitLine(self._points)
 
-    print("Line: ", self._line)
+    if _DEBUG:
+      print("Line: ", self._line)
 
     return self._line
 
   def circle2D(self):
-    if self._circle2D == None:
+    if self._circle2D is None:
       self._circle2D = metrology.leastSquaresCircle.calculate(self._points)
 
-    print("Circle2D: ", self._circle2D)
+    if _DEBUG:
+      print("Circle2D: ", self._circle2D)
 
     return self._circle2D
 
