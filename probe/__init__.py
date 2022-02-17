@@ -151,7 +151,7 @@ class ProbeCalibration():
 
     r = r0*(1-t)+r1*t
 
-    comp = [ r*math.cos(theta), r*math.sin(theta), 0 ]
+    comp = [ -r*math.cos(theta), -r*math.sin(theta), 0 ]
 
     print("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
 
