@@ -5,6 +5,7 @@ from enum import Enum
 class DeviceModel(Enum):
   UNKNOWN = "UNKNOWN"
   BBB = "BBB"
+  BBG = "BBG"
   BBAI = "BBAI"
 
 def getProcDeviceModel():
@@ -17,6 +18,8 @@ def getDeviceModel():
     return DeviceModel.BBAI
   elif "Black" in device:
     return DeviceModel.BBB
+  elif "Green" in device:
+    return DeviceModel.BBG
   else:
     return DeviceModel.UNKNOWN
 

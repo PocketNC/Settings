@@ -6,7 +6,7 @@ model = getDeviceModel()
 
 if model == DeviceModel.BBAI:
   busNum = 3
-elif model == DeviceModel.BBB:
+elif model == DeviceModel.BBB or model == DeviceModel.BBG:
   busNum = 2
 
 bus = SMBus(busNum)
