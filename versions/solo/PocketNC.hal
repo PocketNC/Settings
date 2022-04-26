@@ -59,7 +59,7 @@ addf mult2.0                       servo-thread
 
 # X feedback
 setp hpg2.pwmread.00.max_time 2074689
-setp hpg2.pwmread.00.pin [POCKETNC_PINS]X_FEEDBACK_PIN
+setp hpg2.pwmread.00.pin [SOLO_PINS]X_FEEDBACK_PIN
 
 net x-duty-cycle hpg2.pwmread.00.duty_cycle
 net x-duty-cycle torque.duty_cycle.x
@@ -76,7 +76,7 @@ net x-f-errored solo-estop.x-f-error
 
 # Y feedback
 setp hpg2.pwmread.01.max_time 2074689
-setp hpg2.pwmread.01.pin [POCKETNC_PINS]Y_FEEDBACK_PIN
+setp hpg2.pwmread.01.pin [SOLO_PINS]Y_FEEDBACK_PIN
 
 net y-duty-cycle hpg2.pwmread.01.duty_cycle
 net y-duty-cycle torque.duty_cycle.y
@@ -93,7 +93,7 @@ net y-f-errored solo-estop.y-f-error
 
 # Z feedback
 setp hpg2.pwmread.02.max_time 2074689
-setp hpg2.pwmread.02.pin [POCKETNC_PINS]Z_FEEDBACK_PIN
+setp hpg2.pwmread.02.pin [SOLO_PINS]Z_FEEDBACK_PIN
 
 net z-duty-cycle hpg2.pwmread.02.duty_cycle
 net z-duty-cycle torque.duty_cycle.z
@@ -110,7 +110,7 @@ net z-f-errored solo-estop.z-f-error
 
 # B feedback
 setp hpg2.pwmread.03.max_time 2074689
-setp hpg2.pwmread.03.pin [POCKETNC_PINS]B_FEEDBACK_PIN
+setp hpg2.pwmread.03.pin [SOLO_PINS]B_FEEDBACK_PIN
 
 net b-duty-cycle hpg2.pwmread.03.duty_cycle
 net b-duty-cycle torque.duty_cycle.b
@@ -127,7 +127,7 @@ net b-f-errored solo-estop.b-f-error
 
 # C feedback
 setp hpg2.pwmread.04.max_time 2074689
-setp hpg2.pwmread.04.pin [POCKETNC_PINS]C_FEEDBACK_PIN
+setp hpg2.pwmread.04.pin [SOLO_PINS]C_FEEDBACK_PIN
 
 net c-duty-cycle hpg2.pwmread.04.duty_cycle
 net c-duty-cycle torque.duty_cycle.c
@@ -142,11 +142,11 @@ net c-fault solo-estop.c-fault
 net c-f-errored joint.4.f-errored
 net c-f-errored solo-estop.c-f-error
 
-setp hpg2.pwmread.05.pin [POCKETNC_PINS]SPINDLE_FEEDBACK_PIN
+setp hpg2.pwmread.05.pin [SOLO_PINS]SPINDLE_FEEDBACK_PIN
 
 # Tool changer feedback
 setp hpg2.pwmread.06.max_time 2074689
-setp hpg2.pwmread.06.pin [POCKETNC_PINS]TOOL_CHANGER_FEEDBACK_PIN
+setp hpg2.pwmread.06.pin [SOLO_PINS]TOOL_CHANGER_FEEDBACK_PIN
 
 net tool-changer-duty-cycle hpg2.pwmread.06.duty_cycle
 net tool-changer-duty-cycle torque.duty_cycle.t
@@ -175,8 +175,8 @@ setp hpg3.stepgen.00.position-scale  [JOINT_0]SCALE
 setp hpg3.stepgen.00.maxvel          [JOINT_0]STEPGEN_MAX_VEL
 setp hpg3.stepgen.00.maxaccel        [JOINT_0]STEPGEN_MAX_ACC
 
-setp hpg3.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN
-setp hpg3.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN
+setp hpg3.stepgen.00.steppin         [SOLO_PINS]X_STEP_PIN
+setp hpg3.stepgen.00.dirpin          [SOLO_PINS]X_DIR_PIN
 
 # ################
 # Y [1] Axis
@@ -201,8 +201,8 @@ setp hpg0.stepgen.01.position-scale  [JOINT_1]SCALE
 setp hpg0.stepgen.01.maxvel          [JOINT_1]STEPGEN_MAX_VEL
 setp hpg0.stepgen.01.maxaccel        [JOINT_1]STEPGEN_MAX_ACC
 
-setp hpg0.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN 
-setp hpg0.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN
+setp hpg0.stepgen.01.steppin         [SOLO_PINS]Y_STEP_PIN 
+setp hpg0.stepgen.01.dirpin          [SOLO_PINS]Y_DIR_PIN
 
 # ################
 # Z [2] Axis
@@ -227,8 +227,8 @@ setp hpg1.stepgen.00.position-scale  [JOINT_2]SCALE
 setp hpg1.stepgen.00.maxvel          [JOINT_2]STEPGEN_MAX_VEL
 setp hpg1.stepgen.00.maxaccel        [JOINT_2]STEPGEN_MAX_ACC
 
-setp hpg1.stepgen.00.steppin         [POCKETNC_PINS]Z_STEP_PIN
-setp hpg1.stepgen.00.dirpin          [POCKETNC_PINS]Z_DIR_PIN
+setp hpg1.stepgen.00.steppin         [SOLO_PINS]Z_STEP_PIN
+setp hpg1.stepgen.00.dirpin          [SOLO_PINS]Z_DIR_PIN
 
 # ################
 # B [4] Axis
@@ -253,8 +253,8 @@ setp hpg1.stepgen.01.position-scale  [JOINT_3]SCALE
 setp hpg1.stepgen.01.maxvel          [JOINT_3]STEPGEN_MAX_VEL
 setp hpg1.stepgen.01.maxaccel        [JOINT_3]STEPGEN_MAX_ACC
 
-setp hpg1.stepgen.01.steppin         [POCKETNC_PINS]B_STEP_PIN
-setp hpg1.stepgen.01.dirpin          [POCKETNC_PINS]B_DIR_PIN
+setp hpg1.stepgen.01.steppin         [SOLO_PINS]B_STEP_PIN
+setp hpg1.stepgen.01.dirpin          [SOLO_PINS]B_DIR_PIN
 
 # ################
 # C [5] Axis
@@ -279,8 +279,8 @@ setp hpg0.stepgen.00.position-scale  [JOINT_4]SCALE
 setp hpg0.stepgen.00.maxvel          [JOINT_4]STEPGEN_MAX_VEL
 setp hpg0.stepgen.00.maxaccel        [JOINT_4]STEPGEN_MAX_ACC
 
-setp hpg0.stepgen.00.steppin         [POCKETNC_PINS]C_STEP_PIN
-setp hpg0.stepgen.00.dirpin          [POCKETNC_PINS]C_DIR_PIN
+setp hpg0.stepgen.00.steppin         [SOLO_PINS]C_STEP_PIN
+setp hpg0.stepgen.00.dirpin          [SOLO_PINS]C_DIR_PIN
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -289,39 +289,39 @@ setp hpg0.stepgen.00.dirpin          [POCKETNC_PINS]C_DIR_PIN
 ### Home and Limit switches ###
 # X axis
 #
-newinst bb_gpio x-limit-pin pin=[POCKETNC_PINS]X_LIMIT_PIN direction=input
+newinst bb_gpio x-limit-pin pin=[SOLO_PINS]X_LIMIT_PIN direction=input
 setp x-limit-pin.invert 1
 net x-max-and-home x-limit-pin.in
 net x-max-and-home joint.0.home-sw-in
 
 # Y axis
-newinst bb_gpio y-limit-pin pin=[POCKETNC_PINS]Y_LIMIT_PIN direction=input
+newinst bb_gpio y-limit-pin pin=[SOLO_PINS]Y_LIMIT_PIN direction=input
 setp y-limit-pin.invert 1
 net y-max-and-home y-limit-pin.in
 net y-max-and-home joint.1.home-sw-in
 
 # Z axis
-newinst bb_gpio z-limit-pin pin=[POCKETNC_PINS]Z_LIMIT_PIN direction=input
+newinst bb_gpio z-limit-pin pin=[SOLO_PINS]Z_LIMIT_PIN direction=input
 setp z-limit-pin.invert 1
 net z-max-and-home z-limit-pin.in
 net z-max-and-home joint.2.home-sw-in
 
 # B Axis Limit
-newinst bb_gpio b-limit-pin pin=[POCKETNC_PINS]B_LIMIT_PIN direction=input
+newinst bb_gpio b-limit-pin pin=[SOLO_PINS]B_LIMIT_PIN direction=input
 setp b-limit-pin.invert 1
 net b-min-and-home b-limit-pin.in
 net b-min-and-home joint.3.home-sw-in
 
 # C axis
-newinst bb_gpio c-limit-pin pin=[POCKETNC_PINS]C_LIMIT_PIN direction=input
+newinst bb_gpio c-limit-pin pin=[SOLO_PINS]C_LIMIT_PIN direction=input
 setp c-limit-pin.invert 1
 net c-home-and-index c-limit-pin.in
 net c-home-and-index => joint.4.home-sw-in
 
-newinst bb_gpio spindle-neutral-pin pin=[POCKETNC_PINS]SPINDLE_NEUTRAL_PIN direction=input
+newinst bb_gpio spindle-neutral-pin pin=[SOLO_PINS]SPINDLE_NEUTRAL_PIN direction=input
 setp spindle-neutral-pin.invert 1
 
-newinst bb_gpio cycle-start-pin pin=[POCKETNC_PINS]CYCLE_START_PIN direction=input
+newinst bb_gpio cycle-start-pin pin=[SOLO_PINS]CYCLE_START_PIN direction=input
 setp cycle-start-pin.invert 1
 
 # eStop
@@ -348,7 +348,7 @@ net machine-on solo-estop.machine-on
 net machine-on halui.machine.on
 
 # Z brake
-net machine-on mcp21.A.out-02
+net machine-on [SOLO_PINS]Z_BRAKE_PIN
 
 net estop-user-enable iocontrol.0.user-enable-out
 net estop-user-enable solo-estop.user-enable
@@ -356,33 +356,33 @@ net estop-user-enable solo-estop.user-enable
 net estop-user-requested-enable iocontrol.0.user-request-enable
 net estop-user-requested-enable solo-estop.user-request-enable
 
-newinst bb_gpio estop-button-pin pin=[POCKETNC_PINS]ESTOP_BUTTON_PIN direction=input
+newinst bb_gpio estop-button-pin pin=[SOLO_PINS]ESTOP_BUTTON_PIN direction=input
 setp estop-button-pin.invert 1
 net estop-button solo-estop.button
 net estop-button estop-button-pin.in
 
 # Machine power
-newinst bb_gpio enable-pin pin=[POCKETNC_PINS]ENABLE_PIN direction=output
+newinst bb_gpio enable-pin pin=[SOLO_PINS]ENABLE_PIN direction=output
 net motors-on solo-estop.power
 net motors-on enable-pin.out
 
-newinst bb_gpio x-enable-pin pin=[POCKETNC_PINS]X_ENABLE_PIN direction=output
+newinst bb_gpio x-enable-pin pin=[SOLO_PINS]X_ENABLE_PIN direction=output
 net x-motor-enable solo-estop.x-motor-enable
 net x-motor-enable x-enable-pin.out
 
-newinst bb_gpio y-enable-pin pin=[POCKETNC_PINS]Y_ENABLE_PIN direction=output
+newinst bb_gpio y-enable-pin pin=[SOLO_PINS]Y_ENABLE_PIN direction=output
 net y-motor-enable solo-estop.y-motor-enable
 net y-motor-enable y-enable-pin.out
 
-newinst bb_gpio z-enable-pin pin=[POCKETNC_PINS]Z_ENABLE_PIN direction=output
+newinst bb_gpio z-enable-pin pin=[SOLO_PINS]Z_ENABLE_PIN direction=output
 net z-motor-enable solo-estop.z-motor-enable
 net z-motor-enable z-enable-pin.out
 
-newinst bb_gpio b-enable-pin pin=[POCKETNC_PINS]B_ENABLE_PIN direction=output
+newinst bb_gpio b-enable-pin pin=[SOLO_PINS]B_ENABLE_PIN direction=output
 net b-motor-enable solo-estop.b-motor-enable
 net b-motor-enable b-enable-pin.out
 
-newinst bb_gpio c-enable-pin pin=[POCKETNC_PINS]C_ENABLE_PIN direction=output
+newinst bb_gpio c-enable-pin pin=[SOLO_PINS]C_ENABLE_PIN direction=output
 net c-motor-enable solo-estop.c-motor-enable
 net c-motor-enable c-enable-pin.out
 
@@ -391,8 +391,8 @@ net program-is-running halui.program.is-running
 net program-is-paused halui.program.is-paused
 
 # Tool Probe
-newinst bb_gpio tool-probe-pin pin=[POCKETNC_PINS]TOOL_PROBE_PIN direction=input
-newinst bb_gpio tool-probe-error-pin pin=[POCKETNC_PINS]TOOL_PROBE_ERROR_PIN direction=input
+newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
+newinst bb_gpio tool-probe-error-pin pin=[SOLO_PINS]TOOL_PROBE_ERROR_PIN direction=input
 
 setp tool-probe-pin.invert 1
 setp tool-probe-error-pin.invert 1
@@ -404,7 +404,7 @@ net tool-probe motion.probe-input
 ## Air
 
 # Schunk Mini90 open
-net vice-released mcp21.A.out-06
+net vice-released [SOLO_PINS]MINI90_OPEN_PIN
 
 ### Spindle ###
 
@@ -420,7 +420,7 @@ net spindle-max-speed spindle-vfd.max-rpm
 net spindle-enable spindle.0.on
 net spindle-enable spindle-vfd.spindle-on
 # turn on air seal when spindle is enabled
-net spindle-enable mcp22.B.out-03 
+net spindle-enable [SOLO_PINS]AIR_SEAL_PIN
 
 net spindle-speed spindle.0.speed-out
 net spindle-speed spindle-vfd.speed-command
@@ -442,7 +442,6 @@ net kinstype-select motion.switchkins-type
 net tool-offset motion.tooloffset.z
 net tool-offset xyzbc-trt-kins.tool-offset  
 
-#net mist-coolant mcp22.B.out-06
 net mist-coolant iocontrol.0.coolant-mist 
 
 # Feedrate calculation
@@ -464,6 +463,18 @@ net c-pos feedrate.c
 net c-pos joint.4.pos-cmd
 
 net calculated-feedrate feedrate.feedrate
+
+####################################################
+# Cutting Fluid
+####################################################
+
+# Cutting fluid pump pressure settings
+loadusr -Wn solo_cutting_fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
+net cutting-fluid-pressure solo_cutting_fluid.pressure
+sets cutting-fluid-pressure 1
+
+net flood-coolant iocontrol.0.coolant-flood
+net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
 
 ####################################################
 # Tool Changer
@@ -506,8 +517,8 @@ net z-homed solo-tool-changer.z-homed
 net b-homed joint.3.homed
 net b-homed solo-tool-changer.b-homed
 
-newinst bb_gpio tool-changer-opened-pin pin=[POCKETNC_PINS]TOOL_CHANGER_OPENED_PIN direction=input
-newinst bb_gpio tool-changer-closed-pin pin=[POCKETNC_PINS]TOOL_CHANGER_CLOSED_PIN direction=input
+newinst bb_gpio tool-changer-opened-pin pin=[SOLO_PINS]TOOL_CHANGER_OPENED_PIN direction=input
+newinst bb_gpio tool-changer-closed-pin pin=[SOLO_PINS]TOOL_CHANGER_CLOSED_PIN direction=input
 setp tool-changer-opened-pin.invert 1
 setp tool-changer-closed-pin.invert 1
 
@@ -533,35 +544,35 @@ addf clamped-notool-debounce.funct servo-thread
 setp clamped-tool-debounce.delay 300
 setp clamped-notool-debounce.delay 300
 
-net clamped-no-tool-raw mcp22.A.in-01
+net clamped-no-tool-raw [SOLO_PINS]CLAMPED_NO_TOOL_SENSOR_PIN
 net clamped-no-tool-raw clamped-notool-debounce.0.in
 
-setp mcp22.A.in-01.invert 1
-setp mcp22.A.in-01.pullup 1
+setp [SOLO_PINS]CLAMPED_NO_TOOL_SENSOR_INVERT 1
+setp [SOLO_PINS]CLAMPED_NO_TOOL_SENSOR_PULLUP 1
 net clamped-no-tool clamped-notool-debounce.0.out
 net clamped-no-tool motion.digital-in-61
 net clamped-no-tool solo-tool-changer.clamped-no-tool
 
-net tool-clamped-raw mcp22.A.in-02
+net tool-clamped-raw [SOLO_PINS]TOOL_CLAMPED_SENSOR_PIN
 net tool-clamped-raw clamped-tool-debounce.0.in
 
-setp mcp22.A.in-02.invert 1
-setp mcp22.A.in-02.pullup 1
+setp [SOLO_PINS]TOOL_CLAMPED_SENSOR_INVERT 1
+setp [SOLO_PINS]TOOL_CLAMPED_SENSOR_PULLUP 1
 net tool-clamped clamped-tool-debounce.0.out
 net tool-clamped motion.digital-in-60
 net tool-clamped solo-tool-changer.clamped-with-tool
 
-setp mcp22.A.in-03.invert 1
-setp mcp22.A.in-03.pullup 1
+setp [SOLO_PINS]TOOL_UNCLAMPED_SENSOR_INVERT 1
+setp [SOLO_PINS]TOOL_UNCLAMPED_SENSOR_PULLUP 1
 
-net tool-unclamped mcp22.A.in-03
+net tool-unclamped [SOLO_PINS]TOOL_UNCLAMPED_SENSOR_PIN
 net tool-unclamped motion.digital-in-59
 net tool-unclamped solo-tool-changer.unclamped
 
-net open-tool-changer mcp22.B.out-04
+net open-tool-changer [SOLO_PINS]OPEN_TOOL_CHANGER_PIN
 net open-tool-changer solo-tool-changer.open-out
 
-net close-tool-changer mcp21.A.out-03
+net close-tool-changer [SOLO_PINS]CLOSE_TOOL_CHANGER_PIN
 net close-tool-changer solo-tool-changer.close-out
 
 net inhibit-feed motion.feed-inhibit
@@ -572,9 +583,10 @@ net inhibit-homing solo-tool-changer.inhibit-homing
 
 setp solo-tool-changer.enabled 1
 
+# unclamp tool
 net tool-released solo-tool-changer.unclamp-out
-net tool-released mcp21.A.out-01
-net tool-released mcp21.A.out-04
+net tool-released [SOLO_PINS]TOOL_OPEN_PIN
+net tool-released [SOLO_PINS]TAPER_AIR_PURGE_PIN
 
 net unclamp-cmd solo-tool-changer.unclamp-cmd
 net unclamp-cmd motion.digital-out-59
