@@ -1,0 +1,40 @@
+; An approximate tool length must be known at this point
+; and must be active with G43 (see find-nominal-probe-length-offset).
+; C should be mostly zeroed already
+
+o<align-c-with-x> sub
+
+o100 if [ #<_tool_offset> NE 1 ]
+  (abort,You must have a tool length offset in place)
+o100 endif
+
+o<push_feature_set> call
+M70
+
+G20 
+G90 G94 G40 G17 G91.1
+M429
+
+G53 G0 Z0
+
+;G1 F60 Y2.5 X1.75
+;G1 F60 Z1.3
+
+;o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [2] [3.5] [0.51] [60] [10] [4] [1]
+;
+;G91 G0 C[ -#<_penta_line_angle_about_z> ]
+
+;o<clear_points> call
+
+G90 G1 F60 Y2.25 X1.75
+G90 G1 F60 Z1.3
+o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [10] [3.5] [0.25] [60] [10] [4] [1]
+
+G53 G0 Z0
+
+G91 G0 C[ -#<_penta_line_angle_about_z> ]
+
+M72
+o<pop_feature_set> call
+
+o<align-c-with-x> endsub

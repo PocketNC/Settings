@@ -1,0 +1,62 @@
+o<find-x-offsets> sub
+o<push_feature_set> call
+M70
+
+G20 
+G90 G94 G40 G17 G91.1
+M429
+
+G53 G0 Z0
+G0 B0 C0
+
+G49
+
+G90 G1 F200 Y0 X2.25
+G90 G1 F60 Z-2
+
+o<set_active_feature> call [0]
+
+o<probe-relative> call [-.5] [0] [0] [10] [4] [1]
+o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
+
+G53 G0 Z0
+G90 G1 F200 Y0 X-2.25
+G90 G1 F60 Z-2
+
+o<set_active_feature> call [0]
+o<probe-relative> call [.5] [0] [0] [10] [4] [1]
+o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
+
+G53 G0 Z0
+G0 C180
+
+G90 G1 F200 Y0 X2.25
+G90 G1 F60 Z-2
+
+o<set_active_feature> call [0]
+o<probe-relative> call [-.5] [0] [0] [10] [4] [1]
+o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
+
+
+G53 G0 Z0
+G90 G1 F200 Y0 X-2.25
+G90 G1 F60 Z-2
+
+o<set_active_feature> call [0]
+o<probe-relative> call [.5] [0] [0] [10] [4] [1]
+o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
+
+G53 G0 Z0
+
+o<set_active_feature> call [0]
+
+(logappend,x-offsets.txt)
+(log, #<_penta_average_x>)
+(logclose)
+
+G53 G0 Z0
+
+M72
+o<pop_feature_set> call
+o<find-x-offsets> endsub
+M2

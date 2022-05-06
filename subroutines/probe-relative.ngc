@@ -13,6 +13,11 @@ G61.1
 #<cmdY> = [ #<startY>+#2 ]
 #<cmdZ> = [ #<startZ>+#3 ]
 
+#<mag> = [ SQRT [ #1 * #1 + #2 * #2 + #3 * #3 ] ]
+#<dirX> = [ #1 / #<mag> ]
+#<dirY> = [ #2 / #<mag> ]
+#<dirZ> = [ #3 / #<mag> ]
+
 #<feedFast> = #4
 #<feedBack> = #5
 #<feedSlow> = #6
@@ -24,11 +29,10 @@ G38.2 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
 #<fastTrippedY> = #5062
 #<fastTrippedZ> = #5063
 
-G4 P.1
 G38.4 F#<feedBack> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
-G4 P.1
+G91 G1 F#<feedBack> X[ -#<dirX>*.001 ] Y[ -#<dirY>*.001 ] Z[ -#<dirZ>*.001 ]
+G90
 G38.2 F#<feedSlow> X[ #<fastTrippedX> ] Y[ #<fastTrippedY> ] Z[ #<fastTrippedZ> ]
-G4 P.1
 
 o<set_probe_direction> call [#1] [#2] [#3]
 
@@ -46,4 +50,4 @@ G1 F#<feedFast> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
 
 M72
 o<probe-relative> endsub
-
+M2

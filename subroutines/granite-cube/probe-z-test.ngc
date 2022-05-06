@@ -1,0 +1,16 @@
+o<probe-z-test> sub
+M70
+
+G90 G53 G1 F60 Z-1.5
+
+o<probe-relative> call [0] [0] [-.15] [10] [4] [1]
+
+#<logValue> = [ #<_probedG5X_Z> ]
+
+(logappend,z-homing-repeatability.txt)
+(log,#<logValue>)
+(logclose)
+
+M72
+o<probe-z-test> endsub
+M2

@@ -1,0 +1,26 @@
+o<find-nominal-probe-length-offset> sub
+
+#<maxPlunge> = #1
+#<toolNumber> = #2
+
+M70
+
+M429
+
+G20 
+G90 G94 G40 G17 G91.1
+
+G53 G0 Z0
+G49
+
+G90 G1 F60 X0 Y0
+
+o<probe-relative> call [0] [0] [#<maxPlunge>] [10] [4] [1]
+
+M72
+
+#<zOffset> = [ #<_probedRelativeZ> - 39.6 / 25.4 ]
+G10 L1 P#<toolNumber> Z#<zOffset>
+G43 H#<toolNumber>
+
+o<find-nominal-probe-length-offset> endsub

@@ -1,12 +1,17 @@
 import numpy
 from enum import Enum
 import metrology.leastSquaresCircle
+import metrology.leastSquaresSphere
 
 _DEBUG = True
 
 def setDebug(d):
   global _DEBUG
   _DEBUG = d
+
+def bestFitSphere(pts):
+  transpose = pts.T
+  return metrology.leastSquaresSphere.sphereFit(transpose[0], transpose[1], transpose[2])
 
 def bestFitPlane(pts):
   pts_array = numpy.array(pts)
@@ -38,6 +43,7 @@ class Feature:
     """Clears any cached calculations, such as average position, best fit circle, etc."""
     self._average = None
     self._circle2D = None
+    self._sphere = None
     self._line = None
     self._plane = None
 
@@ -87,6 +93,15 @@ class Feature:
 
     return self._line
 
+  def sphere(self):
+    if self._sphere is None:
+      self._sphere = bestFitSphere(self._points)
+
+    if _DEBUG:
+      print("Sphere: ", self._sphere)
+
+    return self._sphere
+
   def circle2D(self):
     if self._circle2D is None:
       self._circle2D = metrology.leastSquaresCircle.calculate(self._points)
@@ -98,7 +113,7 @@ class Feature:
 
 featureManagerInstance = None
 
-class FeatureManager:
+class FeatureSet:
   def __init__(self):
     self.features = {}
     self.activeFeatureID = 0
@@ -119,6 +134,19 @@ class FeatureManager:
 
   def getActiveFeature(self):
     return self.getFeature(self.activeFeatureID)
+
+class FeatureManager:
+  def __init__(self):
+    self.sets = [ FeatureSet() ];
+
+  def push(self):
+    self.sets.append( FeatureSet() )
+
+  def pop(self):
+    self.sets.pop()
+
+  def getActiveFeatureSet(self):
+    return self.sets[-1]
 
   def getInstance():
     global featureManagerInstance

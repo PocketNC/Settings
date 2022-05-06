@@ -1,0 +1,49 @@
+; An approximate tool length must be known at this point
+; and must be active with G43 (see find-nominal-probe-length-offset).
+; B and C should be aligned so the top edge of the
+; back face of the cube is parallel with X.
+; See align-b-with-x and align-c-with-x.
+
+; Must be run with at least a 50mm tool probe
+
+o<find-oos-z-compensation> sub
+
+o100 if [ #<_tool_offset> NE 1 ]
+  (abort,You must have a tool length offset in place)
+o100 endif
+
+o<push_feature_set> call
+M70
+
+G20 
+G90 G94 G40 G17 G91.1
+M429
+
+G53 G0 Z0
+
+o200 if [ #<_z> GT 2 ]
+  (abort,Tool probe too short)
+o200 endif
+
+G90 G1 F60 X2.25 Y1.75
+G90 G1 F60 Z1.25
+
+o<set_active_feature> call [0]
+o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [1.75] [0.25] [60] [10] [4] [1]
+(debug,ZX #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
+
+G53 G0 Z0
+
+G90 G1 F60 X1.75 Y2.25
+G90 G1 F60 Z1.25
+
+o<set_active_feature> call [1]
+o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [1.75] [0.25] [60] [10] [4] [1]
+(debug,ZY #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
+
+G53 G0 Z0
+
+M72
+o<pop_feature_set> call
+
+o<find-oos-z-compensation> endsub

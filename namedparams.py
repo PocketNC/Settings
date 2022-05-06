@@ -13,89 +13,123 @@ import probe
 
 manager = metrology.FeatureManager.getInstance()
 
-def _f_points(self):
-  feature = manager.getActiveFeature()
-  print("in _f_points: %s" % (len(feature.points()),))
+def _penta_points(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  print("in _penta_points: %s" % (len(feature.points()),))
   return len(feature.points());
 
-def _f_average_x(self):
-  feature = manager.getActiveFeature()
+def _penta_average_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _f_average_x: %s" % (avg[0],))
+  print("in _penta_average_x: %s" % (avg[0],))
 
   return avg[0]
 
-def _f_average_y(self):
-  feature = manager.getActiveFeature()
+def _penta_average_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _f_average_y: %s" % (avg[1],))
+  print("in _penta_average_y: %s" % (avg[1],))
 
   return avg[1]
 
-def _f_average_z(self):
-  feature = manager.getActiveFeature()
+def _penta_average_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _f_average_z: %s" % (avg[2],))
+  print("in _penta_average_z: %s" % (avg[2],))
 
   return avg[2]
 
-def _f_circle2d_center_x(self):
-  feature = manager.getActiveFeature()
+def _penta_circle2d_center_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   circle2D = feature.circle2D()
 
   return circle2D[0][0]
 
-def _f_circle2d_center_y(self):
-  feature = manager.getActiveFeature()
+def _penta_circle2d_center_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   circle2D = feature.circle2D()
 
   return circle2D[0][1]
 
-def _f_circle2d_radius(self):
-  feature = manager.getActiveFeature()
+def _penta_circle2d_radius(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   circle2D = feature.circle2D()
 
   return circle2D[1]
 
-def _f_circle2d_diameter(self):
-  feature = manager.getActiveFeature()
+def _penta_circle2d_diameter(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   circle2D = feature.circle2D()
 
   return 2*circle2D[1]
 
-def _f_line_direction_x(self):
-  feature = manager.getActiveFeature()
+def _penta_sphere_radius(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  sphere = feature.sphere()
+
+  return sphere[0]
+
+def _penta_sphere_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  sphere = feature.sphere()
+
+  return sphere[1]
+
+def _penta_sphere_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  sphere = feature.sphere()
+
+  return sphere[2]
+
+def _penta_sphere_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  sphere = feature.sphere()
+
+  return sphere[3]
+
+def _penta_sphere_diameter(self):
+  return 2*_penta_sphere_radius(self)
+  
+
+def _penta_line_direction_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   line = feature.line()
 
   return line[1][0]
 
-def _f_line_direction_y(self):
-  feature = manager.getActiveFeature()
+def _penta_line_direction_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   line = feature.line()
 
   return line[1][1]
 
-def _f_line_angle_about_x(self):
-  feature = manager.getActiveFeature()
+def _penta_line_direction_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   line = feature.line()
 
-  return math.atan(line[1][1]/(-line[1][2]))
+  return line[1][2]
 
-def _f_line_angle_about_y(self):
-  feature = manager.getActiveFeature()
+def _penta_line_angle_about_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   line = feature.line()
 
-  return math.atan((-line[1][2])/line[1][0])
+  return math.degrees(math.atan(line[1][1]/-line[1][2]))
 
-
-def _f_line_angle_about_z(self):
-  feature = manager.getActiveFeature()
+def _penta_line_angle_about_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
   line = feature.line()
 
-  return math.atan(line[1][1]/line[1][0])
+  return math.degrees(math.atan(-line[1][2]/line[1][0]))
+
+
+def _penta_line_angle_about_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  line = feature.line()
+
+  return math.degrees(math.atan(line[1][1]/line[1][0]))
 
 def _probe_compensation_x(self):
   cal = probe.getInstance()

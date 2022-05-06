@@ -1,0 +1,106 @@
+o<add-points-probe-sphere> sub
+
+o100 if [ #<_tool_offset> NE 1 ]
+  (abort,You must have a tool length offset in place)
+o100 endif
+
+#<ballDiameter> = #1
+#<probeDiameter> = #2
+#<plungeDepth> = #3
+
+#<theta> = #4
+#<rings> = #5
+#<samplesPerRing> = #6
+
+#<positioningFeed> = #7
+#<feedFast> = #8
+#<feedBack> = #9
+#<feedSlow> = #10
+
+#<startX> = #5420
+#<startY> = #5421
+#<startZ> = #5422
+
+M70
+G94
+
+o<probe-relative> call [0] [0] [-#<plungeDepth>] [#<feedFast>] [ #<feedBack> ] [ #<feedSlow> ]
+
+o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> + [ #<probeDiameter> / 2 ] ]
+
+#<approxSphereCenterX> = [ #<_probedG5X_X> ]
+#<approxSphereCenterY> = [ #<_probedG5X_Y> ]
+#<approxSphereCenterZ> = [ #<_probedG5X_Z> - [ #<ballDiameter> / 2 ] ]
+
+(debug,approxSphereCenter #<approxSphereCenterX>, #<approxSphereCenterY>, #<approxSphereCenterZ>)
+
+; startZ is the end of the tool, so the bottom of the probe sphere.
+; We'll use probingRadius to calculate starting points around sphere.
+#<probingRadius> = [ #<startZ> + [ #<probeDiameter> / 2 ] - #<approxSphereCenterZ> ]
+
+#<ringIndex> = 1
+o200 while [ #<ringIndex> LE #<rings> ]
+  #<latAngle> = [ #<theta> / #<rings> * #<ringIndex> ]
+  (debug,latAngle #<latAngle>)
+  (debug,probingRadius #<probingRadius>)
+
+  #<unitSphereFirstX> = [ SIN[ #<latAngle> ] ]
+  #<unitSphereFirstY> = [ 0 ]
+  #<unitSphereFirstZ> = [ COS[ #<latAngle> ] ]
+
+  (debug,unitSphereFirst #<unitSphereFirstX>, #<unitSphereFirstY>, #<unitSphereFirstZ>)
+
+  #<beginProbeFirstX> = [ #<probingRadius> * #<unitSphereFirstX> + #<approxSphereCenterX> ]
+  #<beginProbeFirstY> = [ #<probingRadius> * #<unitSphereFirstY> + #<approxSphereCenterY> ]
+  #<beginProbeFirstZ> = [ #<probingRadius> * #<unitSphereFirstZ> + #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+
+  (debug,beginProbeFirst #<beginProbeFirstX>, #<beginProbeFirstY>, #<beginProbeFirstZ>)
+
+  ; rotate in XZ plane down to next ring
+  G18
+  G90.1
+  F#<positioningFeed>
+  G90 G3 X[ #<beginProbeFirstX> ] Z[ #<beginProbeFirstZ> ] I[ #<approxSphereCenterX> ] K[ #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+
+  #<pointIndex> = 0
+  o300 while [ #<pointIndex> LT #<samplesPerRing> ]
+    #<longAngle> = [ 360 / #<samplesPerRing> * #<pointIndex> ]
+    #<nextLongAngle> = [ 360 / #<samplesPerRing> * [ #<pointIndex> + 1 ] ]
+
+    #<unitSphereX> = [ SIN[ #<latAngle> ] * COS[ #<longAngle> ] ]
+    #<unitSphereY> = [ SIN[ #<latAngle> ] * SIN[ #<longAngle> ] ]
+    #<unitSphereZ> = [ COS[ #<latAngle> ] ]
+
+    o<probe-relative> call [ -#<unitSphereX> * #<plungeDepth> ] [ -#<unitSphereY> * #<plungeDepth> ] [ -#<unitSphereZ> * #<plungeDepth> ] [ #<feedFast> ] [ #<feedBack> ] [ #<feedSlow> ]
+
+    o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> + [ #<probeDiameter> / 2 ] ]
+
+    #<nextUnitSphereX> = [ SIN[ #<latAngle> ] * COS[ #<nextLongAngle> ] ]
+    #<nextUnitSphereY> = [ SIN[ #<latAngle> ] * SIN[ #<nextLongAngle> ] ]
+    #<nextUnitSphereZ> = [ COS[ #<latAngle> ] ]
+
+    #<nextProbeX> = [ #<probingRadius> * #<nextUnitSphereX> + #<approxSphereCenterX> ]
+    #<nextProbeY> = [ #<probingRadius> * #<nextUnitSphereY> + #<approxSphereCenterY> ]
+    #<nextProbeZ> = [ #<probingRadius> * #<nextUnitSphereZ> + #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+
+    ; rotate in XY plane around to next point
+    G17
+    G90.1
+    F#<positioningFeed>
+    G90 G3 X[ #<nextProbeX> ] Y[ #<nextProbeY> ] I[ #<approxSphereCenterX> ] J[ #<approxSphereCenterY> ]
+
+    #<pointIndex> = [ #<pointIndex> + 1 ]
+  o300 endwhile
+
+  #<ringIndex> = [ #<ringIndex> + 1 ]
+o200 endwhile
+
+G18
+G90.1
+F#<positioningFeed>
+G90 G2 X[ #<startX> ] Z[ #<startZ> ] I[ #<approxSphereCenterX> ] K[ #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+
+M72
+
+o<add-points-probe-sphere> endsub
+M2

@@ -10,7 +10,7 @@ class ProbeCalibration():
   def __init__(self, directory="/var/opt/pocketnc/", filename="probe-calibration-xy"):
     self._directory = directory
     self._filename = filename
-    self._enabled = True
+    self._enabled = False
     self.theta_values = []
     self.r_values = []
 

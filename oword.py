@@ -12,17 +12,33 @@ import probe
 
 def add_point(self, x=0, y=0, z=0):
   manager = metrology.FeatureManager.getInstance()
-  feature = manager.getActiveFeature()
+  featureSet = manager.getActiveFeatureSet()
+  feature = featureSet.getActiveFeature()
   feature.addPoint(x,y,z)
 
 def clear_points(self):
   manager = metrology.FeatureManager.getInstance()
-  feature = manager.getActiveFeature()
+  featureSet = manager.getActiveFeatureSet()
+  feature = featureSet.getActiveFeature()
   feature.clearPoints()
+
+# Used for allocating a new feature set to avoid stomping on data from
+# other contexts. In a given routine that is using feature numbers,
+# start the routine with "o<push_feature_set> call" and end it with
+# "o<pop_feature_set> call" and the routine will have free reign to modify
+# any feature without stomping on other's data
+def push_feature_set(self):
+  manager = metrology.FeatureManager.getInstance()
+  manager.push()
+
+def pop_feature_set(self):
+  manager = metrology.FeatureManager.getInstance()
+  manager.pop()
 
 def set_active_feature(self, id):
   manager = metrology.FeatureManager.getInstance()
-  manager.setActiveFeatureID(id)
+  featureSet = manager.getActiveFeatureSet()
+  featureSet.setActiveFeatureID(id)
 
 def set_probe_direction(self, dirx, diry, dirz):
   cal = probe.getInstance()
@@ -38,7 +54,8 @@ def enable_probe_calibration(self):
 
 def set_probe_calibration_circle2d(self, actualDiameter, probeTipDiameter):
   manager = metrology.FeatureManager.getInstance()
-  feature = manager.getActiveFeature()
+  featureSet = manager.getActiveFeatureSet()
+  feature = featureSet.getActiveFeature()
   cal = probe.getInstance()
 
   cal.setProbeCompensationCircle2D(actualDiameter, probeTipDiameter, feature)

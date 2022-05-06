@@ -1,0 +1,47 @@
+o<add-points-probe-line> sub
+
+#<lineDirX> = #1
+#<lineDirY> = #2
+#<lineDirZ> = #3
+
+#<probeDirX> = #4
+#<probeDirY> = #5
+#<probeDirZ> = #6
+
+#<numPoints> = #7
+#<lineDist> = #8
+#<probeDist> = #9
+#<lineFeed> = #10
+#<feedFast> = #11
+#<feedBack> = #12
+#<feedSlow> = #13
+
+#<startX> = #5420
+#<startY> = #5421
+#<startZ> = #5422
+
+#<currentPoint> = 0
+o100 while [ #<currentPoint> LT #<numPoints> ]
+  #<param> = [ #<lineDist> * #<currentPoint> / [ #<numPoints> - 1 ] ]
+
+  #<lineXCmd> = [ #<lineDirX> * #<param> + #<startX> ]
+  #<lineYCmd> = [ #<lineDirY> * #<param> + #<startY> ]
+  #<lineZCmd> = [ #<lineDirZ> * #<param> + #<startZ> ]
+
+  G1 F#<lineFeed> X[ #<lineXCmd> ] Y[ #<lineYCmd> ] Z[ #<lineZCmd> ]
+
+  #<probeXCmd> = [ #<probeDirX> * #<probeDist> ]
+  #<probeYCmd> = [ #<probeDirY> * #<probeDist> ]
+  #<probeZCmd> = [ #<probeDirZ> * #<probeDist> ]
+
+  o<probe-relative> call [#<probeXCmd>] [ #<probeYCmd> ] [ #<probeZCmd> ] [#<feedFast>] [#<feedBack>] [#<feedSlow>]
+
+  o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
+
+  #<currentPoint> = [ #<currentPoint> + 1 ]
+o100 endwhile
+
+G1 F#<lineFeed> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
+
+o<add-points-probe-line> endsub
+M2

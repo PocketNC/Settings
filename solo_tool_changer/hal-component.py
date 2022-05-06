@@ -3,8 +3,8 @@
 #********************************************************************
 # Description:  solo_tool_changer
 #               This file, 'solo_tool_changer.py', is a HAL component that 
-#               has reads data from a D5 Next water cooler via
-#               I2C.
+#               controls the behavior of the tool changer drawer on the
+#               Penta Solo machine.
 #
 # Author: John Allwine <john@pocketnc.com>
 # License: GPL Version 2
