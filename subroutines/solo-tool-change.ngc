@@ -1,4 +1,8 @@
 O<solo-tool-change> SUB
+M6 T[#<T>]
+
+o<solo-tool-change> RETURN
+
 #<_RapidFeed> = 300
 #<_RapidFeedRotary> = 600
 
