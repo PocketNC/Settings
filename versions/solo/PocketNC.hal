@@ -598,3 +598,10 @@ net clamp-cmd motion.digital-out-60
 
 net tool-changer-fault solo-tool-changer.fault
 net tool-changer-fault halui.abort
+
+####################################################
+# Door
+####################################################
+
+net unsafe_set_door_open_signal [SOLO_PINS]DOOR_OPEN_PIN
+net unsafe_set_door_close_signal [SOLO_PINS]DOOR_CLOSE_PIN
