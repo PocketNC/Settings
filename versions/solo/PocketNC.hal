@@ -321,8 +321,34 @@ net c-home-and-index => joint.4.home-sw-in
 newinst bb_gpio spindle-neutral-pin pin=[SOLO_PINS]SPINDLE_NEUTRAL_PIN direction=input
 setp spindle-neutral-pin.invert 1
 
+# Cycle/Start button
 newinst bb_gpio cycle-start-pin pin=[SOLO_PINS]CYCLE_START_PIN direction=input
 setp cycle-start-pin.invert 1
+net cycle-start-pushed cycle-start-pin.in
+
+newinst and2 resume-program-and
+addf resume-program-and.funct servo-thread
+
+newinst and2 run-program-and
+addf run-program-and.funct servo-thread
+
+# If the cycle/start button is pressed and the interpreter is idle, run the program
+net program-is-idle run-program-and.in0
+net cycle-start-pushed run-program-and.in1
+
+net program-run run-program-and.out
+
+# If the cycle/start button is pressed and the interpreter is paused, resume the program
+net program-is-paused resume-program-and.in0
+net cycle-start-pushed resume-program-and.in1
+
+net program-resume resume-program-and.out
+
+# Feed Hold
+newinst bb_gpio feed-hold-pin pin=[SOLO_PINS]FEED_HOLD_PIN direction=input
+setp feed-hold-pin.invert 1
+
+net program-pause feed-hold-pin.in
 
 # eStop
 net estop-loop solo-estop.emc-enable
@@ -386,9 +412,13 @@ newinst bb_gpio c-enable-pin pin=[SOLO_PINS]C_ENABLE_PIN direction=output
 net c-motor-enable solo-estop.c-motor-enable
 net c-motor-enable c-enable-pin.out
 
-# Program start/run
+# Program status and commands
 net program-is-running halui.program.is-running
 net program-is-paused halui.program.is-paused
+net program-is-idle halui.program.is-idle
+net program-run halui.program.run
+net program-resume halui.program.resume
+net program-pause halui.program.pause
 
 # Tool Probe
 newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
