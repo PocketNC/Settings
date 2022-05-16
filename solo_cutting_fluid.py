@@ -9,6 +9,16 @@ h = hal.component("solo_cutting_fluid")
 
 # pressure is a float from 0-1 that represents a parameter between minimum and maximum pressure
 h.newpin("pressure", hal.HAL_FLOAT, hal.HAL_IN)
+
+try:
+  i = 4095
+  lo = i & 15 << 4
+  hi = i >> 4
+  combined = (lo << 8) | hi
+  bus.write_word_data(0x60, 64, combined)
+except:
+  print("Failed to set pressure")
+
 h.ready()
 
 lastPressure = 1
