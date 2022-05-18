@@ -1,4 +1,6 @@
 o<add-points-probe-line> sub
+M70
+G90
 
 #<lineDirX> = #1
 #<lineDirY> = #2
@@ -15,6 +17,8 @@ o<add-points-probe-line> sub
 #<feedFast> = #11
 #<feedBack> = #12
 #<feedSlow> = #13
+
+#<returnToStart> = #14
 
 #<startX> = #5420
 #<startY> = #5421
@@ -41,7 +45,10 @@ o100 while [ #<currentPoint> LT #<numPoints> ]
   #<currentPoint> = [ #<currentPoint> + 1 ]
 o100 endwhile
 
+o200 if [ #<returnToStart> EQ 1 ] 
 G1 F#<lineFeed> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
+o200 endif
 
+M72
 o<add-points-probe-line> endsub
 M2

@@ -52,6 +52,21 @@ def enable_probe_calibration(self):
   cal = probe.getInstance()
   cal.enableCompensation()
 
+def project_points_onto_plane(self, pointsId, planeId, newId):
+  manager = metrology.FeatureManager.getInstance()
+  featureSet = manager.getActiveFeatureSet()
+  pointsFeature = featureSet.getFeature(pointsId)
+  planeFeature = featureSet.getFeature(planeId)
+  newFeature = featureSet.getFeature(newId)
+
+  newFeature.clearPoints()
+  plane = planeFeature.plane()
+  points = pointsFeature.points()
+
+  for p in points:
+    pointOnPlane = metrology.projectPointOntoPlane(p, plane)
+    newFeature.addPoint(pointOnPlane[0], pointOnPlane[1], pointOnPlane[2])
+
 def set_probe_calibration_circle2d(self, actualDiameter, probeTipDiameter):
   manager = metrology.FeatureManager.getInstance()
   featureSet = manager.getActiveFeatureSet()

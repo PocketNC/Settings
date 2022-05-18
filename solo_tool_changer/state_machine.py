@@ -12,7 +12,7 @@ B_MAX = 45
 
 EPS = .0001
 
-SAFE_Z = 0
+SAFE_Z = -.1
 SAFE_B = 0
 SAFE_X = 1
 TIME_ALLOWED_TO_OPEN_OR_CLOSE = 4
@@ -219,13 +219,13 @@ class SoloToolChangerState(object):
 
   def on_enter_UNEXPECTED_NOT_CLOSED(self):
     print("UNEXPECTED_NOT_CLOSED")
-    print("Tool changer drawer started to open expectedly.")
+    print("Tool changer drawer started to open unexpectedly.")
     self.h["fault-reason"] = FAULT_UNEXPECTED_NOT_CLOSED
     self.to_FAULT()
 
   def on_enter_UNEXPECTED_NOT_OPENED(self):
     print("UNEXPECTED_NOT_OPENED")
-    print("Tool changer drawer started to close expectedly.")
+    print("Tool changer drawer started to close unexpectedly.")
     self.h["fault-reason"] = FAULT_UNEXPECTED_NOT_OPENED
     self.to_FAULT()
 

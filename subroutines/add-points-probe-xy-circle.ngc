@@ -2,17 +2,20 @@ o<add-points-probe-xy-circle> sub
 
 #<radius> = #1
 #<numPoints> = #2
-#<feedFast> = #3
-#<feedBack> = #4
-#<feedSlow> = #5
+#<startAngle> = #3
+#<feedFast> = #4
+#<feedBack> = #5
+#<feedSlow> = #6
 
 #<currentPoint> = 0
 o100 while [ #<currentPoint> LT #<numPoints> ]
-  #<angle> = [ 360 * #<currentPoint> / #<numPoints> ]
+  #<angle> = [ 360 * #<currentPoint> / #<numPoints> + #<startAngle> ]
   #<xCmd> = [ #<radius> * COS[#<angle>] ]
   #<yCmd> = [ #<radius> * SIN[#<angle>] ]
 
-  o<add-point-probe-relative> call [#<xCmd>] [ #<yCmd> ] [0] [#<feedFast>] [#<feedBack>] [#<feedSlow>]
+  o<probe-relative> call [#<xCmd>] [ #<yCmd> ] [0] [#<feedFast>] [#<feedBack>] [#<feedSlow>]
+
+  o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
 
   #<currentPoint> = [ #<currentPoint> + 1 ]
 o100 endwhile

@@ -1,0 +1,126 @@
+; An approximate tool length must be known at this point
+; and must be active with G43 (see find-nominal-probe-length-offset).
+
+o<calibrate-tool-changer> sub
+
+o100 if [ #<_tool_offset> NE 1 ]
+  (abort,You must have a tool length offset in place)
+o100 endif
+
+o<init-tool-changer-vars> call
+
+o<push_feature_set> call
+M70
+
+G20
+G90 G94 G40 G17 G91.1
+M429
+
+G53 G0 Z0
+;M270
+
+; Probe slot x and y should be within +/- .1 inches of the right position
+; Probe slot z should be within .1 of the right position
+
+; Begin by probing the drawer height to the right of the probe slot
+F#<_ini[TOOL_PROBE]FEED_TRAVEL>
+G90 G1 X[ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> ] Y[ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> ]
+G90 G1 Z[ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> + .1 ]
+
+G91 X[ .5 * #<_middleOffsetX> ]
+
+o<probe-relative> call [0] [0] [-.15] [#<_ini[TOOL_PROBE]FEED_FAST> ] [ #<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ]
+
+#<probeSlotZTmp> = #<_probedG5X_Z>
+
+G91 X[ -.5 * #<_middleOffsetX> ]
+G91 Z[ -.35 ]
+
+; Then probe the probe tool slot to dial in X and Y position of the center
+o<set_active_feature> call [0]
+o<add-points-probe-xy-circle> call [.5] [3] [0] [#<_ini[TOOL_PROBE]FEED_FAST> ] [ #<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ]
+
+#<probeSlotXTmp> = [ #<_penta_circle2d_center_x> ]
+#<probeSlotYTmp> = [ #<_penta_circle2d_center_y> ]
+
+G91 Z0.35
+G91 Y[ -#<_toolDist> ]
+G91 Z-0.35
+
+o<set_active_feature> call [1]
+o<add-points-probe-xy-circle> call [.5] [3] [0] [#<_ini[TOOL_PROBE]FEED_FAST> ] [ #<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ]
+
+F#<_ini[TOOL_PROBE]FEED_TRAVEL>
+G90 G1 Z[ #<probeSlotZTmp> + .1 ]
+G90 G1 X[ #<probeSlotXTmp> ] Y[ #<probeSlotYTmp> ]
+
+o<set_active_feature> call [2]
+
+G91 G1 X[ .75 * #<_middleOffsetX> ]
+o<add-points-probe-line> call [0] [-1] [0] [0] [0] [-1] [4] [ 3 * #<_toolDist> ] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [0]
+
+G91 G1 X[ -1.5 * #<_middleOffsetX> ]
+o<add-points-probe-line> call [0] [1] [0] [0] [0] [-1] [4] [ 3 * #<_toolDist> ] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [0]
+
+#<zBasisX> = #<_penta_plane_normal_x>
+#<zBasisY> = #<_penta_plane_normal_y>
+#<zBasisZ> = #<_penta_plane_normal_z>
+
+o<project_points_onto_plane> call [0] [2] [3]
+o<project_points_onto_plane> call [1] [2] [4]
+
+o<set_active_feature> call [3]
+#<probeSlotX> = #<_penta_circle_center_x>
+#<probeSlotY> = #<_penta_circle_center_y>
+#<probeSlotZ> = #<_penta_circle_center_z>
+
+(debug, Probe Slot #<probeSlotX>, #<probeSlotY>, #<probeSlotZ>)
+
+o<set_active_feature> call [4]
+#<toolSlot6X> = #<_penta_circle_center_x>
+#<toolSlot6Y> = #<_penta_circle_center_y>
+#<toolSlot6Z> = #<_penta_circle_center_z>
+
+(debug, Tool Slot 6 #<toolSlot6X>, #<toolSlot6Y>, #<toolSlot6Z>)
+
+#<yDirectionX> = [ #<probeSlotX>-#<toolSlot6X> ] 
+#<yDirectionY> = [ #<probeSlotY>-#<toolSlot6Y> ] 
+#<yDirectionZ> = [ #<probeSlotZ>-#<toolSlot6Z> ] 
+
+#<yDirectionMag> = [ SQRT[ #<yDirectionX> * #<yDirectionX> + #<yDirectionY> * #<yDirectionY> + #<yDirectionZ> * #<yDirectionZ> ] ]
+
+#<yBasisX> = [ #<yDirectionX> / #<yDirectionMag> ]
+#<yBasisY> = [ #<yDirectionY> / #<yDirectionMag> ]
+#<yBasisZ> = [ #<yDirectionZ> / #<yDirectionMag> ]
+
+; y cross z is the x basis vector
+
+#<xBasisX> = [ #<yBasisY> * #<zBasisZ> - #<yBasisZ> * #<zBasisY> ]
+#<xBasisY> = [ #<yBasisZ> * #<zBasisX> - #<yBasisX> * #<zBasisZ> ]
+#<xBasisZ> = [ #<yBasisX> * #<zBasisY> - #<yBasisY> * #<zBasisX> ]
+
+G90
+
+G53 G0 Z0
+;M271
+
+(logopen,tool-changer.ini)
+(log,[TOOL_CHANGER])
+(log,PROBE_SLOT_X=#<probeSlotX>)
+(log,PROBE_SLOT_Y=#<probeSlotY>)
+(log,PROBE_SLOT_Z=#<probeSlotZ>)
+(log,DRAWER_XX=#<xBasisX>)
+(log,DRAWER_XY=#<xBasisY>)
+(log,DRAWER_XZ=#<xBasisZ>)
+(log,DRAWER_YX=#<yBasisX>)
+(log,DRAWER_YY=#<yBasisY>)
+(log,DRAWER_YZ=#<yBasisZ>)
+(log,DRAWER_ZX=#<zBasisX>)
+(log,DRAWER_ZY=#<zBasisY>)
+(log,DRAWER_ZZ=#<zBasisZ>)
+(logclose)
+
+M72
+o<pop_feature_set> call
+o<calibrate-tool-changer> endsub
+M2

@@ -1,0 +1,72 @@
+o<init-tool-changer-vars> sub
+
+#<_toolDist> = [ 40.75 / 25.4 ]
+#<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
+#<_middleOffsetY> = [ .5 * #<_toolDist> ]
+
+#<xBasisX> = #<_ini[TOOL_CHANGER]DRAWER_XX>
+#<xBasisY> = #<_ini[TOOL_CHANGER]DRAWER_XY>
+#<xBasisZ> = #<_ini[TOOL_CHANGER]DRAWER_XZ>
+
+#<yBasisX> = #<_ini[TOOL_CHANGER]DRAWER_YX>
+#<yBasisY> = #<_ini[TOOL_CHANGER]DRAWER_YY>
+#<yBasisZ> = #<_ini[TOOL_CHANGER]DRAWER_YZ>
+
+#<zBasisX> = #<_ini[TOOL_CHANGER]DRAWER_ZX>
+#<zBasisY> = #<_ini[TOOL_CHANGER]DRAWER_ZY>
+#<zBasisZ> = #<_ini[TOOL_CHANGER]DRAWER_ZZ>
+
+#<_tool1X> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> + #<_middleOffsetX> * #<xBasisX> + #<_middleOffsetY> * #<yBasisX> ]
+#<_tool1Y> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> + #<_middleOffsetX> * #<xBasisY> + #<_middleOffsetY> * #<yBasisY> ]
+#<_tool1Z> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> + #<_middleOffsetX> * #<xBasisZ> + #<_middleOffsetY> * #<yBasisZ> ]
+
+#<_tool2X> = [ #<_tool1X> - #<_toolDist> * #<yBasisX> ]
+#<_tool2Y> = [ #<_tool1Y> - #<_toolDist> * #<yBasisY> ] 
+#<_tool2Z> = [ #<_tool1Z> - #<_toolDist> * #<yBasisZ> ]
+
+#<_tool3X> = [ #<_tool1X> - 2 * #<_toolDist> * #<yBasisX> ]
+#<_tool3Y> = [ #<_tool1Y> - 2 * #<_toolDist> * #<yBasisY> ] 
+#<_tool3Z> = [ #<_tool1Z> - 2 * #<_toolDist> * #<yBasisZ> ]
+
+#<_tool4X> = [ #<_tool1X> - 3 * #<_toolDist> * #<yBasisX> ]
+#<_tool4Y> = [ #<_tool1Y> - 3 * #<_toolDist> * #<yBasisY> ] 
+#<_tool4Z> = [ #<_tool1Z> - 3 * #<_toolDist> * #<yBasisZ> ]
+
+#<_tool5X> = [ #<_tool1X> - 4 * #<_toolDist> * #<yBasisX> ]
+#<_tool5Y> = [ #<_tool1Y> - 4 * #<_toolDist> * #<yBasisY> ] 
+#<_tool5Z> = [ #<_tool1Z> - 4 * #<_toolDist> * #<yBasisZ> ]
+
+#<_tool6X> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> - #<_toolDist> * #<yBasisX> ]
+#<_tool6Y> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> - #<_toolDist> * #<yBasisY> ] 
+#<_tool6Z> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> - #<_toolDist> * #<yBasisZ> ]
+
+#<_tool7X> = [ #<_tool6X> - #<_toolDist> * #<yBasisX> ]
+#<_tool7Y> = [ #<_tool6Y> - #<_toolDist> * #<yBasisY> ] 
+#<_tool7Z> = [ #<_tool6Z> - #<_toolDist> * #<yBasisZ> ]
+
+#<_tool8X> = [ #<_tool6X> - 2 * #<_toolDist> * #<yBasisX> ]
+#<_tool8Y> = [ #<_tool6Y> - 2 * #<_toolDist> * #<yBasisY> ] 
+#<_tool8Z> = [ #<_tool6Z> - 2 * #<_toolDist> * #<yBasisZ> ]
+
+#<_tool9X> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> - #<_middleOffsetX> * #<xBasisX> + #<_middleOffsetY> * #<yBasisX> ]
+#<_tool9Y> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> - #<_middleOffsetX> * #<xBasisY> + #<_middleOffsetY> * #<yBasisY> ]
+#<_tool9Z> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> - #<_middleOffsetX> * #<xBasisZ> + #<_middleOffsetY> * #<yBasisZ> ]
+
+#<_tool10X> = [ #<_tool9X> - #<_toolDist> * #<yBasisX> ]
+#<_tool10Y> = [ #<_tool9Y> - #<_toolDist> * #<yBasisY> ] 
+#<_tool10Z> = [ #<_tool9Z> - #<_toolDist> * #<yBasisZ> ]
+
+#<_tool11X> = [ #<_tool9X> - 2 * #<_toolDist> * #<yBasisX> ]
+#<_tool11Y> = [ #<_tool9Y> - 2 * #<_toolDist> * #<yBasisY> ] 
+#<_tool11Z> = [ #<_tool9Z> - 2 * #<_toolDist> * #<yBasisZ> ]
+
+#<_tool12X> = [ #<_tool9X> - 3 * #<_toolDist> * #<yBasisX> ]
+#<_tool12Y> = [ #<_tool9Y> - 3 * #<_toolDist> * #<yBasisY> ] 
+#<_tool12Z> = [ #<_tool9Z> - 3 * #<_toolDist> * #<yBasisZ> ]
+
+#<_tool13X> = [ #<_tool9X> - 4 * #<_toolDist> * #<yBasisX> ]
+#<_tool13Y> = [ #<_tool9Y> - 4 * #<_toolDist> * #<yBasisY> ] 
+#<_tool13Z> = [ #<_tool9Z> - 4 * #<_toolDist> * #<yBasisZ> ]
+
+o<init-tool-changer-vars> endsub
+M2

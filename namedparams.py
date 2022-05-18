@@ -66,6 +66,54 @@ def _penta_circle2d_diameter(self):
 
   return 2*circle2D[1]
 
+def _penta_circle_center_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[0][0]
+
+def _penta_circle_center_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[0][1]
+
+def _penta_circle_center_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[0][2]
+
+def _penta_circle_radius(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[1]
+
+def _penta_circle_diameter(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return 2*circle[1]
+
+def _penta_circle_normal_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[0][0]
+
+def _penta_circle_normal_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[0][1]
+
+def _penta_circle_normal_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  circle = feature.circle()
+
+  return circle[0][2]
+
 def _penta_sphere_radius(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   sphere = feature.sphere()
@@ -130,6 +178,42 @@ def _penta_line_angle_about_z(self):
   line = feature.line()
 
   return math.degrees(math.atan(line[1][1]/line[1][0]))
+
+def _penta_plane_normal_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  plane = feature.plane()
+
+  return plane[1][0]
+
+def _penta_plane_normal_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  plane = feature.plane()
+
+  return plane[1][1]
+
+def _penta_plane_normal_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  plane = feature.plane()
+
+  return plane[1][2]
+
+def _penta_plane_point_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  plane = feature.plane()
+
+  return plane[0][0]
+
+def _penta_plane_point_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  plane = feature.plane()
+
+  return plane[0][1]
+
+def _penta_plane_point_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  plane = feature.plane()
+
+  return plane[0][2]
 
 def _probe_compensation_x(self):
   cal = probe.getInstance()

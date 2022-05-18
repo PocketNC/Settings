@@ -17,18 +17,20 @@ M429
 
 G53 G0 Z0
 
-;G1 F60 Y2.5 X1.75
-;G1 F60 Z1.3
+;F#<_ini[TOOL_PROBE]FEED_TRAVEL>
+;G1 Y2.5 X1.75
+;G1 Z1.3
 
-;o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [2] [3.5] [0.51] [60] [10] [4] [1]
+;o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [2] [3.5] [0.51] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 ;
 ;G91 G0 C[ -#<_penta_line_angle_about_z> ]
 
 ;o<clear_points> call
 
-G90 G1 F60 Y2.25 X1.75
-G90 G1 F60 Z1.3
-o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [10] [3.5] [0.25] [60] [10] [4] [1]
+F#<_ini[TOOL_PROBE]FEED_TRAVEL>
+G90 G1 Y2.25 X1.75
+G90 G1 Z1.3
+o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [10] [3.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 
 G53 G0 Z0
 
