@@ -221,6 +221,11 @@ o<local-pick-up-tool> sub
   ;O<local-sync> call
   G53 G1 F#<_pickupFeed> X#<_toolX> Y#<_toolY>
   ;O<local-sync> call
+  G53 G1 F#<_pickupFeed> Z[ #<_toolZ> + .1 ]
+  M64 P61
+  G4 P1
+  M65 P61
+  G4 P1
   G53 G1 F#<_pickupFeed> Z#<_toolZ>
   M261
   G53 G1 F#<_pickupFeed> Z#<_safeZ>

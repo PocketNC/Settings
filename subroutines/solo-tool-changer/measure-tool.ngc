@@ -1,0 +1,50 @@
+o<measure-tool> sub
+
+; TODO - this needs to be a calibrated value
+; For now this was calculated by measuring a tool length offset using
+; the nominal height of the granite cube and touching off it with a tool.
+#<toolSetterHeight> = 1.886288
+
+o<init-tool-changer-vars> call
+
+#<feedTravel> = #<_ini[TOOL_PROBE]FEED_TRAVEL>
+#<feedFast> = #<_ini[TOOL_PROBE]FEED_FAST>
+#<feedBack> = #<_ini[TOOL_PROBE]FEED_BACK>
+#<feedSlow> = #<_ini[TOOL_PROBE]FEED_SLOW>
+
+M70
+
+G20
+G90 G94 G40 G17 G91.1
+G49
+G61.1
+M429
+
+G53 G0 Z0
+
+;M270
+
+G1 F#<feedTravel> X#<_toolSetterX> Y#<_toolSetterY>
+
+G38.2 F20 Z[ #<_toolSetterZ> ]
+
+#<fastTrippedZ> = #5063
+
+G38.4 F#<feedBack> Z0
+G91 G1 F#<feedBack> Z0.001
+G90
+G38.2 F#<feedSlow> Z[ #<fastTrippedZ> ]
+#<slowTrippedZ> = #5063
+
+#<toolLengthOffset> = [ #<slowTrippedZ> - #<toolSetterHeight> ]
+(debug,Tripped at #<slowTrippedZ>, #<fastTrippedZ>, #<toolLengthOffset>)
+
+G10 L1 P#5400 Z#<toolLengthOffset>
+
+G53 G0 Z0
+
+;M271
+
+M72
+
+o<measure-tool> endsub

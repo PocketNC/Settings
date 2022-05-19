@@ -427,8 +427,20 @@ newinst bb_gpio tool-probe-error-pin pin=[SOLO_PINS]TOOL_PROBE_ERROR_PIN directi
 setp tool-probe-pin.invert 1
 setp tool-probe-error-pin.invert 1
 net tool-probe-error tool-probe-error-pin.in
+net tool-probe-error motion.digital-in-58
 
-net tool-probe tool-probe-pin.in
+newinst bb_gpio tool-setter-pin pin=[SOLO_PINS]TOOL_SETTER_PIN direction=input
+
+newinst or2 tool-setter-or-probe
+addf tool-setter-or-probe.funct servo-thread
+
+net tool-setter-raw tool-setter-pin.in
+net tool-setter-raw tool-setter-or-probe.in0
+
+net tool-probe-raw tool-probe-pin.in
+net tool-probe-raw tool-setter-or-probe.in1
+
+net tool-probe tool-setter-or-probe.out
 net tool-probe motion.probe-input
 
 ## Air
@@ -616,7 +628,10 @@ setp solo-tool-changer.enabled 1
 # unclamp tool
 net tool-released solo-tool-changer.unclamp-out
 net tool-released [SOLO_PINS]TOOL_OPEN_PIN
-net tool-released [SOLO_PINS]TAPER_AIR_PURGE_PIN
+
+# taper air purge is for clearing chips around tool
+net taper-air-purge motion.digital-out-61
+net taper-air-purge [SOLO_PINS]TAPER_AIR_PURGE_PIN
 
 net unclamp-cmd solo-tool-changer.unclamp-cmd
 net unclamp-cmd motion.digital-out-59

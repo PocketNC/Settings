@@ -1,5 +1,17 @@
 o<init-tool-changer-vars> sub
 
+; TODO - This will need to be a calibrated value
+; I measured this using the 4" granite cube + a .400 gage block
+; I jogged the spindle down without a tool and touched it off
+; the gage block and set the tool length offset by setting the
+; DRO to 1.95906 (39.6mm nominally to top face of granite cube +
+; .400 inch gage block)
+#<_spindleFaceToolLengthOffset> = -7.9655
+#<_drawerTopFace> = 1.797079
+#<_pickUpDist> = 0.02
+
+#<_toolSetterDist> = [ 24.375 / 25.4 ]
+#<_toolSetterHeight> = [ 2 / 25.4 ]
 #<_toolDist> = [ 40.75 / 25.4 ]
 #<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
 #<_middleOffsetY> = [ .5 * #<_toolDist> ]
@@ -67,6 +79,10 @@ o<init-tool-changer-vars> sub
 #<_tool13X> = [ #<_tool9X> - 4 * #<_toolDist> * #<yBasisX> ]
 #<_tool13Y> = [ #<_tool9Y> - 4 * #<_toolDist> * #<yBasisY> ] 
 #<_tool13Z> = [ #<_tool9Z> - 4 * #<_toolDist> * #<yBasisZ> ]
+
+#<_toolSetterX> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> + #<_toolSetterDist> * #<yBasisX> + #<_toolSetterHeight> * #<zBasisX> ]
+#<_toolSetterY> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> + #<_toolSetterDist> * #<yBasisY> + #<_toolSetterHeight> * #<zBasisY> ]
+#<_toolSetterZ> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> + #<_toolSetterDist> * #<yBasisZ> + #<_toolSetterHeight> * #<zBasisZ> ]
 
 o<init-tool-changer-vars> endsub
 M2
