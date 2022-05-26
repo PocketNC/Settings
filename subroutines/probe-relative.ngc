@@ -39,7 +39,7 @@ G91 G1 F#<feedBack> X[ -#<dirX>*.001 ] Y[ -#<dirY>*.001 ] Z[ -#<dirZ>*.001 ]
 G90
 G38.2 F#<feedSlow> X[ #<fastTrippedX> ] Y[ #<fastTrippedY> ] Z[ #<fastTrippedZ> ]
 
-o<set_probe_direction> call [#1] [#2] [#3]
+o<set_probe_direction> call [#<dirX>] [#<dirY>] [#<dirZ>]
 
 ; TODO - account for TCPC
 

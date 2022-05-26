@@ -1,3 +1,5 @@
+; Position tip of probe directly above the sphere within plungeDepth of touching it.
+; A tool length offset must be in place for representing where the tip of the tool is.
 o<add-points-probe-sphere> sub
 
 o100 if [ #<_tool_offset> NE 1 ]
@@ -32,8 +34,6 @@ o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> + [ 
 #<approxSphereCenterY> = [ #<_probedG5X_Y> ]
 #<approxSphereCenterZ> = [ #<_probedG5X_Z> - [ #<ballDiameter> / 2 ] ]
 
-(debug,approxSphereCenter #<approxSphereCenterX>, #<approxSphereCenterY>, #<approxSphereCenterZ>)
-
 ; startZ is the end of the tool, so the bottom of the probe sphere.
 ; We'll use probingRadius to calculate starting points around sphere.
 #<probingRadius> = [ #<startZ> + [ #<probeDiameter> / 2 ] - #<approxSphereCenterZ> ]
@@ -41,20 +41,14 @@ o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> + [ 
 #<ringIndex> = 1
 o200 while [ #<ringIndex> LE #<rings> ]
   #<latAngle> = [ #<theta> / #<rings> * #<ringIndex> ]
-  (debug,latAngle #<latAngle>)
-  (debug,probingRadius #<probingRadius>)
 
   #<unitSphereFirstX> = [ SIN[ #<latAngle> ] ]
   #<unitSphereFirstY> = [ 0 ]
   #<unitSphereFirstZ> = [ COS[ #<latAngle> ] ]
 
-  (debug,unitSphereFirst #<unitSphereFirstX>, #<unitSphereFirstY>, #<unitSphereFirstZ>)
-
   #<beginProbeFirstX> = [ #<probingRadius> * #<unitSphereFirstX> + #<approxSphereCenterX> ]
   #<beginProbeFirstY> = [ #<probingRadius> * #<unitSphereFirstY> + #<approxSphereCenterY> ]
   #<beginProbeFirstZ> = [ #<probingRadius> * #<unitSphereFirstZ> + #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
-
-  (debug,beginProbeFirst #<beginProbeFirstX>, #<beginProbeFirstY>, #<beginProbeFirstZ>)
 
   ; rotate in XZ plane down to next ring
   G18

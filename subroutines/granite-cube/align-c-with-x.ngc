@@ -36,6 +36,10 @@ G53 G0 Z0
 
 G91 G0 C[ -#<_penta_line_angle_about_z> ]
 
+(logappend,c-offsets.txt)
+(log,#<_penta_line_angle_about_z>)
+(logclose)
+
 M72
 o<pop_feature_set> call
 

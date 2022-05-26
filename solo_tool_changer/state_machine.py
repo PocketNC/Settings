@@ -265,20 +265,26 @@ class SoloToolChangerState(object):
 
   @property
   def is_clamp_requested(self):
-    return self.h["clamp-cmd"] and self.h["clamp-cmd"] != self.last_clamp_cmd
+# these edge triggers cause issues when the command was given in a state that doesn't allow a transition
+
+#    return self.h["clamp-cmd"] and self.h["clamp-cmd"] != self.last_clamp_cmd
+    return self.h["clamp-cmd"]
 
   @property
   def is_unclamp_requested(self):
-    return self.h["unclamp-cmd"] and self.h["unclamp-cmd"] != self.last_unclamp_cmd
+#    return self.h["unclamp-cmd"] and self.h["unclamp-cmd"] != self.last_unclamp_cmd
+    return self.h["unclamp-cmd"]
 
   @property
   def is_open_requested(self):
     # open is requested on rising edge only
-    return self.h["open-cmd"] and self.h["open-cmd"] != self.last_open_cmd
+#    return self.h["open-cmd"] and self.h["open-cmd"] != self.last_open_cmd
+    return self.h["open-cmd"]
 
   @property
   def is_close_requested(self):
-    return self.h["close-cmd"] and self.h["close-cmd"] != self.last_close_cmd
+#    return self.h["close-cmd"] and self.h["close-cmd"] != self.last_close_cmd
+    return self.h["close-cmd"]
 
   @property
   def is_closed_sensor_triggered(self):

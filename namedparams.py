@@ -1,3 +1,4 @@
+print("named paramed average magnitude");
 import metrology
 import math
 import probe
@@ -12,6 +13,18 @@ import probe
 #      - See SOFT-846.
 
 manager = metrology.FeatureManager.getInstance()
+
+def _penta_average_magnitude(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+
+  points = feature.points()
+
+  totalMag = 0
+  numPoints = len(points)
+  for p in points:
+    totalMag += math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2])
+
+  return totalMag/numPoints
 
 def _penta_points(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
@@ -100,19 +113,19 @@ def _penta_circle_normal_x(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   circle = feature.circle()
 
-  return circle[0][0]
+  return circle[2][0]
 
 def _penta_circle_normal_y(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   circle = feature.circle()
 
-  return circle[0][1]
+  return circle[2][1]
 
 def _penta_circle_normal_z(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   circle = feature.circle()
 
-  return circle[0][2]
+  return circle[2][2]
 
 def _penta_sphere_radius(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
@@ -124,19 +137,19 @@ def _penta_sphere_x(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   sphere = feature.sphere()
 
-  return sphere[1]
+  return sphere[1][0]
 
 def _penta_sphere_y(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   sphere = feature.sphere()
 
-  return sphere[2]
+  return sphere[1][1]
 
 def _penta_sphere_z(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   sphere = feature.sphere()
 
-  return sphere[3]
+  return sphere[1][2]
 
 def _penta_sphere_diameter(self):
   return 2*_penta_sphere_radius(self)

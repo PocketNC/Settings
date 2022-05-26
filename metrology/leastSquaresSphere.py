@@ -1,3 +1,4 @@
+print("in leastSquaresSphere.py")
 # From https://github.com/cjekel/cjekel.github.io/blob/master/assets/2015-09-13/demo.py
 
 # The MIT License (MIT)
@@ -29,9 +30,6 @@ import numpy as np
 #	the best fit sphere
 def sphereFit(spX,spY,spZ):
   #   Assemble the A matrix
-  spX = np.array(spX)
-  spY = np.array(spY)
-  spZ = np.array(spZ)
   A = np.zeros((len(spX),4))
   A[:,0] = spX*2
   A[:,1] = spY*2
@@ -47,4 +45,4 @@ def sphereFit(spX,spY,spZ):
   t = (C[0]*C[0])+(C[1]*C[1])+(C[2]*C[2])+C[3]
   radius = np.sqrt(t)
 
-  return radius, C[0], C[1], C[2]
+  return (radius[0], (C[0][0], C[1][0], C[2][0]))

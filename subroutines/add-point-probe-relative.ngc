@@ -2,7 +2,7 @@ o<add-point-probe-relative> sub
 
 o<probe-relative> call [#1] [#2] [#3] [#4] [#5] [#6]
 
-o<add_point> call [#<_probedRelativeX>] [#<_probedRelativeY>] [#<_probedRelativeZ>]
+o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
 
 o<add-point-probe-relative> endsub
 M2

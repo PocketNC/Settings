@@ -1,42 +1,29 @@
+print("in probe module10")
 import math
 import bisect
 import os
 import numpy as np
+import json
 from datetime import datetime
 
 _instance = None
 
 class ProbeCalibration():
-  def __init__(self, directory="/var/opt/pocketnc/", filename="probe-calibration-xy"):
+  def __init__(self, directory="/var/opt/pocketnc/", filename="probe-calibration"):
     self._directory = directory
     self._filename = filename
-    self._enabled = False
-    self.theta_values = []
-    self.r_values = []
+    self._enabled = True
+    self._calibration = None
 
     path = os.path.join(directory, filename)
 
     try:
       if os.path.exists(path):
         with open(path) as file:
-          data = file.read().split("\n")
-          for line in data:
-            line_data = line.split()
-
-            if len(line_data) > 0:
-              if len(line_data) != 2:
-                raise ValueError("Line has %s values, expecting 2." % len(line_data))
-              else:
-                self.theta_values.append(float(line_data[0]))
-                self.r_values.append(float(line_data[1]))
-      else:
-        self.theta_values = [ 0, 2*math.pi ]
-        self.r_values = [ 0, 0 ]
+          data = file.read()
+          self._calibration = json.loads(data)
     except:
-      raise ValueError("Failed to parse probe xy calibration data.")
-
-    if self.theta_values[0] > 0 or self.theta_values[-1] < 2*math.pi-.000001:
-      raise ValueError("Probe calibration data doesn't cover full range of values")
+      raise ValueError("Failed to parse probe calibration data.")
 
     self.setProbeDirection(0,0,0)
 
@@ -46,36 +33,51 @@ class ProbeCalibration():
   def enableCompensation(self):
     self._enabled = True
 
-  def setProbeCompensationCircle2D(self, actualDiameter, probeTipDiameter, feature):
+  # Sphere feature must have points collected in the same way as add-points-probe-sphere
+  def setProbeCalibration(self, actualDiameter, probeTipDiameter, feature, rings, samplesPerRing, theta):
     actualR = (actualDiameter-probeTipDiameter)*.5
 
-    circle = feature.circle2D()
+    sphere = feature.sphere()
     data = np.array(feature.points())
 
-    data = data-np.array([ circle[0][0], circle[0][1], 0 ])
+    data = data-np.array([ sphere[1][0], sphere[1][1], sphere[1][2] ])
 
-    pts = []
-    for pt in data:
-      theta = math.atan2(pt[1], pt[0])
+    probeCalibration = []
 
-      if theta < 0:
-        theta += 2*math.pi
+    idealX = 0
+    idealY = 0
+    idealZ = actualR
 
-      r = math.sqrt(pt[0]*pt[0]+pt[1]*pt[1])
-      pts.append([ theta, r-actualR ])
+    x = pts[0][0]
+    y = pts[0][1]
+    z = pts[0][2]
 
-    pts.sort(key=lambda a: a[0])
-    first = pts[0]
-    last = pts[-1]
+    mag = actualR-math.sqrt(x*x+y*y+z*z)
+    probeCalibration.append([ 0, [ 0, mag ], [ 360, mag ] ])
 
-    pts.insert(0, [ last[0]-math.pi*2, last[1] ])
-    pts.append([ first[0]+math.pi*2, first[1] ])
+    for ringIndex in range(1,rings+1):
+      latAngle = math.radians(90 / rings * ringIndex)
 
-    self.theta_values = []
-    self.r_values = []
-    for pt in pts:
-      self.theta_values.append(pt[0])
-      self.r_values.append(pt[1])
+      latArray = []
+      for pointIndex in range(samplesPerRing):
+        longAngle = math.radians(360 / samplesPerRing * pointIndex)
+
+        idealX = actualR * math.sin(latAngle) * math.cos(longAngle)
+        idealY = actualR * math.sin(latAngle) * math.sin(longAngle)
+        idealZ = actualR * math.cos(latAngle)
+
+        x = pts[i][0]
+        y = pts[i][1]
+        z = pts[i][2]
+
+        mag = actualR-math.sqrt(x*x+y*y+z*z)
+
+        latArray.append([ math.degrees(longAngle), mag ])
+        i += 1
+
+      probeCalibration.append([ math.degrees(latAngle), latArray ])
+
+    self._calibration = probeCalibration
 
     
   # TODO - Save probe compensation to specific probe number.
@@ -83,24 +85,23 @@ class ProbeCalibration():
   #      - to a specific name. This allows us to always open a specific file at start up,
   #      - without worrying about overwriting previous data (the symlink could feasibly be
   #      - reverted to an older one).
-  def saveProbeCompensation(self):
+  def saveProbeCalibration(self):
     path = os.path.join(self._directory, self._filename)
     pathDateTime = os.path.join(self._directory, self._filename + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
     with open(pathDateTime, 'w') as file:
-      for i in range(len(self.theta_values)):
-        file.write("%s\t%s\n" % (self.theta_values[i], self.r_values[i]))
+      file.write(json.dumps(self._calibration))
 
     os.unlink(path)
     os.symlink(pathDateTime, path)
 
-
   def setProbeDirection(self, x, y, z):
+    print("in setProbeDirection (%s, %s, %s)" % (x, y, z))
     self._dirx = x
     self._diry = y
     self._dirz = z
 
-    self._compensation = self.computeCompensation(x, y, z)
+    self._compensation = self.computeCompensation(-x, -y, -z)
 
   def getCompensationX(self):
     if self._enabled:
@@ -121,42 +122,64 @@ class ProbeCalibration():
     return 0
 
   def computeCompensation(self, x, y, z):
-    # TODO - include z in the calculations, for now we only look at the xy direction
-    if abs(x) < .00001 and abs(y) < .00001:
-      return [0, 0, 0]
+    print("computing compensation for direction (%s, %s, %s)" % (x,y,z))
 
-    theta = math.atan2(y, x)
-    if theta < 0:
-      theta += 2*math.pi
+    latAngle = math.degrees(math.acos(z))
+    longAngle = math.degrees(math.atan2(y,x))
+    if longAngle < 0:
+      longAngle += 360
 
-    index = bisect.bisect_left(self.theta_values, theta)
+    latIndex = bisect.bisect_left([ elem[0] for elem in self._calibration ], latAngle)
 
-    print("index: %s" % (index,))
+    if latIndex == 0:
+      latIndex = 1
 
-    theta0 = self.theta_values[index-1]
-    theta1 = self.theta_values[index]
+    print("latIndex: %s" % (latIndex,))
 
-    print("theta0, theta1: (%s, %s)" % (theta0, theta1))
+    latArray0 = self._calibration[latIndex-1]
+    latArray1 = self._calibration[latIndex]
 
-    r0 = self.r_values[index-1]
-    r1 = self.r_values[index]
+    latAngle0 = latArray0[0]
+    latAngle1 = latArray1[0]
 
-    print("r0, r1: (%s, %s)" % (r0, r1))
+    longIndex0 = bisect.bisect_left([ elem[0] for elem in latArray0[1] ], longAngle)
+    longIndex1 = bisect.bisect_left([ elem[0] for elem in latArray1[1] ], longAngle)
 
-    print("theta: %s" % (theta,))
+    compMag0_0 = latArray0[1][longIndex0-1][1]
+    compMag0_1 = latArray0[1][longIndex0][1]
 
-    t = (theta-theta0)/(theta1-theta0)
+    longAngle0_0 = latArray0[1][longIndex0-1][0]
+    longAngle0_1 = latArray0[1][longIndex0][0]
 
-    print("t: %s" % (t, ))
+    compMag1_0 = latArray1[1][longIndex1-1][1]
+    compMag1_1 = latArray1[1][longIndex1][1]
 
-    r = r0*(1-t)+r1*t
+    longAngle1_0 = latArray1[1][longIndex1-1][0]
+    longAngle1_1 = latArray1[1][longIndex1][0]
 
-    comp = [ -r*math.cos(theta), -r*math.sin(theta), 0 ]
+    t0 = (longAngle-longAngle0_0)/(longAngle0_1-longAngle0_0)
+    t1 = (longAngle-longAngle1_0)/(longAngle1_1-longAngle1_0)
+
+    latT = (latAngle-latAngle0)/(latAngle1-latAngle0)
+
+    print("t0: %s" % (t0, ))
+    print("t1: %s" % (t1, ))
+    print("latT: %s" % (latT, ))
+
+    compMag0 = compMag0_0*(1-t0) + compMag0_1*t0
+    compMag1 = compMag1_0*(1-t1) + compMag1_1*t1
+
+    compMag = compMag0*(1-latT)+compMag1*latT
+
+    comp = [ 
+      compMag*x,
+      compMag*y,
+      compMag*z
+    ]
 
     print("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
 
     return comp
-
 
 def getInstance():
   global _instance

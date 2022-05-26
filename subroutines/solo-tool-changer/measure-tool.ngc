@@ -2,8 +2,10 @@ o<measure-tool> sub
 
 ; TODO - this needs to be a calibrated value
 ; For now this was calculated by measuring a tool length offset using
-; the nominal height of the granite cube and touching off it with a tool.
-#<toolSetterHeight> = 1.886288
+; the nominal height of the granite cube and touching off it with a tool
+; then probing the tool on the tool setter and calculating the toolSetterHeight
+; based on the tool length offset.
+#<toolSetterHeight> = 1.933188
 
 o<init-tool-changer-vars> call
 
@@ -22,7 +24,7 @@ M429
 
 G53 G0 Z0
 
-;M270
+M270
 
 G1 F#<feedTravel> X#<_toolSetterX> Y#<_toolSetterY>
 
@@ -43,7 +45,7 @@ G10 L1 P#5400 Z#<toolLengthOffset>
 
 G53 G0 Z0
 
-;M271
+M271
 
 M72
 

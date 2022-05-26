@@ -1,0 +1,83 @@
+; probe must be positioned roughly in the center above a tooling ball
+; with B at 0
+o<find-axis-of-b-rotation> sub
+
+o100 if [ #<_tool_offset> NE 1 ]
+  (abort,You must have a tool length offset in place)
+o100 endif
+
+o200 if [ ABS [ #<_b> ] GT .000001 ]
+  (abort,B must be at 0)
+o200 endif
+
+#<ballDiameter> = #1
+#<probeDiameter> = #2
+#<plungeDepth> = #3
+
+#<theta> = #4
+#<rings> = #5
+#<samplesPerRing> = #6
+
+#<positioningFeed> = #7
+#<feedFast> = #8
+#<feedBack> = #9
+#<feedSlow> = #10
+
+#<angle1> = #11
+#<angle2> = #12
+#<numMeasurements> = #13
+
+o<push_feature_set> call
+M70
+
+G20 
+G90 G94 G40 G17 G91.1
+
+; Feature 0 is the tooling ball 
+o<set_active_feature> call [0]
+o<add-points-probe-sphere> call [ #<ballDiameter> ] [ #<probeDiameter> ] [ #<plungeDepth> ] [ #<theta> ] [ #<rings> ] [ #<samplesPerRing> ] [ #<positioningFeed> ] [ #<feedFast> ] [ #<feedBack> ] [ #<feedSlow> ]
+
+#<measurement> = 0
+o300 while [ #<measurement> LT #<numMeasurements> ]
+  #<t> = [ #<measurement> / [ #<numMeasurements> - 1 ] ]
+  #<angle> = [ #<angle1> * [ 1 - #<t> ] + #<angle2> * #<t> ]
+
+  o<set_active_feature> call [0]
+  o<set_feature_transform_with_axis_angle> call [0] [1] [0] [#<angle>]
+  F#<positioningFeed>
+  G53 G1 Z0
+  G1 X#<_penta_sphere_x> Y#<_penta_sphere_y>
+  G0 B#<angle>
+  G1 Z[ #<_penta_sphere_z> + #<ballDiameter> * .5 + #<plungeDepth> * .25 ]
+
+  ; temporary feature 1 will hold points for currently rotated sphere
+  ; so clear the points in preparation for probing 
+  o<set_active_feature> call [1]
+  o<clear_points> call
+
+  o<add-points-probe-sphere> call [ #<ballDiameter> ] [ #<probeDiameter> ] [ #<plungeDepth> ] [ #<theta> ] [ #<rings> ] [ #<samplesPerRing> ] [ #<positioningFeed> ] [ #<feedFast> ] [ #<feedBack> ] [ #<feedSlow> ]
+
+  #<centerX> = #<_penta_sphere_x>
+  #<centerY> = #<_penta_sphere_y>
+  #<centerZ> = #<_penta_sphere_z>
+
+  ; Feature 3 is the circle we're tracing through the center of the tooling ball at each rotation
+  ; so record the center of the latest sampled ball
+  o<set_active_feature> call [3]
+  o<add_point> call [ #<centerX> ] [ #<centerY> ] [ #<centerZ> ]
+
+  #<measurement> = [ #<measurement> + 1 ]
+o300 endwhile
+
+(debug,B Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)
+(debug,B Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
+(debug,B Diameter #<_penta_circle_diameter>)
+
+G53 G0 Z0
+G0 B0
+
+M72
+o<pop_feature_set> call
+
+o<find-axis-of-b-rotation> endsub
+M2

@@ -1,5 +1,7 @@
 import metrology
 import probe
+import math
+import numpy
 
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
@@ -21,6 +23,12 @@ def clear_points(self):
   featureSet = manager.getActiveFeatureSet()
   feature = featureSet.getActiveFeature()
   feature.clearPoints()
+
+def set_feature_transform_with_axis_angle(self, x, y, z, angle):
+  manager = metrology.FeatureManager.getInstance()
+  featureSet = manager.getActiveFeatureSet()
+  feature = featureSet.getActiveFeature()
+  feature.setTransformWithAxisAngle([x,y,z], math.radians(angle))
 
 # Used for allocating a new feature set to avoid stomping on data from
 # other contexts. In a given routine that is using feature numbers,
@@ -67,14 +75,38 @@ def project_points_onto_plane(self, pointsId, planeId, newId):
     pointOnPlane = metrology.projectPointOntoPlane(p, plane)
     newFeature.addPoint(pointOnPlane[0], pointOnPlane[1], pointOnPlane[2])
 
-def set_probe_calibration_circle2d(self, actualDiameter, probeTipDiameter):
+def point_deviations_from_plane(self, pointsId, planeId, newId):
+  manager = metrology.FeatureManager.getInstance()
+  featureSet = manager.getActiveFeatureSet()
+  pointsFeature = featureSet.getFeature(pointsId)
+  planeFeature = featureSet.getFeature(planeId)
+  newFeature = featureSet.getFeature(newId)
+
+  newFeature.clearPoints()
+  plane = planeFeature.plane()
+  points = pointsFeature.points()
+
+  for p in points:
+    pointOnPlane = metrology.projectPointOntoPlane(p, plane)
+
+    print("point: (%s, %s, %s)" % (p[0], p[1], p[2]))
+    print("point on plane: (%s, %s, %s)" % (pointOnPlane[0], pointOnPlane[1], pointOnPlane[2]))
+
+    dx = p[0]-pointOnPlane[0]
+    dy = p[1]-pointOnPlane[1]
+    dz = p[2]-pointOnPlane[2]
+    print("mag: (%s)" % (math.sqrt(dx*dx+dy*dy+dz*dz),))
+
+    newFeature.addPoint(dx,dy,dz)
+
+def set_probe_calibration(self, actualDiameter, probeTipDiameter, rings, samplesPerRing, theta):
   manager = metrology.FeatureManager.getInstance()
   featureSet = manager.getActiveFeatureSet()
   feature = featureSet.getActiveFeature()
   cal = probe.getInstance()
 
-  cal.setProbeCompensationCircle2D(actualDiameter, probeTipDiameter, feature)
+  cal.setProbeCalibration(actualDiameter, probeTipDiameter, feature, rings, samplesPerRing, theta)
 
 def save_probe_calibration(self):
   cal = probe.getInstance()
-  cal.saveProbeCompensation()
+  cal.saveProbeCalibration()
