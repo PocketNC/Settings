@@ -1,7 +1,6 @@
 print("in metrology __init__.py")
 import numpy
 from enum import Enum
-import metrology.leastSquaresCircle
 import metrology.leastSquaresSphere
 import metrology.helpers
 import skg
