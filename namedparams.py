@@ -127,6 +127,51 @@ def _penta_circle_normal_z(self):
 
   return circle[2][2]
 
+def _penta_cylinder_point_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[0][0]
+
+def _penta_cylinder_point_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[0][1]
+
+def _penta_cylinder_point_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[0][2]
+
+def _penta_cylinder_axis_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[1][0]
+
+def _penta_cylinder_axis_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[1][1]
+
+def _penta_cylinder_axis_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[1][2]
+
+def _penta_cylinder_radius(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  cylinder = feature.cylinder()
+
+  return cylinder[2]
+
+def _penta_cylinder_diameter(self):
+  return _penta_cylinder_radius(self)*2
+
 def _penta_sphere_radius(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   sphere = feature.sphere()

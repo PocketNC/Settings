@@ -1,0 +1,95 @@
+o<add-points-probe-circle> sub
+
+M70
+G17 G90 G90.1
+
+#<circleDiameter> = #1
+#<probeDiameter> = #2
+#<probeDist> = #3
+#<numPoints> = #4
+#<startAngle> = #5
+#<endAngle> = #6
+#<performLastProbe> = #7 ; 1 if you want to include the final probe point, 0 if not. Set this to 0 for example when probing a full circle to avoid probing the start point twice (one in the beginning and one at the end).
+#<inside> = #8
+#<returnToStart> = #9 ; 1 if you want to travel back to the start through the same path, 0 if you want to stop after final probe
+#<feedTravel> = #10
+#<feedFast> = #11
+#<feedBack> = #12
+#<feedSlow> = #13
+
+o50 if [ #<startAngle> GT #<endAngle> ]
+  #<arcDirection> = 2
+  o55 if [ ABS[ #<endAngle> MOD 360 - #<startAngle> ] LT .00001 ]
+    #<returnArcDirection> = 2
+  o55 else
+    #<returnArcDirection> = 3
+  o55 endif
+o50 else
+  #<arcDirection> = 3
+  o60 if [ ABS[ #<endAngle> MOD 360 - #<startAngle> ] LT .00001 ]
+    #<returnArcDirection> = 3
+  o60 else
+    #<returnArcDirection> = 2
+  o60 endif
+o50 endif
+
+#<startX> = #5420
+#<startY> = #5421
+#<startZ> = #5422
+
+#<direction> = [ #<inside> * 1 + [ [ 1-#<inside> ] * -1 ] ] ; -1 if outside circle and 1 if inside circle
+(debug,Direction #<direction>)
+
+#<unitCircleX> = [ COS[#<startAngle>] ]
+#<unitCircleY> = [ SIN[#<startAngle>] ]
+
+#<xCmd> = [ #<direction> * #<probeDist> * #<unitCircleX> ]
+#<yCmd> = [ #<direction> * #<probeDist> * #<unitCircleY> ]
+
+(debug,Relative First Probe #<xCmd>, #<yCmd>)
+
+o<add-point-probe-relative> call [#<xCmd>] [ #<yCmd> ] [0] [#<feedFast>] [#<feedBack>] [#<feedSlow>]
+
+#<nominalRadius> = [[ #<circleDiameter> - [ #<direction> * #<probeDiameter> ] ] * .5 ]
+#<approxCenterX> = [ #<_probedG5X_X> + [ #<direction> * #<unitCircleX> * #<nominalRadius> ] ]
+#<approxCenterY> = [ #<_probedG5X_Y> + [ #<direction> * #<unitCircleY> * #<nominalRadius> ] ]
+
+#<relativeStartX> = [ #<startX> - #<approxCenterX> ]
+#<relativeStartY> = [ #<startY> - #<approxCenterY> ]
+
+#<startRadius> = [ SQRT[ #<relativeStartX> * #<relativeStartX> + #<relativeStartY> * #<relativeStartY> ] ] 
+
+(debug,Start Radius #<startRadius>)
+(debug,Approx Center #<approxCenterX>, #<approxCenterY>)
+
+#<currentPoint> = 1
+o100 while [ #<currentPoint> LT #<numPoints> ]
+  #<angle> = [ [ #<endAngle> - #<startAngle> ] * #<currentPoint> / [ #<numPoints> - #<performLastProbe> ] + #<startAngle> ]
+
+  #<unitCircleX> = [ COS[#<angle>] ]
+  #<unitCircleY> = [ SIN[#<angle>] ]
+
+  #<xCmd> = [ #<direction> * #<probeDist> * #<unitCircleX> ]
+  #<yCmd> = [ #<direction> * #<probeDist> * #<unitCircleY> ]
+
+  #<probePositionX> = [ #<startRadius> * #<unitCircleX> + #<approxCenterX> ]
+  #<probePositionY> = [ #<startRadius> * #<unitCircleY> + #<approxCenterY> ]
+
+  F#<feedTravel>
+  G[#<arcDirection>] X[ #<probePositionX> ] Y[ #<probePositionY> ] I[ #<approxCenterX> ] J[ #<approxCenterY> ]
+
+  o<add-point-probe-relative> call [#<xCmd>] [ #<yCmd> ] [0] [#<feedFast>] [#<feedBack>] [#<feedSlow>]
+
+  #<currentPoint> = [ #<currentPoint> + 1 ]
+o100 endwhile
+
+o200 if [ #<returnToStart> EQ 1 AND [ ABS[ #<startX> - #5420 ] GT 0.00001 OR ABS[ #<startY> - #5421 ] GT 0.00001 ] ]
+
+G[#<returnArcDirection>] X[ #<startX> ] Y[ #<startY> ] I[ #<approxCenterX> ] J[ #<approxCenterY> ]
+
+o200 endif
+
+M72
+
+o<add-points-probe-circle> endsub
+M2

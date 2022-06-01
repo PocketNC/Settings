@@ -1,9 +1,11 @@
-print("in metrology __init__.py")
+print("in metrology __init__.py 4")
 import numpy
 from enum import Enum
+import scipy.optimize
 import metrology.leastSquaresSphere
 import metrology.helpers
 import skg
+import math
 
 from importlib import reload
 reload(metrology.leastSquaresSphere)
@@ -13,6 +15,91 @@ _DEBUG = True
 def setDebug(d):
   global _DEBUG
   _DEBUG = d
+
+def nearestPointOnLine(pt, line):
+  dx = pt[0]-line[0][0]
+  dy = pt[1]-line[0][1]
+  dz = pt[2]-line[0][2]
+
+  dot = dx*line[1][0] + dy*line[1][1] + dz*line[1][2]
+
+  return (pt[0]-dot*line[1][0], pt[1]-dot*line[1][1], pt[2]-dot*line[1][2])
+  
+# with help from https://nvlpubs.nist.gov/nistpubs/jres/103/6/j36sha.pdf
+def bestFitCylinder(pts):
+  data = pts.T
+
+  x = data[0]
+  y = data[1]
+  z = data[2]
+
+  def distFromCylinder(c):
+    ptX = c[0]
+    ptY = c[1]
+    ptZ = c[2]
+
+    dirX = c[3]
+    dirY = c[4]
+    dirZ = c[5]
+
+    dirMag = math.sqrt(dirX*dirX+dirY*dirY+dirZ*dirZ)
+    dirX = dirX/dirMag
+    dirY = dirY/dirMag
+    dirZ = dirZ/dirMag
+
+    r = c[6]
+
+    # (u,v,w) is the cross product of the direction vector (dirX, dirY, dirZ) 
+    # with the vector from each point P to a known point on the line (ptX, ptY, ptZ)
+    # The magnitude of the resulting vector is the distance from the point to the line defined by the direction, dir, and point, pt.
+    # Note that u, v and w are numpy arrays with each element representing a single (x,y,z) point P.
+    u = dirZ*(y - ptY) - dirY*(z - ptZ)
+    v = dirX*(z - ptZ) - dirZ*(x - ptX)
+    w = dirY*(x - ptX) - dirX*(y - ptY)
+
+    # So what we're returning here is a numpy array of distances from our cylinder.
+    # When we minimize this value, we'll have our pt, dir and radius for a best fit cylinder
+    return numpy.sqrt(u*u + v*v + w*w) - r
+
+# Using the Jacobian matrix can result in fewer iterations of the least squares solver
+# But this doesn't always seem to give the correct answer.
+  def jac(c):
+    ptX = c[0]
+    ptY = c[1]
+    ptZ = c[2]
+
+    dirX = c[3]
+    dirY = c[4]
+    dirZ = c[5]
+
+    dirMag = math.sqrt(dirX*dirX+dirY*dirY+dirZ*dirZ)
+    dirX = dirX/dirMag
+    dirY = dirY/dirMag
+    dirZ = dirZ/dirMag
+
+    u = dirZ*(y - ptY) - dirY*(z - ptZ)
+    v = dirX*(z - ptZ) - dirZ*(x - ptX)
+    w = dirY*(x - ptX) - dirX*(y - ptY)
+
+    d = numpy.sqrt(u*u + v*v + w*w)
+
+    ddPtX = (v*dirZ - w*dirY)/d
+    ddPtY = (-u*dirZ + w*dirX)/d
+    ddPtZ = (u*dirY + v*dirZ)/d
+    ddDirX = (v*(z - ptZ) + w*(-y+ptY))*(1-dirX*dirX)/dirMag/d
+    ddDirY = (u*(-z+ptZ) + w*(x-ptX))*(1-dirY*dirY)/dirMag/d
+    ddDirZ = (u*(y-ptY) + v*(-x+ptX))*(1-dirZ*dirZ)/dirMag/d
+    ddR = numpy.full((x.size,), -1)
+
+    return numpy.column_stack((ddPtX, ddPtY, ddPtZ, ddDirX, ddDirY, ddDirZ, ddR))
+    
+  (cylinder, ier) = scipy.optimize.leastsq(distFromCylinder, numpy.array([ x.mean(), y.mean(), z.mean(), 0, 0, 1, 1 ]))
+
+  (ptX, ptY, ptZ, dirX, dirY, dirZ, r) = cylinder
+
+  dirMag = math.sqrt(dirX*dirX+dirY*dirY+dirZ*dirZ)
+
+  return ((ptX, ptY, ptZ), (dirX/dirMag, dirY/dirMag, dirZ/dirMag), r)
 
 def bestFitSphere(pts):
   transpose = pts.T
@@ -43,20 +130,18 @@ def bestFitCircle(pts):
     x = numpy.dot(planePt, xvec)
     y = numpy.dot(planePt, yvec)
 
-#    print("Projected to plane: ", planePt, x, y)
-    print(x, y)
-    
     planePts.append([ x, y, 0 ])
 
   circle = skg.nsphere.nsphere_fit(planePts)
   circle2d = (circle[1], circle[0])
 
-  print("Circle2D", circle2d)
-  print("xvec", xvec)
-  print("yvec", yvec)
-  print("planeOrigin", planeOrigin)
-  print("numpy.multiply(circle2d[0][0], xvec)", numpy.multiply(circle2d[0][0], xvec))
-  print("numpy.multiply(circle2d[0][1], yvec)", numpy.multiply(circle2d[0][1], yvec))
+  if _DEBUG:
+    print("Circle2D", circle2d)
+    print("xvec", xvec)
+    print("yvec", yvec)
+    print("planeOrigin", planeOrigin)
+    print("numpy.multiply(circle2d[0][0], xvec)", numpy.multiply(circle2d[0][0], xvec))
+    print("numpy.multiply(circle2d[0][1], yvec)", numpy.multiply(circle2d[0][1], yvec))
 
   center = numpy.multiply(circle2d[0][0], xvec)+numpy.multiply(circle2d[0][1], yvec)+planeOrigin
 
@@ -94,12 +179,7 @@ class Feature:
     self._featureTransform = None
 
     self._points = numpy.array([])
-    self._average = None
-    self._circle2D = None
-    self._sphere = None
-    self._line = None
-    self._plane = None
-    self._circle = None
+    self.makeDirty()
 
   def setTransformWithAxisAngle(self, axis, angle):
     self._featureTransform = metrology.helpers.makeRotationAxis(axis, angle)
@@ -113,6 +193,7 @@ class Feature:
     self._line = None
     self._plane = None
     self._circle = None
+    self._cylinder = None
     self._transformedPoints = None
 
   def addPoint(self, x, y, z):
@@ -172,14 +253,21 @@ class Feature:
 
     return self._line
 
+  def cylinder(self):
+    if self._cylinder is None:
+      self._cylinder = bestFitCylinder(self.points())
+
+    if _DEBUG:
+      print("Cylinder: ", self._cylinder)
+
+    return self._cylinder
+
   def sphere(self):
     if self._sphere is None:
       self._sphere = skg.nsphere.nsphere_fit(self.points())
-      self._debugSphere = bestFitSphere(self.points())
 
     if _DEBUG:
       print("Sphere: ", self._sphere)
-      print("Least Squares Sphere: ", self._debugSphere)
 
     return self._sphere
 
