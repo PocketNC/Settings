@@ -1,4 +1,3 @@
-print("in probe module10")
 import math
 import bisect
 import os
@@ -74,6 +73,8 @@ class ProbeCalibration():
 
         latArray.append([ math.degrees(longAngle), mag ])
         i += 1
+
+      latArray.append([ latArray[0][0]+360, latArray[0][1] ])
 
       probeCalibration.append([ math.degrees(latAngle), latArray ])
 

@@ -7,7 +7,13 @@ o<init-tool-changer-vars> sub
 ; DRO to 1.95906 (39.6mm nominally to top face of granite cube +
 ; .400 inch gage block)
 #<_spindleFaceToolLengthOffset> = -7.9655
-#<_drawerTopFace> = 1.797079
+
+; #_drawerTopFace is used by calibrate-tool-changer to initially position
+; the probe above the open drawer so it can probe the actual position.
+; This number shouldn't need to be adjusted from machine to machine, but
+; we may need to adjust the how much allowance there is in the plunge distance
+; of the probe to ensure we always hit the drawer.
+#<_drawerTopFace> = 1.836981
 #<_pickUpDist> = 0.02
 
 #<_toolSetterDist> = [ 24.375 / 25.4 ]
