@@ -7,24 +7,14 @@ O<solo-tool-change> SUB
 
 o<init-tool-changer-vars> call
 
-#<_RapidFeed> = 300
-#<_RapidFeedRotary> = 600
-
-#<_safeZ> = 0
-
 #<_oldTool> = #5400
-
-o100 if [ #<_oldTool> EQ 0 ]
-  #<_oldTool> = #<_ini[PENTA]LAST_TOOL>
-o100 endif
 
 #<_newTool> = #<T>
 
-o200 if [ #<_oldTool> EQ #<_newTool> ]
+M66 P#<_toolClampedInput> L0
+o200 if [ #<_oldTool> EQ #<_newTool> AND #5399 EQ 1]
   O<solo-tool-change> return
 o200 endif
-
-(debug,Changing to #<_newTool>)
 
 M70                                            ( save current modal state )
 
@@ -38,18 +28,18 @@ G53 G1 Z#<_safeZ> F#<_RapidFeed>
 G53 G1 B0 F#<_RapidFeedRotary>
 M270
 
-M66 P60 L0
+M66 P#<_toolClampedInput> L0
 o300 if [ #5399 EQ 1 ]
   ; if we have a tool loaded, put it back in its slot
-  o[#<_oldTool> + 7000] call
+  o<place-tool> call [ #<_oldTool> ]
 o300 else  
   ; else unclamp tool for only picking up
   M260
 o300 endif
 
-o[#<_newTool> + 8000] call
+o<pick-up-tool> call [ #<_newTool> ]
 
-; write last tool to disk 
+; write last tool to disk so at boot up we know what tool is loaded
 M199 P[#<T>]
 
 M6 T[#<T>]
@@ -59,178 +49,6 @@ M271
 M72                                          ( restore modal state )
 
 O<solo-tool-change> ENDSUB
-
-; tool 1
-o7001 sub
-  o<local-place-tool> call [#<_tool1X>] [#<_tool1Y>] [#<_tool1Z>]
-o7001 endsub
-
-; tool 2
-o7002 sub
-  o<local-place-tool> call [#<_tool2X>] [#<_tool2Y>] [#<_tool2Z>]
-o7002 endsub
-
-; tool 3
-o7003 sub
-  o<local-place-tool> call [#<_tool3X>] [#<_tool3Y>] [#<_tool3Z>]
-o7003 endsub
-
-; tool 4
-o7004 sub
-  o<local-place-tool> call [#<_tool4X>] [#<_tool4Y>] [#<_tool4Z>]
-o7004 endsub
-
-; tool 5
-o7005 sub
-  o<local-place-tool> call [#<_tool5X>] [#<_tool5Y>] [#<_tool5Z>]
-o7005 endsub
-
-; tool 6
-o7006 sub
-  o<local-place-tool> call [#<_tool6X>] [#<_tool6Y>] [#<_tool6Z>]
-o7006 endsub
-
-; tool 7
-o7007 sub
-  o<local-place-tool> call [#<_tool7X>] [#<_tool7Y>] [#<_tool7Z>]
-o7007 endsub
-
-; tool 8
-o7008 sub
-  o<local-place-tool> call [#<_tool8X>] [#<_tool8Y>] [#<_tool8Z>]
-o7008 endsub
-
-; tool 9
-o7009 sub
-  o<local-place-tool> call [#<_tool9X>] [#<_tool9Y>] [#<_tool9Z>]
-o7009 endsub
-
-; tool 10
-o7010 sub
-  o<local-place-tool> call [#<_tool10X>] [#<_tool10Y>] [#<_tool10Z>]
-o7010 endsub
-
-; tool 11
-o7011 sub
-  o<local-place-tool> call [#<_tool11X>] [#<_tool11Y>] [#<_tool11Z>]
-o7011 endsub
-
-; tool 12
-o7012 sub
-  o<local-place-tool> call [#<_tool12X>] [#<_tool12Y>] [#<_tool12Z>]
-o7012 endsub
-
-; tool 13
-o7013 sub
-  o<local-place-tool> call [#<_tool13X>] [#<_tool13Y>] [#<_tool13Z>]
-o7013 endsub
-
-o<local-place-tool> sub
-  M66 P60 L0
-  o7100 if [ #5399 NE 1 ]
-    o<local-sync> call
-    (abort,No tool in spindle.)
-  o7100 endif
-
-  #<_toolX> = #1
-  #<_toolY> = #2
-  #<_toolZ> = #3
-  #<_placeFeed> = 300
-  (debug,Tool location X#<_toolX> Y#<_toolY> Z#<_toolZ>)
-  o<local-sync> call
-
-  G53 G1 F#<_placeFeed> X#<_toolX> Y#<_toolY>
-  ;O<local-sync> call
-  G53 G1 F#<_placeFeed> Z#<_toolZ>
-  M260
-
-  G53 G1 F#<_placeFeed> Z[ #<_toolZ> + 1 ]
-  ;O<local-sync> call
-o<local-place-tool> endsub
-
-; tool 1
-o8001 sub
-  o<local-pick-up-tool> call [#<_tool1X>] [#<_tool1Y>] [#<_tool1Z>]
-o8001 endsub
-
-; tool 2
-o8002 sub
-  o<local-pick-up-tool> call [#<_tool2X>] [#<_tool2Y>] [#<_tool2Z>]
-o8002 endsub
-
-; tool 3
-o8003 sub
-  o<local-pick-up-tool> call [#<_tool3X>] [#<_tool3Y>] [#<_tool3Z>]
-o8003 endsub
-
-; tool 4
-o8004 sub
-  o<local-pick-up-tool> call [#<_tool4X>] [#<_tool4Y>] [#<_tool4Z>]
-o8004 endsub
-
-; tool 5
-o8005 sub
-  o<local-pick-up-tool> call [#<_tool5X>] [#<_tool5Y>] [#<_tool5Z>]
-o8005 endsub
-
-; tool 6
-o8006 sub
-  o<local-pick-up-tool> call [#<_tool6X>] [#<_tool6Y>] [#<_tool6Z>]
-o8006 endsub
-
-; tool 7
-o8007 sub
-  o<local-pick-up-tool> call [#<_tool7X>] [#<_tool7Y>] [#<_tool7Z>]
-o8007 endsub
-
-; tool 8
-o8008 sub
-  o<local-pick-up-tool> call [#<_tool8X>] [#<_tool8Y>] [#<_tool8Z>]
-o8008 endsub
-
-; tool 9
-o8009 sub
-  o<local-pick-up-tool> call [#<_tool9X>] [#<_tool9Y>] [#<_tool9Z>]
-o8009 endsub
-
-; tool 10
-o8010 sub
-  o<local-pick-up-tool> call [#<_tool10X>] [#<_tool10Y>] [#<_tool10Z>]
-o8010 endsub
-
-; tool 11
-o8011 sub
-  o<local-pick-up-tool> call [#<_tool11X>] [#<_tool11Y>] [#<_tool11Z>]
-o8011 endsub
-
-; tool 12
-o8012 sub
-  o<local-pick-up-tool> call [#<_tool12X>] [#<_tool12Y>] [#<_tool12Z>]
-o8012 endsub
-
-; tool 13
-o8013 sub
-  o<local-pick-up-tool> call [#<_tool13X>] [#<_tool13Y>] [#<_tool13Z>]
-o8013 endsub
-
-o<local-pick-up-tool> sub
-  #<_toolX> = #1
-  #<_toolY> = #2
-  #<_toolZ> = #3
-  #<_pickupFeed> = 300
-  ;O<local-sync> call
-  G53 G1 F#<_pickupFeed> X#<_toolX> Y#<_toolY>
-  ;O<local-sync> call
-  G53 G1 F#<_pickupFeed> Z[ #<_toolZ> + .1 ]
-  M64 P61
-  G4 P1
-  M65 P61
-  G4 P1
-  G53 G1 F#<_pickupFeed> Z#<_toolZ>
-  M261
-  G53 G1 F#<_pickupFeed> Z#<_safeZ>
-  ;O<local-sync> call
-o<local-pick-up-tool> endsub
 
 o<local-sync> sub
 ;  G4 P.2

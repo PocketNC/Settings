@@ -1,0 +1,33 @@
+o<return-tool> sub
+
+o<init-tool-changer-vars> call
+
+M70
+
+G61
+
+G90
+G94
+G40
+
+G53 G1 Z#<_safeZ> F#<_RapidFeed>
+G53 G1 B0 F#<_RapidFeedRotary>
+
+M270
+
+M66 P#<_toolClampedInput> L0
+o300 if [ #5399 EQ 1 ]
+  ; if we have a tool loaded, put it back in its slot
+  o<place-tool> call [ #5400 ]
+o300 endif  
+
+G53 G1 Z#<_safeZ> F#<_RapidFeed>
+
+M262
+
+M271
+
+M72
+  
+o<return-tool> endsub
+M2

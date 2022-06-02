@@ -58,5 +58,8 @@ M6 T12
 M61 Q1
 
 M6 T13
+M61 Q2
+
+o<return-tool> call
 
 o<test-slots> endsub

@@ -1,0 +1,107 @@
+o<place-tool> sub
+  o<init-tool-changer-vars> call
+
+  M66 P60 L0
+  o7100 if [ #5399 NE 1 ]
+    M66  E0 L0
+    (abort,No tool in spindle.)
+  o7100 endif
+
+  #<toolSlot> = #1
+
+  o7200 if [ #<toolSlot> LT 1 OR #<toolSlot> GT 13 ]
+    M66  E0 L0
+    (abort,Tool number must be between 1 and 13.)
+  o7200 endif
+
+  o[#<toolSlot> + 7000] call
+
+  M61 Q0
+
+o<place-tool> endsub
+
+; tool 1
+o7001 sub
+  o<local-place-tool> call [#<_tool1X>] [#<_tool1Y>] [#<_tool1Z>]
+o7001 endsub
+
+; tool 2
+o7002 sub
+  o<local-place-tool> call [#<_tool2X>] [#<_tool2Y>] [#<_tool2Z>]
+o7002 endsub
+
+; tool 3
+o7003 sub
+  o<local-place-tool> call [#<_tool3X>] [#<_tool3Y>] [#<_tool3Z>]
+o7003 endsub
+
+; tool 4
+o7004 sub
+  o<local-place-tool> call [#<_tool4X>] [#<_tool4Y>] [#<_tool4Z>]
+o7004 endsub
+
+; tool 5
+o7005 sub
+  o<local-place-tool> call [#<_tool5X>] [#<_tool5Y>] [#<_tool5Z>]
+o7005 endsub
+
+; tool 6
+o7006 sub
+  o<local-place-tool> call [#<_tool6X>] [#<_tool6Y>] [#<_tool6Z>]
+o7006 endsub
+
+; tool 7
+o7007 sub
+  o<local-place-tool> call [#<_tool7X>] [#<_tool7Y>] [#<_tool7Z>]
+o7007 endsub
+
+; tool 8
+o7008 sub
+  o<local-place-tool> call [#<_tool8X>] [#<_tool8Y>] [#<_tool8Z>]
+o7008 endsub
+
+; tool 9
+o7009 sub
+  o<local-place-tool> call [#<_tool9X>] [#<_tool9Y>] [#<_tool9Z>]
+o7009 endsub
+
+; tool 10
+o7010 sub
+  o<local-place-tool> call [#<_tool10X>] [#<_tool10Y>] [#<_tool10Z>]
+o7010 endsub
+
+; tool 11
+o7011 sub
+  o<local-place-tool> call [#<_tool11X>] [#<_tool11Y>] [#<_tool11Z>]
+o7011 endsub
+
+; tool 12
+o7012 sub
+  o<local-place-tool> call [#<_tool12X>] [#<_tool12Y>] [#<_tool12Z>]
+o7012 endsub
+
+; tool 13
+o7013 sub
+  o<local-place-tool> call [#<_tool13X>] [#<_tool13Y>] [#<_tool13Z>]
+o7013 endsub
+
+o<local-place-tool> sub
+  M66 P60 L0
+  o7100 if [ #5399 NE 1 ]
+    (abort,No tool in spindle.)
+  o7100 endif
+
+  #<toolX> = #1
+  #<toolY> = #2
+  #<toolZ> = #3
+  #<_placeFeed> = 300
+  M66  E0 L0
+
+  G53 G1 F#<_placeFeed> X#<toolX> Y#<toolY>
+  G53 G1 F#<_placeFeed> Z#<toolZ>
+  M260
+
+  G53 G1 F#<_placeFeed> Z[ #<toolZ> + 1 ]
+
+  M66  E0 L0
+o<local-place-tool> endsub

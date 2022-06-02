@@ -1,0 +1,100 @@
+o<pick-up-tool> sub
+  o<init-tool-changer-vars> call
+
+  #<toolSlot> = #1
+
+  M66 P59 L0
+  o100 if [ #5399 NE 1 ]
+    M66  E0 L0
+    (abort,Spindle must be unclamped to pick up a tool.)
+  o100 endif
+
+  o200 if [ #<toolSlot> LT 1 OR #<toolSlot> GT 13 ]
+    M66  E0 L0
+    (abort,Tool number must be between 1 and 13.)
+  o200 endif
+
+  o[#<toolSlot> + 8000] call
+  
+o<pick-up-tool> endsub
+
+; tool 1
+o8001 sub
+  o<local-pick-up-tool> call [#<_tool1X>] [#<_tool1Y>] [#<_tool1Z>]
+o8001 endsub
+
+; tool 2
+o8002 sub
+  o<local-pick-up-tool> call [#<_tool2X>] [#<_tool2Y>] [#<_tool2Z>]
+o8002 endsub
+
+; tool 3
+o8003 sub
+  o<local-pick-up-tool> call [#<_tool3X>] [#<_tool3Y>] [#<_tool3Z>]
+o8003 endsub
+
+; tool 4
+o8004 sub
+  o<local-pick-up-tool> call [#<_tool4X>] [#<_tool4Y>] [#<_tool4Z>]
+o8004 endsub
+
+; tool 5
+o8005 sub
+  o<local-pick-up-tool> call [#<_tool5X>] [#<_tool5Y>] [#<_tool5Z>]
+o8005 endsub
+
+; tool 6
+o8006 sub
+  o<local-pick-up-tool> call [#<_tool6X>] [#<_tool6Y>] [#<_tool6Z>]
+o8006 endsub
+
+; tool 7
+o8007 sub
+  o<local-pick-up-tool> call [#<_tool7X>] [#<_tool7Y>] [#<_tool7Z>]
+o8007 endsub
+
+; tool 8
+o8008 sub
+  o<local-pick-up-tool> call [#<_tool8X>] [#<_tool8Y>] [#<_tool8Z>]
+o8008 endsub
+
+; tool 9
+o8009 sub
+  o<local-pick-up-tool> call [#<_tool9X>] [#<_tool9Y>] [#<_tool9Z>]
+o8009 endsub
+
+; tool 10
+o8010 sub
+  o<local-pick-up-tool> call [#<_tool10X>] [#<_tool10Y>] [#<_tool10Z>]
+o8010 endsub
+
+; tool 11
+o8011 sub
+  o<local-pick-up-tool> call [#<_tool11X>] [#<_tool11Y>] [#<_tool11Z>]
+o8011 endsub
+
+; tool 12
+o8012 sub
+  o<local-pick-up-tool> call [#<_tool12X>] [#<_tool12Y>] [#<_tool12Z>]
+o8012 endsub
+
+; tool 13
+o8013 sub
+  o<local-pick-up-tool> call [#<_tool13X>] [#<_tool13Y>] [#<_tool13Z>]
+o8013 endsub
+
+o<local-pick-up-tool> sub
+  #<_toolX> = #1
+  #<_toolY> = #2
+  #<_toolZ> = #3
+  #<_pickupFeed> = 300
+  G53 G1 F#<_pickupFeed> X#<_toolX> Y#<_toolY>
+  G53 G1 F#<_pickupFeed> Z[ #<_toolZ> + .1 ]
+  M64 P61
+  G4 P1
+  M65 P61
+  G4 P1
+  G53 G1 F#<_pickupFeed> Z#<_toolZ>
+  M261
+  G53 G1 F#<_pickupFeed> Z#<_safeZ>
+o<local-pick-up-tool> endsub
