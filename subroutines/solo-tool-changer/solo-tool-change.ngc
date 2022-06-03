@@ -1,5 +1,10 @@
 O<solo-tool-change> SUB
 
+o400 if [ #<T> LT 1 OR #<T> GT 13 ]
+  M66  E0 L0
+  (abort,Tool number must be between 1 and 13.)
+o400 endif
+
 ; Uncomment these two lines to not perform a tool change when using M6
 ; but still indicate that the tool changed
 ;M6 T[#<T>]
@@ -15,6 +20,12 @@ M66 P#<_toolClampedInput> L0
 o200 if [ #<_oldTool> EQ #<_newTool> AND #5399 EQ 1]
   O<solo-tool-change> return
 o200 endif
+
+o500 if [ [ #5400 LT 1 OR #5400 GT 13 ] AND #5399 EQ 1 ]
+  M66  E0 L0
+  (abort,Can't put away tool #5400. Manually remove tool and try again.)
+o500 endif
+
 
 M70                                            ( save current modal state )
 

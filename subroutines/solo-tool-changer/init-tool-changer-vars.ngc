@@ -36,7 +36,7 @@ o100 endif
 #<_drawerTopFace> = 1.836981
 #<_pickUpDist> = 0.02
 
-#<_toolSetterDist> = [ 24.375 / 25.4 ]
+#<_toolSetterDist> = [ 24.375 / 25.4 ] ; distance between probe slot center and tool setter center in the Y axis
 #<_toolSetterHeight> = [ 2 / 25.4 ]
 #<_toolDist> = [ 40.75 / 25.4 ]
 #<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
@@ -109,7 +109,6 @@ o100 endif
 #<_toolSetterX> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> + #<_toolSetterDist> * #<yBasisX> + #<_toolSetterHeight> * #<zBasisX> ]
 #<_toolSetterY> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> + #<_toolSetterDist> * #<yBasisY> + #<_toolSetterHeight> * #<zBasisY> ]
 #<_toolSetterZ> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> + #<_toolSetterDist> * #<yBasisZ> + #<_toolSetterHeight> * #<zBasisZ> ]
-
 
 o<init-tool-changer-vars> endsub
 M2

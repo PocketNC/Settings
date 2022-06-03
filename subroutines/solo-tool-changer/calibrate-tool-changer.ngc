@@ -73,8 +73,7 @@ o<set_active_feature> call [3]
 #<probeSlotX> = #<_penta_circle_center_x>
 #<probeSlotY> = #<_penta_circle_center_y>
 #<probeSlotZ> = [ #<_penta_circle_center_z> + #<_spindleFaceToolLengthOffset> + #<_pickUpDist> ]
-
-(debug, Probe Slot #<probeSlotX>, #<probeSlotY>, #<probeSlotZ>)
+#<probeSlotZCOR> = #<_penta_circle_center_z> ; Z value is normally in machine coordinates, but we still need it relative to the center of rotation below
 
 o<set_active_feature> call [4]
 #<toolSlot6X> = #<_penta_circle_center_x>
@@ -101,11 +100,22 @@ o<set_active_feature> call [4]
 
 G90
 
-G53 G0 Z0
 ;M271
 
+#<toolSetterX> = [ #<probeSlotX> + #<_toolSetterDist> * #<yBasisX> + #<_toolSetterHeight> * #<zBasisX> ]
+#<toolSetterY> = [ #<probeSlotY> + #<_toolSetterDist> * #<yBasisY> + #<_toolSetterHeight> * #<zBasisY> ]
+#<toolSetterZCOR> = [ #<probeSlotZCOR> + #<_toolSetterDist> * #<yBasisZ> + #<_toolSetterHeight> * #<zBasisZ> ]
+
+G1 F#<_ini[TOOL_PROBE]FEED_TRAVEL> Z[#<toolSetterZCOR> + .1]
+G1 F#<_ini[TOOL_PROBE]FEED_TRAVEL> X#<toolSetterX> Y#<toolSetterY>
+
+o<probe-relative> call [0] [0] [-.15] [#<_ini[TOOL_PROBE]FEED_FAST> ] [ #<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ]
+#<toolSetterTriggerZ> = #<_probedG5X_Z>
+
+G53 G0 Z0
 (logopen,tool-changer.ini)
 (log,[TOOL_CHANGER])
+(log,TOOL_SETTER_TRIGGER_Z=#<toolSetterTriggerZ>)
 (log,PROBE_SLOT_X=#<probeSlotX>)
 (log,PROBE_SLOT_Y=#<probeSlotY>)
 (log,PROBE_SLOT_Z=#<probeSlotZ>)

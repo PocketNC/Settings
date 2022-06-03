@@ -1,21 +1,6 @@
 o<measure-tool> sub
 
-; TODO - this needs to be a calibrated value
-; For now this was calculated by measuring a tool length offset using
-; the nominal height of the granite cube and touching off it with a tool
-; then probing the tool on the tool setter and calculating the toolSetterHeight
-; based on the tool length offset.
-; #<toolSetterHeight> = 1.933188
-
-; This value was the value that the tool probe triggers at after setting
-; it's tool length offset to the center of rotation of the B axis using
-; o<find-axis-of-b-rotation>. First a nominal tool length offset is used
-; by probing it against the 4" granite cube using find-nominal-probe-length-offset,
-; then the find-axis-of-b-rotation is used to dial in the center of rotation.
-; Then, using the dialed in tool length offset of the probe, probe the tool
-; setter to get this number. More testing is needed to know if this is sufficient
-; as the tool setter may trigger slightly lower.
-#<toolSetterHeight> = 1.96
+#<toolSetterTriggerZ> = #<_ini[TOOL_CHANGER]TOOL_SETTER_TRIGGER_Z>
 
 o<init-tool-changer-vars> call
 
@@ -48,8 +33,7 @@ G90
 G38.2 F#<feedSlow> Z[ #<fastTrippedZ> ]
 #<slowTrippedZ> = #5063
 
-#<toolLengthOffset> = [ #<slowTrippedZ> - #<toolSetterHeight> ]
-(debug,Tripped at #<slowTrippedZ>, #<fastTrippedZ>, #<toolLengthOffset>)
+#<toolLengthOffset> = [ #<slowTrippedZ> - #<toolSetterTriggerZ> ]
 
 G10 L1 P#5400 Z#<toolLengthOffset>
 
