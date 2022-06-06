@@ -1,19 +1,29 @@
 o<solo-open-tool-changer> SUB
 
-M64 P63       ; Request open
-M66 P63 L3 Q4 ; Wait until open or 4 seconds have passed
-M65 P63
+o<init-tool-changer-vars> call
 
-o100 if [ ABS[ #5399+1 ] LT .000001  ]
+M66 P#<_okToOpenToolChangerInput> L0
+o300 if [ #5399 EQ 1 ]
+
+  M64 P63       ; Request open
+  M66 P63 L3 Q4 ; Wait until open or 4 seconds have passed
+  M65 P63
+
+  o100 if [ ABS[ #5399+1 ] LT .000001  ]
+    M66  E0 L0                           ; force synch
+    (abort,Tool changer drawer failed to open within 4 seconds.)
+  o100 endif
+
+  ; Check status of closed sensor, error if it still indicates the drawer is closed
+  M66 P62 L0
+  o200 if [ ABS[ #5399-1 ] LT .000001 ]
+    M66  E0 L0                           ; force synch
+    (abort,Tool changer drawer failed to open: closed sensor indicates drawer is closed.)
+  o200 endif
+o300 else
   M66  E0 L0                           ; force synch
-  (abort,Tool changer drawer failed to open within 4 seconds.)
-o100 endif
-
-; Check status of closed sensor, error if it still indicates the drawer is closed
-M66 P62 L0
-o200 if [ ABS[ #5399-1 ] LT .000001 ]
-  (abort,Tool changer drawer failed to open: closed sensor indicates drawer is closed.)
-o200 endif
+  (abort,Cannot open tool changer. Ensure spindle is fully retracted or moved aside and trunnion is out of the way.)
+o300 endif
 
 o<solo-open-tool-changer> ENDSUB
 M2

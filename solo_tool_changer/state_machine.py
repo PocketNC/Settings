@@ -114,6 +114,8 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = True
     self.h["fault"] = False
     self.h["fault-reason"] = 0
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_NOT_CLOSED_AT_STARTUP(self):
     print("NOT_CLOSED_AT_STARTUP")
@@ -124,6 +126,8 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = True
     self.h["fault"] = False
     self.h["fault-reason"] = 0
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_STARTUP(self):
     print("STARTUP")
@@ -134,6 +138,8 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = True
     self.h["fault"] = False
     self.h["fault-reason"] = 0
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_OPEN(self):
     print("OPEN")
@@ -147,6 +153,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = -EPS
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_CLOSE(self):
     print("CLOSE")
@@ -160,6 +168,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = -EPS
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_OK_TO_HOME(self):
     print("OK_TO_HOME")
@@ -171,6 +181,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = B_MIN
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_OK_TO_OPEN(self):
     print("OK_TO_OPEN")
@@ -182,6 +194,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = B_MIN
+    self.h["ok-to-close"] = True
+    self.h["ok-to-open"] = True
 
   def on_enter_NOT_SAFE_TO_OPEN(self):
     print("NOT_SAFE_TO_OPEN")
@@ -193,6 +207,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = B_MIN
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_OK_TO_CLOSE(self):
     print("OK_TO_CLOSE")
@@ -204,6 +220,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = -EPS
+    self.h["ok-to-close"] = True
+    self.h["ok-to-open"] = True
 
 
   def on_enter_NOT_SAFE_TO_CLOSE(self):
@@ -216,6 +234,8 @@ class SoloToolChangerState(object):
     self.h["fault"] = False
     self.h["fault-reason"] = 0
     self.h["b-min"] = -EPS 
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   def on_enter_UNEXPECTED_NOT_CLOSED(self):
     print("UNEXPECTED_NOT_CLOSED")
@@ -250,6 +270,8 @@ class SoloToolChangerState(object):
     self.h["inhibit-homing"] = True
     self.h["fault"] = True
     self.h["b-min"] = -EPS
+    self.h["ok-to-close"] = False
+    self.h["ok-to-open"] = False
 
   @property
   def has_user_indicated_safe_to_close(self):

@@ -623,6 +623,12 @@ net inhibit-feed solo-tool-changer.inhibit-feed
 net inhibit-homing motion.homing-inhibit
 net inhibit-homing solo-tool-changer.inhibit-homing
 
+net ok-to-open-tool-changer solo-tool-changer.ok-to-open
+net ok-to-open-tool-changer motion.digital-in-57
+
+net ok-to-close-tool-changer solo-tool-changer.ok-to-close
+net ok-to-close-tool-changer motion.digital-in-56
+
 setp solo-tool-changer.enabled 1
 
 # unclamp tool

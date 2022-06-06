@@ -19,7 +19,6 @@ from tool_info import is_over_tool_slot, get_tool_slot_position, get_tool_slot_n
 
 h = hal.component("solo-tool-changer")
 
-# rising edge triggered requests
 h.newpin("open-cmd", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("close-cmd", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("clamp-cmd", hal.HAL_BIT, hal.HAL_IN)
@@ -68,6 +67,10 @@ h.newpin("close-out", hal.HAL_BIT, hal.HAL_OUT)
 # output for controlling tool clamp solenoid and reporting state
 h.newpin("clamp-out", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("unclamp-out", hal.HAL_BIT, hal.HAL_OUT)
+
+# outputs that reflect certain state machine states
+h.newpin("ok-to-close", hal.HAL_BIT, hal.HAL_OUT)
+h.newpin("ok-to-open", hal.HAL_BIT, hal.HAL_OUT)
 
 h.newpin("tool-change-complete", hal.HAL_BIT, hal.HAL_OUT)
 

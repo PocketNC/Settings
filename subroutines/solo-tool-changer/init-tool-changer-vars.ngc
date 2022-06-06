@@ -19,6 +19,8 @@ o100 endif
 #<_toolClampedInput> = 60
 #<_toolUnclampedInput> = 59
 #<_noToolClampedInput> = 58
+#<_okToOpenToolChangerInput> = 57
+#<_okToCloseToolChangerInput> = 56
   
 ; TODO - This will need to be a calibrated value
 ; I measured this using the 4" granite cube + a .400 gage block
