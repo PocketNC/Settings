@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+
+from USB2507 import USB2507
+from i2c import busNum
+
+print("USB2507 Test")
+#1. Initialize the Class
+USB = USB2507(0x2C, BusAddr=busNum)
+#1 Check if USB Hub is accesible - If the Hub has already been configured and set up, the USB will not be usable by the SMBUS
+Readable, Status = USB.Available()
+print(Readable, Status)
+if( Readable ):
+    print("USB Hub Is Available")
+else:
+    print("USB Hub Not Available")
+    exit()
+#use the default Vendor ID and Product ID from Microchip.(was owned by Standard Microsystems Corp.)
+print("Writing Device ID.")
+USB.writeDID(LSB = USB.address , MSB = 0x00)
+print("Writing Vendor ID.")
+USB.writeVID(LSB = 0x24 , MSB = 0x04)
+print("Writing Product ID.")
+USB.writePID(LSB = 0x07 , MSB = 0x25)
+#Demonstrate Reading Status, Vendor ID, Product ID, and Device ID
+# Vendor ID is issued by the USB IF(USB Implementers Forum INC) https://www.usb.org/about
+stat = USB.readStatus()
+print("status", stat)
+VID = USB.readVID()
+print("Vendor ID", VID)
+PID = USB.readPID()
+print("Product ID", PID)
+DID = USB.readDID()
+print("Device ID", DID)
+#3 Configure the USB - (Config bytes 1 and 2)
+USB.writeConfig(DYNAMIC_POWER = 0,SELF_BUS_PWR=1, PORT_IND = 1, CURRENT_SNS = 1, PORT_PWR = 1)
+print("USB Configured")
+#Reading the Configuration we could add a verification step
+config = USB.readConfig()
+print(config)
+#4. set Power And Current Limits
+# Set th time the host initiated power-on sequence begins on a port until power is good in ms
+USB.setPowerOnTime(10)
+#The Maximum Current a self powered Hub can consume from the Host
+USB.setMaxSelfCurrent(2)#per datasheet this value should not be set above 100mA
+#The Maximum Current a bus powered Hub can consume from the Host
+USB.setMaxBusCurrent(510)
+#The maximum power a self powerd Hub can consume from the Host
+USB.setMaxSelfPower(2)#per datasheet this value should not be set above 100mA
+
+#5. Write Protect
+USB.WRITE_PROTECT()
+#6. Command the Hub to attach
+USB.USB_ATTACH()

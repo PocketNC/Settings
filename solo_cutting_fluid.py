@@ -5,7 +5,7 @@ from i2c import bus
 import hal
 import time
 
-h = hal.component("solo_cutting_fluid")
+h = hal.component("solo-cutting-fluid")
 
 # pressure is a float from 0-1 that represents a parameter between minimum and maximum pressure
 h.newpin("pressure", hal.HAL_FLOAT, hal.HAL_IN)

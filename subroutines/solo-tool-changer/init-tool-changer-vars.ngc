@@ -1,7 +1,7 @@
 o<init-tool-changer-vars> sub
 
 #<_RapidFeed> = 300
-#<_RapidFeedRotary> = 600
+#<_RapidFeedRotary> = 5000
 
 #<_safeZ> = 0
 

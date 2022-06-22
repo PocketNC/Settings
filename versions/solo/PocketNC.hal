@@ -419,6 +419,7 @@ net program-is-idle halui.program.is-idle
 net program-run halui.program.run
 net program-resume halui.program.resume
 net program-pause halui.program.pause
+net is-estopped halui.estop.is-activated
 
 # Tool Probe
 newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
@@ -507,12 +508,21 @@ net c-pos joint.4.pos-cmd
 net calculated-feedrate feedrate.feedrate
 
 ####################################################
+# LEDs
+####################################################
+loadusr -Wn solo-leds /opt/pocketnc/Settings/solo/solo_leds.py
+
+net program-is-paused solo-leds.is-paused
+net program-is-idle solo-leds.is-idle
+net is-estopped solo-leds.is-estopped
+
+####################################################
 # Cutting Fluid
 ####################################################
 
 # Cutting fluid pump pressure settings
-loadusr -Wn solo_cutting_fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
-net cutting-fluid-pressure solo_cutting_fluid.pressure
+loadusr -Wn solo-cutting-fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
+net cutting-fluid-pressure solo-cutting-fluid.pressure
 sets cutting-fluid-pressure 1
 
 net flood-coolant iocontrol.0.coolant-flood
