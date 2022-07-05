@@ -1,4 +1,6 @@
 o<solo-close-tool-changer> SUB
+M66  E0 L0
+G4 P0.2
 
 M66 P#<_okToCloseToolChangerInput> L0
 o300 if [ #5399 EQ 1 ]
