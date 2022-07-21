@@ -56,10 +56,10 @@ G90 G1 X[ #<probeSlotXTmp> ] Y[ #<probeSlotYTmp> ]
 
 o<set_active_feature> call [2]
 
-G91 G1 X[ .75 * #<_middleOffsetX> ]
+G91 G1 X[ .5 * #<_middleOffsetX> ]
 o<add-points-probe-line> call [0] [-1] [0] [0] [0] [-1] [4] [ 3 * #<_toolDist> ] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [0]
 
-G91 G1 X[ -1.5 * #<_middleOffsetX> ]
+G91 G1 X[ -#<_middleOffsetX> ]
 o<add-points-probe-line> call [0] [1] [0] [0] [0] [-1] [4] [ 3 * #<_toolDist> ] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [0]
 
 #<zBasisX> = #<_penta_plane_normal_x>

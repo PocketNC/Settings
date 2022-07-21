@@ -35,11 +35,11 @@ o100 endif
 ; This number shouldn't need to be adjusted from machine to machine, but
 ; we may need to adjust the how much allowance there is in the plunge distance
 ; of the probe to ensure we always hit the drawer.
-#<_drawerTopFace> = 1.836981
-#<_pickUpDist> = 0.02
+#<_drawerTopFace> = [ 1.8 ]
+#<_pickUpDist> = [ 0.02 - 1.6 / 25.4 ]
 
 #<_toolSetterDist> = [ 24.375 / 25.4 ] ; distance between probe slot center and tool setter center in the Y axis
-#<_toolSetterHeight> = [ 2 / 25.4 ]
+#<_toolSetterHeight> = [ 2 / 25.4 - 1.6 / 25.4 ]
 #<_toolDist> = [ 40.75 / 25.4 ]
 #<_middleOffsetX> = [ SQRT[3] * .5 * #<_toolDist> ]
 #<_middleOffsetY> = [ .5 * #<_toolDist> ]
