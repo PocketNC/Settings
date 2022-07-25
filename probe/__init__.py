@@ -34,7 +34,7 @@ class ProbeCalibration():
 
   # Sphere feature must have points collected in the same way as add-points-probe-sphere
   def setProbeCalibration(self, actualDiameter, probeTipDiameter, feature, rings, samplesPerRing, theta):
-    actualR = (actualDiameter-probeTipDiameter)*.5
+    actualR = (actualDiameter+probeTipDiameter)*.5
 
     sphere = feature.sphere()
     data = np.array(feature.points())
@@ -47,13 +47,14 @@ class ProbeCalibration():
     idealY = 0
     idealZ = actualR
 
-    x = pts[0][0]
-    y = pts[0][1]
-    z = pts[0][2]
+    x = data[0][0]
+    y = data[0][1]
+    z = data[0][2]
 
     mag = actualR-math.sqrt(x*x+y*y+z*z)
     probeCalibration.append([ 0, [ 0, mag ], [ 360, mag ] ])
 
+    i = 1
     for ringIndex in range(1,rings+1):
       latAngle = math.radians(90 / rings * ringIndex)
 
@@ -65,9 +66,9 @@ class ProbeCalibration():
         idealY = actualR * math.sin(latAngle) * math.sin(longAngle)
         idealZ = actualR * math.cos(latAngle)
 
-        x = pts[i][0]
-        y = pts[i][1]
-        z = pts[i][2]
+        x = data[i][0]
+        y = data[i][1]
+        z = data[i][2]
 
         mag = actualR-math.sqrt(x*x+y*y+z*z)
 
