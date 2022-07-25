@@ -77,9 +77,12 @@ try:
       update = True
       lastEStop = h['is-estopped']
 
-    if update:
-      updateLEDs(lastPaused, lastIdle, lastEStop)
-      update = False
+    try:
+      if update:
+        updateLEDs(lastPaused, lastIdle, lastEStop)
+        update = False
+    except:
+      pass
 
     time.sleep(.1)
 
