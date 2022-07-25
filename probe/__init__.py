@@ -52,7 +52,7 @@ class ProbeCalibration():
     z = data[0][2]
 
     mag = actualR-math.sqrt(x*x+y*y+z*z)
-    probeCalibration.append([ 0, [ 0, mag ], [ 360, mag ] ])
+    probeCalibration.append([ 0, [[ 0, mag ], [ 360, mag ]] ])
 
     i = 1
     for ringIndex in range(1,rings+1):
