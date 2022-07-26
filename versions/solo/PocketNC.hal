@@ -448,6 +448,7 @@ net tool-probe motion.probe-input
 
 # Schunk Mini90 open
 net vice-released [SOLO_PINS]MINI90_OPEN_PIN
+net vice-released [SOLO_PINS]VICE_AIR_BLAST_PIN
 
 ### Spindle ###
 
