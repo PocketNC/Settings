@@ -69,9 +69,11 @@ o300 while [ #<measurement> LT #<numMeasurements> ]
   #<measurement> = [ #<measurement> + 1 ]
 o300 endwhile
 
-(debug,B Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)
-(debug,B Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
-(debug,B Diameter #<_penta_circle_diameter>)
+(logappend,b-axis.txt)
+(log,B Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)
+(log,B Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
+(log,B Diameter #<_penta_circle_diameter>)
+(logclose)
 
 G53 G0 Z0
 G0 B0
