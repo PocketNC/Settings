@@ -539,6 +539,9 @@ net flood-coolant flood-coolant-air-blast-oneshot.in
 net air-blast flood-coolant-air-blast-oneshot.out
 net air-blast [SOLO_PINS]AIR_BLAST_PIN
 
+net cutting-fluid-on halui.flood.on
+net cutting-fluid-off halui.flood.off
+
 ####################################################
 # Tool Changer
 ####################################################
