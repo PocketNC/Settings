@@ -1,3 +1,4 @@
 loadusr -W /opt/pocketnc/Settings/features/timekeeper/timekeeper.py
 
 net spindle-enable timekeeper.spindle-on
+net spindle-seconds <= timekeeper.spindle-seconds
