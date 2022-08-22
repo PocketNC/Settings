@@ -1,46 +1,17 @@
 loadusr -Wn interlock /opt/pocketnc/Settings/features/interlock/interlock.py
 
 newinst bb_gpio interlock-open-pin pin=[POCKETNC_PINS]INTERLOCK_OPEN_PIN direction=input
-
-newinst and2 interlock-closed-and-released.and
-addf interlock-closed-and-released.and servo-thread
-
-newinst not interlock-open.not
-addf interlock-open.not servo-thread
-
 setp interlock-open-pin.invert 0
+
+net program-is-idle interlock.idle
+net program-is-running interlock.running
+net program-is-paused interlock.paused
+
 net interlock-open interlock-open-pin.in
-net interlock-open interlock-open.not.in
-net interlock-closed interlock-open.not.out
-net interlock-closed interlock.closed
+net interlock-open interlock.open
 
-net interlock-closed interlock-closed-and-released.and.in0
-net interlock-released interlock.paused-by-interlock.not
-net interlock-released interlock-closed-and-released.and.in1
-
-net cycle-start-triggered interlock.start-button-pulse
-
-net [PENTA]INTERLOCK_PAUSE_SIG interlock.pause-program
-net [PENTA]INTERLOCK_OK_SIG interlock-closed-and-released.and.out
-
-### IN pins reporting machine state ###
-net current-vel motion.current-vel
-net current-vel interlock.current-vel
-
-net program-is-running interlock.program-running
-net program-is-paused interlock.program-is-paused
-
-net program-is-paused-by-interlock interlock.paused-by-interlock
-
-net is-spindle-enabled interlock.spindle-is-enabled
-
-# sig spindle-enable is set by motion.spindle-on, which appears to only be true when the spindle is actually moving (it goes false when the spindle override rate is set to 0%)
-net spindle-enable interlock.spindle-is-turning
-
-net is-mode-mdi interlock.mode-is-mdi
-
-### OUT pins that change machine state ###
-net [PENTA]INTERLOCK_INHIBIT_SPINDLE_SIG interlock.spindle-inhibit
-net [PENTA]INTERLOCK_INHIBIT_FEED_SIG interlock.feed-inhibit
-net [PENTA]INTERLOCK_SPINDLE_STOP_SIG interlock.spindle-stop
-net [PENTA]INTERLOCK_ESTOP_SIG interlock.exception
+net [PENTA]INTERLOCK_OK_TO_RUN_SIG interlock.ok-to-run
+net [PENTA]INTERLOCK_FEED_HOLD_SIG interlock.feed-hold
+net [PENTA]INTERLOCK_INHIBIT_SPINDLE_SIG interlock.inhibit-spindle
+net [PENTA]INTERLOCK_INHIBIT_FEED_SIG interlock.inhibit-feed
+net [PENTA]INTERLOCK_SPINDLE_STOP_SIG interlock.stop-spindle
