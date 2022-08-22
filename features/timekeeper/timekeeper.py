@@ -9,7 +9,10 @@ lastWriteTime = now
 
 h = hal.component("timekeeper")
 h.newpin("spindle-on", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("spindle-seconds", hal.HAL_FLOAT, hal.HAL_OUT)
 h.ready()
+
+# sig = hal.new_sig("spindle_seconds", hal.HAL_FLOAT)
 
 try:
   interface = timekeeper_core.EEPROMInterface()
@@ -18,6 +21,7 @@ except IOError as e:
   interface = timekeeper_core.FilesystemInterface()
 
 runtime = interface.runtime
+h['spindle-seconds'] = runtime
 
 try:
   while True:
@@ -32,6 +36,7 @@ try:
     if(int(runtime) != interface.runtime and (now - lastWriteTime) > timekeeper_core.WRITE_PERIOD):
       try:
         interface.write_next(runtime)
+        h['spindle-seconds'] = runtime
       except IOError as e:
         print(e)
 
