@@ -30,7 +30,8 @@ if __name__ == "__main__":
     overlay = { 'parameters': [],
                 'sections': {} }
 
-  merged = merge_ini_data(defaults, overlay)
+  before_features = merge_ini_data(defaults, overlay)
+  merged = before_features
 
   features = set()
   priorities = {}
@@ -53,23 +54,23 @@ if __name__ == "__main__":
       priorities[feature] = priority
 
   # Manually enabled/disabled features
-  for param in overlay['parameters']:
+  for param in before_features['parameters']:
     section = param['values']['section']
     name = param['values']['name']
     value = param['values']['value']
 
-    if section == "POCKETNC_FEATURES":
+    if section == "POCKETNC_FEATURES" or section == "PENTA_FEATURES":
       feature = name.lower()
       if value == "1":
         features.add(feature)
       elif value == "0" and feature in features:
         features.remove(feature)
         
-
-  for feature in sorted(features, key=lambda f: priorities[f]):
+  for feature in sorted(features, key=lambda f: (float(priorities[f]), f)):
     dir = os.path.join(FEATURES_DIR, feature)
 
     feature_overlay_path = os.path.join(dir, "overlay.inc")
+    feature_prepend_path = os.path.join(dir, "prepend.inc")
     feature_append_path = os.path.join(dir, "append.inc")
     feature_startup_path = os.path.join(dir, "startup")
 
@@ -84,6 +85,10 @@ if __name__ == "__main__":
     if os.path.isfile(feature_append_path):
       feature_append = read_ini_data(feature_append_path)
       merged = append_ini_data(merged, feature_append)
+
+    if os.path.isfile(feature_prepend_path):
+      feature_prepend = read_ini_data(feature_prepend_path)
+      merged = append_ini_data(feature_prepend, merged)
 
     merged = merge_ini_data(merged, {
       'parameters': [

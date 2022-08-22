@@ -1,22 +1,24 @@
 loadusr -Wn hss_warmup /opt/pocketnc/Settings/features/high_speed_spindle/hss_warmup.py
 
+newinst or2 pause-hss-warmup-or-sensors.or
+addf pause-hss-warmup-or-sensors.or servo-thread
+
 net program-is-running hss_warmup.program_running
 net program-is-paused hss_warmup.program_paused
 
 net spindle-enable hss_warmup.spindle_on
 
-net hssWarmupAbort hss_warmup.abort
-net hssWarmupAbort pauseHssWarmupOrSensors.or.in0
+net hss-warmup-abort hss_warmup.abort
+net hss-warmup-abort pause-hss-warmup-or-sensors.or.in0
 
 loadusr -Wn hss_sensors /opt/pocketnc/Settings/features/high_speed_spindle/hss_sensors.py
 
 net spindle-enable hss_sensors.spindle_on
 
-net hssSensorsAbort hss_sensors.abort
-net hssSensorsAbort pauseHssWarmupOrSensors.or.in1
+net hss-sensors-abort hss_sensors.abort
+net hss-sensors-abort pause-hss-warmup-or-sensors.or.in1
 
-net hssAborted pauseHssWarmupOrSensors.or.out
-net hssAborted triggerEstopFromUserspace.or.in0
+net [PENTA]HIGH_SPEED_SPINDLE_ABORT_SIG pause-hss-warmup-or-sensors.or.out
 
 sets spindle-max-speed 50000
 

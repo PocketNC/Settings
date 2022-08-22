@@ -1,0 +1,5 @@
+# GPIO driver 
+newinst bb_gpio init
+
+addf bb_gpio.read                  servo-thread
+addf bb_gpio.write                 servo-thread

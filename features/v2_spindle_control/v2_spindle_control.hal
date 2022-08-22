@@ -1,0 +1,23 @@
+### Spindle ###
+
+# Start script to monitor spindle speed commands
+# so that it can issue i2c commands to change the
+# voltage.
+loadusr -Wn spindle_speed /opt/pocketnc/Settings/spindle_speed_voltage.py
+loadusr -Wn spindle_clock pin_speed [POCKETNC_PINS]SPINDLE_CLOCK_CHIP [POCKETNC_PINS]SPINDLE_CLOCK_LINE spindle_clock
+
+newinst bb_gpio spindle-dir-pin pin=[POCKETNC_PINS]SPINDLE_DIR_PIN direction=output
+newinst bb_gpio spindle-on-pin pin=[POCKETNC_PINS]SPINDLE_ON_PIN direction=output
+
+net spindle-enable spindle.0.on
+net spindle-enable spindle-on-pin.out
+
+net spindle-direction spindle.0.forward
+net spindle-direction spindle-dir-pin.out
+
+net spindle-clock-frequency spindle_speed.spindle_clock_frequency
+net spindle-clock-frequency spindle_clock.frequency
+
+net measured-spindle-speed spindle_speed.speed_measured
+
+sets spindle-max-speed 10000
