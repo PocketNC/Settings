@@ -10,6 +10,8 @@ net program-is-paused interlock.paused
 net interlock-open interlock-open-pin.in
 net interlock-open interlock.open
 
+net is-spindle-enabled interlock.spindle-on
+
 net [PENTA]INTERLOCK_OK_TO_RUN_SIG interlock.ok-to-run
 net [PENTA]INTERLOCK_FEED_HOLD_SIG interlock.feed-hold
 net [PENTA]INTERLOCK_INHIBIT_SPINDLE_SIG interlock.inhibit-spindle

@@ -74,7 +74,7 @@ class InterlockState:
   def should_machine_be_inhibited(self):
     return (
       (self.h[RUNNING_PIN] and self.h[OPEN_PIN]) or
-      (self.h[PAUSED_PIN] and self.h[SPINDLE_ON_PIN])
+      (self.h[PAUSED_PIN] and self.h[SPINDLE_ON_PIN] and self.h[OPEN_PIN])
     )
 
   @property
@@ -98,7 +98,7 @@ class InterlockState:
     self.h[FEED_HOLD_PIN] = False
     self.h[INHIBIT_FEED_PIN] = False
     self.h[INHIBIT_SPINDLE_PIN] = False
-    self.h[OK_TO_RUN] = False
+    self.h[OK_TO_RUN_PIN] = False
     self.stopped_spindle_at = time.time()
 
   def on_enter_NORMAL(self):
@@ -107,7 +107,7 @@ class InterlockState:
     self.h[FEED_HOLD_PIN] = False
     self.h[INHIBIT_FEED_PIN] = False
     self.h[INHIBIT_SPINDLE_PIN] = False
-    self.h[OK_TO_RUN] = True
+    self.h[OK_TO_RUN_PIN] = True
 
   def on_enter_INHIBITED(self):
     self.h[STATE_PIN] = self.state.value
@@ -115,7 +115,7 @@ class InterlockState:
     self.h[FEED_HOLD_PIN] = True
     self.h[INHIBIT_FEED_PIN] = True
     self.h[INHIBIT_SPINDLE_PIN] = True
-    self.h[OK_TO_RUN] = False
+    self.h[OK_TO_RUN_PIN] = False
 
   # Should transition to CLOSED state after being inhibited and the safty switch is closed
   def on_enter_CLOSED(self):
@@ -124,7 +124,7 @@ class InterlockState:
     self.h[FEED_HOLD_PIN] = False
     self.h[INHIBIT_FEED_PIN] = True
     self.h[INHIBIT_SPINDLE_PIN] = True
-    self.h[OK_TO_RUN] = True
+    self.h[OK_TO_RUN_PIN] = True
 
   def on_enter_SPIN_UP(self):
     self.h[STATE_PIN] = self.state.value
@@ -132,7 +132,7 @@ class InterlockState:
     self.h[FEED_HOLD_PIN] = False
     self.h[INHIBIT_FEED_PIN] = True
     self.h[INHIBIT_SPINDLE_PIN] = False
-    self.h[OK_TO_RUN] = True
+    self.h[OK_TO_RUN_PIN] = True
     self.spin_up_started_at = time.time()
 
 if __name__ == "__main__":

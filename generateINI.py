@@ -13,7 +13,7 @@ POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
 VERSION = getVersion()
 
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
-from ini import read_ini_data, merge_ini_data, write_ini_data, append_ini_data
+from ini import read_ini_data, merge_ini_data, write_ini_data, append_ini_data, rename_section
 INI_DEFAULT_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/versions/%s/PocketNC.ini" % VERSION)
 
 INI_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini")
@@ -25,7 +25,7 @@ if __name__ == "__main__":
   defaults = read_ini_data(INI_DEFAULT_FILE)
 
   if os.path.isfile(CALIBRATION_OVERLAY_FILE):
-    overlay = read_ini_data(CALIBRATION_OVERLAY_FILE)
+    overlay = rename_section(read_ini_data(CALIBRATION_OVERLAY_FILE), "POCKETNC_FEATURES", "PENTA_FEATURES")
   else:
     overlay = { 'parameters': [],
                 'sections': {} }
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     name = param['values']['name']
     value = param['values']['value']
 
-    if section == "POCKETNC_FEATURES" or section == "PENTA_FEATURES":
+    if section == "PENTA_FEATURES":
       feature = name.lower()
       if value == "1":
         features.add(feature)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
       'parameters': [
         {
             'values': {
-                'section': 'POCKETNC_FEATURES',
+                'section': 'PENTA_FEATURES',
                 'name': feature.upper(),
                 'value': "1",
                 'comment': '',
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         }
       ],
       'sections': {
-          'POCKETNC_FEATURES': { 'comment': '', 'help': '' }
+          'PENTA_FEATURES': { 'comment': '', 'help': '' }
       }
     });
 

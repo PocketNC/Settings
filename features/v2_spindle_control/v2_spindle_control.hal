@@ -20,4 +20,6 @@ net spindle-clock-frequency spindle_clock.frequency
 
 net measured-spindle-speed spindle_speed.speed_measured
 
+net commanded-spindle-speed spindle_speed.speed_in
+
 sets spindle-max-speed 10000
