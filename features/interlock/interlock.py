@@ -5,6 +5,9 @@ from enum import Enum, auto
 import time
 import traceback
 import hal
+import json
+import penta_messages
+import os
 
 class States(Enum):
   NORMAL = auto()
@@ -33,14 +36,33 @@ INHIBIT_FEED_PIN = "inhibit-feed"
 INHIBIT_SPINDLE_PIN = "inhibit-spindle"
 OK_TO_RUN_PIN = "ok-to-run"
 
+USER_MESSAGES_END_POINT = os.environ.get('USER_MESSAGES_END_POINT')
+messageClient = penta_messages.Client(USER_MESSAGES_END_POINT)
+
+def send_spindle_stopped_message():
+  messageClient.send(json.dumps({ 
+    "type": "warning", 
+    "kind": "interlock", 
+    "text": "Enclosure opened while spindle enabled. Spindle has been stopped.",
+    "time": time.strftime("%Y-%m-%d %H:%M:%S")
+  }))
+
+def send_inhibited_message():
+  messageClient.send(json.dumps({ 
+    "type": "warning", 
+    "kind": "interlock", 
+    "text": "Enclosure opened while program is running. Program has been paused.",
+    "time": time.strftime("%Y-%m-%d %H:%M:%S")
+  }))
+
 class InterlockState:
   def __init__(self, h):
     self.h = h
 
     self.machine = Machine(self, states=States, initial=States.NORMAL, ignore_invalid_triggers=True)
 
-    self.machine.add_transition(NEXT, States.NORMAL, States.STOP_SPINDLE, conditions="should_spindle_be_stopped")
-    self.machine.add_transition(NEXT, States.NORMAL, States.INHIBITED, conditions="should_machine_be_inhibited")
+    self.machine.add_transition(NEXT, States.NORMAL, States.STOP_SPINDLE, conditions="should_spindle_be_stopped", after=send_spindle_stopped_message)
+    self.machine.add_transition(NEXT, States.NORMAL, States.INHIBITED, conditions="should_machine_be_inhibited", after=send_inhibited_message)
 
     self.machine.add_transition(NEXT, States.STOP_SPINDLE, States.NORMAL, conditions="stopped_spindle_for_enough_time")
 
@@ -51,7 +73,7 @@ class InterlockState:
     self.machine.add_transition(NEXT, States.CLOSED, States.STOP_SPINDLE, conditions="machine_is_idle")
     self.machine.add_transition(NEXT, States.CLOSED, States.SPIN_UP, conditions="machine_is_running")
 
-    self.machine.add_transition(NEXT, States.SPIN_UP, States.INHIBITED, conditions="safety_switch_is_opened")
+    self.machine.add_transition(NEXT, States.SPIN_UP, States.INHIBITED, conditions="safety_switch_is_opened", after=send_inhibited_message)
     self.machine.add_transition(NEXT, States.SPIN_UP, States.NORMAL, conditions="spun_up_for_enough_time")
 
   @property

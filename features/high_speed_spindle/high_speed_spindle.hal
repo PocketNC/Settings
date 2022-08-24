@@ -12,15 +12,30 @@ net hss-warmup-abort hss_warmup.abort
 net hss-warmup-abort pause-hss-warmup-or-sensors.or.in0
 
 loadusr -Wn hss_sensors /opt/pocketnc/Settings/features/high_speed_spindle/hss_sensors.py
+loadusr -Wn hss_pause /opt/pocketnc/Settings/features/high_speed_spindle/hss_pause.py
 
-net spindle-enable hss_sensors.spindle_on
+net spindle-enable hss_pause.spindle-on
 
-net hss-sensors-abort hss_sensors.abort
+net hss-sensors-abort hss_pause.abort
 net hss-sensors-abort pause-hss-warmup-or-sensors.or.in1
 
-net [PENTA]HIGH_SPEED_SPINDLE_ABORT_SIG pause-hss-warmup-or-sensors.or.out
+net program-is-idle hss_pause.idle
+net program-is-running hss_pause.running
+net program-is-paused hss_pause.paused
+
+net cycle-start-triggered hss_pause.cycle-start
+
+net [PENTA]HSS_ABORT_SIG pause-hss-warmup-or-sensors.or.out
+net [PENTA]HSS_FEED_HOLD_SIG hss_pause.feed-hold
+net [PENTA]HSS_INHIBIT_FEED_SIG hss_pause.inhibit-feed
+net [PENTA]HSS_INHIBIT_SPINDLE_SIG hss_pause.inhibit-spindle
+net [PENTA]HSS_OK_TO_RUN_SIG hss_pause.ok-to-run
+net [PENTA]HSS_STOP_SPINDLE_SIG hss_pause.stop-spindle
 
 sets spindle-max-speed 50000
 
 net spindle-temperature hss_sensors.temperature
+net spindle-temperature hss_pause.temperature
+
 net spindle-pressure hss_sensors.pressure
+net spindle-pressure hss_pause.pressure
