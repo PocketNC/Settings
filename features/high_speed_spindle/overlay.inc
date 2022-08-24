@@ -18,3 +18,5 @@ HSS_INHIBIT_FEED_SIG=inhibit-feed-2
 HSS_INHIBIT_SPINDLE_SIG=inhibit-spindle-2
 HSS_FEED_HOLD_SIG=feed-hold-4
 HSS_OK_TO_RUN_SIG=ok-to-run-2
+HSS_ANALOG_INPUT=3
+HSS_MOTION_ANALOG_PIN=motion.analog-in-03

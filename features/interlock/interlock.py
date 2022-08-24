@@ -15,6 +15,7 @@ class States(Enum):
   INHIBITED = auto()
   CLOSED = auto()
   SPIN_UP = auto()
+  OPENED = auto()
 
 NEXT = "next"
 
@@ -63,6 +64,11 @@ class InterlockState:
 
     self.machine.add_transition(NEXT, States.NORMAL, States.STOP_SPINDLE, conditions="should_spindle_be_stopped", after=send_spindle_stopped_message)
     self.machine.add_transition(NEXT, States.NORMAL, States.INHIBITED, conditions="should_machine_be_inhibited", after=send_inhibited_message)
+    self.machine.add_transition(NEXT, States.NORMAL, States.OPENED, conditions="should_be_in_opened")
+
+    self.machine.add_transition(NEXT, States.OPENED, States.NORMAL, conditions="safety_switch_is_closed")
+    self.machine.add_transition(NEXT, States.OPENED, States.INHIBITED, conditions="should_machine_be_inhibited", after=send_inhibited_message) # not sure if this can happen, but just in case
+    self.machine.add_transition(NEXT, States.OPENED, States.STOP_SPINDLE, conditions="should_spindle_be_stopped", after=send_spindle_stopped_message)
 
     self.machine.add_transition(NEXT, States.STOP_SPINDLE, States.NORMAL, conditions="stopped_spindle_for_enough_time")
 
@@ -75,6 +81,10 @@ class InterlockState:
 
     self.machine.add_transition(NEXT, States.SPIN_UP, States.INHIBITED, conditions="safety_switch_is_opened", after=send_inhibited_message)
     self.machine.add_transition(NEXT, States.SPIN_UP, States.NORMAL, conditions="spun_up_for_enough_time")
+
+  @property
+  def should_be_in_opened(self):
+    return self.h[IDLE_PIN] and self.h[OPEN_PIN]
 
   @property
   def machine_is_running(self):
@@ -130,6 +140,14 @@ class InterlockState:
     self.h[INHIBIT_FEED_PIN] = False
     self.h[INHIBIT_SPINDLE_PIN] = False
     self.h[OK_TO_RUN_PIN] = True
+
+  def on_enter_OPENED(self):
+    self.h[STATE_PIN] = self.state.value
+    self.h[STOP_SPINDLE_PIN] = False
+    self.h[FEED_HOLD_PIN] = False
+    self.h[INHIBIT_FEED_PIN] = False
+    self.h[INHIBIT_SPINDLE_PIN] = True
+    self.h[OK_TO_RUN_PIN] = False
 
   def on_enter_INHIBITED(self):
     self.h[STATE_PIN] = self.state.value
