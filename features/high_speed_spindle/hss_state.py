@@ -313,11 +313,11 @@ class HSSState:
     return self.h[PAUSED_PIN] or self.h[IDLE_PIN]
 
   @property
-  def spindle_command_on_and_full_warm_up_needed(self):
+  def spindle_commanded_on_and_full_warm_up_needed(self):
     return self.h[SPINDLE_COMMANDED_ON_PIN] and self.full_warm_up_needed
 
   @property
-  def spindle_command_on_and_short_warm_up_needed(self):
+  def spindle_commanded_on_and_short_warm_up_needed(self):
     return self.h[SPINDLE_COMMANDED_ON_PIN] and self.short_warm_up_needed
 
   def send_warm_up_message_and_reset_run_warm_up(self):
