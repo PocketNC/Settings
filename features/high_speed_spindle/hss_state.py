@@ -341,7 +341,7 @@ class HSSState:
     self.h[RUN_WARM_UP_PIN] = 0
 
   def reset_complete_warm_up(self):
-    self.h[COMPLETE_WARM_UP_PIN] = 0
+    self.h[COMPLETED_WARM_UP_PIN] = 0
 
   @property
   def should_run_warm_up(self):
