@@ -98,6 +98,14 @@ NEXT = "next"
 USER_MESSAGES_END_POINT = os.environ.get('USER_MESSAGES_END_POINT')
 messageClient = penta_messages.Client(USER_MESSAGES_END_POINT)
 
+def send_completed_warm_up_message():
+  messageClient.send(json.dumps({ 
+    "type": "info", 
+    "kind": "warmup_completed", 
+    "text": "The spindle warm up process completed.",
+    "time": time.strftime("%Y-%m-%d %H:%M:%S")
+  }))
+
 def send_warm_up_interrupted_message():
   messageClient.send(json.dumps({ 
     "type": "error", 
@@ -271,7 +279,7 @@ class HSSState:
     self.machine.add_transition(NEXT, States.PERFORMING_WARM_UP, States.ABORT, conditions="pressure_low", after=send_pressure_low_warm_up_message)
     self.machine.add_transition(NEXT, States.PERFORMING_WARM_UP, States.ABORT, conditions="temperature_low", after=send_temperature_low_warm_up_message)
     self.machine.add_transition(NEXT, States.PERFORMING_WARM_UP, States.ABORT, conditions="temperature_high", after=send_temperature_high_warm_up_message)
-    self.machine.add_transition(NEXT, States.PERFORMING_WARM_UP, States.NORMAL, conditions="completed_warm_up", after="send_completed_warm_up_and_reset")
+    self.machine.add_transition(NEXT, States.PERFORMING_WARM_UP, States.NORMAL, conditions="completed_warm_up", after="send_completed_and_reset")
 
     self.machine.add_transition(NEXT, States.INHIBITED, States.ABORT, conditions="temperature_not_detected", after=send_temperature_not_detected)
     self.machine.add_transition(NEXT, States.INHIBITED, States.ABORT, conditions="pressure_not_detected", after=send_pressure_not_detected)
