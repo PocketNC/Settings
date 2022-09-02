@@ -40,6 +40,9 @@ O<tool-probe> SUB
 #<_ToolChangeA> =          0.0  ( machine A coordinate to pause at for manual tool changing )
 (-------------------------------------------------------------------------------------------------------)
 
+; See SOFT-967 for why this is necessary
+#<backupFeed> = #<_feed>
+#<backupMotionMode> = #<_motion_mode>
 M70                                            ( save current modal state )
 
 M429
@@ -83,6 +86,8 @@ G53 G0 Y[#5182]                     ( return to where we were in X Y A)
 G53 G0 X[#5181]                      ( return to where we were in X Y A)
 G53 G1 F[#<_TravelFeed>] Z[#5183]            ( return to where we were in Z )
 M72                                          ( restore modal state )
+G[ #<backupMotionMode> / 10 ]
+F#<backupFeed>
 
 O<tool-probe> ENDSUB
 M2
