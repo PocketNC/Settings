@@ -6,9 +6,9 @@ o100 if [ #<_tool_offset> NE 1 ]
   (abort,You must have a tool length offset in place)
 o100 endif
 
-o200 if [ ABS [ #<_c> ] GT .000001 ]
-  (abort,C must be at 0)
-o200 endif
+;o200 if [ ABS [ #<_c> ] GT .000001 ]
+;  (abort,C must be at 0)
+;o200 endif
 
 #<ballDiameter> = #1
 #<probeDiameter> = #2
@@ -67,9 +67,11 @@ o300 while [ #<measurement> LT #<numMeasurements> ]
   #<measurement> = [ #<measurement> + 1 ]
 o300 endwhile
 
-(debug,C Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)
-(debug,C Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
-(debug,C Diameter #<_penta_circle_diameter>)
+(logappend,c-axis.txt)
+(log,C Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)
+(log,C Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
+(log,C Diameter #<_penta_circle_diameter>)
+(logclose)
 
 G53 G0 Z0
 G0 C0

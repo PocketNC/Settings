@@ -528,7 +528,7 @@ sets cutting-fluid-pressure 1
 
 newinst oneshot flood-coolant-air-blast-oneshot 
 addf flood-coolant-air-blast-oneshot.funct servo-thread
-setp flood-coolant-air-blast-oneshot.width 1
+setp flood-coolant-air-blast-oneshot.width 0
 setp flood-coolant-air-blast-oneshot.rising 0
 setp flood-coolant-air-blast-oneshot.falling 1
 
@@ -538,6 +538,9 @@ net flood-coolant flood-coolant-air-blast-oneshot.in
 
 net air-blast flood-coolant-air-blast-oneshot.out
 net air-blast [SOLO_PINS]AIR_BLAST_PIN
+
+net cutting-fluid-on halui.flood.on
+net cutting-fluid-off halui.flood.off
 
 ####################################################
 # Tool Changer
