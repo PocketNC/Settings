@@ -1,0 +1,27 @@
+;v2-calib-characterize-x
+o<v2-calib-characterize-x> sub
+  g21
+  #1 = 63.5
+  M66  E0 L0
+  g0 z0
+  g0 y63.5a0
+  g0 x63.5
+  M66  E0 L0
+
+  o100 while [#1 GT -50.8]
+    M66  E0 L0
+    g0 x[#1]
+    M66  E0 L0
+    o<v2_calib_probe_x> call [#1][0]
+    M66  E0 L0
+    #1 = [#1 - 25]
+    M66  E0 L0
+  o100 endwhile
+  
+  (perform final probe at limit of travel)
+  g0 x-50.8
+  M66  E0 L0
+  o<v2_calib_probe_x> call [-50.8][0]
+
+o<v2-calib-characterize-x> endsub
+M2

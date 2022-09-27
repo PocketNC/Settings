@@ -1,0 +1,27 @@
+;v2-calib-zero-b
+o<v2-calib-zero-b> sub
+  g21
+  g0 z0
+  #<yPos> = -63
+  g0 y[#<yPos>]
+
+  #<bAngle> = 0
+  #<bAngleMeas> = 0
+  #<bErrAbs> = 0
+  o100 do
+    g0 b[#<bAngle>]
+    M66 E0 L0
+    o<v2_calib_find_pos_b> call [#<yPos>] [#<bAngle>]
+    #<bAngleMeas> = [#<_value>]
+
+    o101 if [#<bAngleMeas> GT 0]
+      #<bErrAbs> = [#<bAngleMeas>]
+    o101 else
+      #<bErrAbs> = [0 - #<bAngleMeas>]
+    o101 endif
+    #<bAngle> = [#<bAngle> - #<bAngleMeas>]
+    
+  o100 while [#<bErrAbs> GT 0.003]
+
+o<v2-calib-zero-b> endsub [#<bAngle>]
+M2

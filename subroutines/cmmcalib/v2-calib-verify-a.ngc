@@ -1,0 +1,24 @@
+;v2-calib-verify-a
+o<v2-calib-verify-a> sub
+  g21
+  g0 y-63 a-25
+  
+  #1 = [-25]
+
+  o100 while [#1 LT 136]
+    M66  E0 L0
+    g0 a[#1]
+    M66  E0 L0
+    o<v2_calib_verify_probe_a> call [-63] [#1]
+    M66  E0 L0
+    #1 = [#1 + 5]
+    M66  E0 L0
+  o100 endwhile
+
+  M66  E0 L0
+  o<cmm_go_to_clearance_y> call
+  M66  E0 L0
+  o<cmm_go_to_clearance_z> call
+
+o<v2-calib-verify-a> endsub
+M2

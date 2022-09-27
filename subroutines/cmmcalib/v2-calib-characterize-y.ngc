@@ -1,0 +1,26 @@
+;v2-calib-characterize-y
+o<v2-calib-characterize-y> sub
+  g21
+  #1 = 64.5
+  M66  E0 L0
+  g0 z0
+  g0 y64.5a0b0
+  M66  E0 L0
+
+  o100 while [#1 GT -63.5]
+    M66  E0 L0
+    g0 y[#1]
+    M66  E0 L0
+    o<v2_calib_probe_y> call [#1]
+    M66  E0 L0
+    #1 = [#1 - 25]
+    M66  E0 L0
+  o100 endwhile
+
+  (perform final probe at limit of travel)
+  g0 y-63.5
+  M66  E0 L0
+  o<v2_calib_probe_y> call [-63.5]
+
+o<v2-calib-characterize-y> endsub
+M2

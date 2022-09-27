@@ -8,11 +8,17 @@ import oword
 import namedparams
 import probe
 import metrology
+sys.path.append("/opt/calib/ippclient")
+import ipp_tests
+sys.path.append("/opt/calib/cmmcalib")
+import calib
 
 reload(oword)
 reload(metrology)
 reload(probe)
 reload(namedparams)
+reload(ipp_tests)
+reload(calib)
 
 def __init__(self):
 # handle any per-module initialisation tasks here
