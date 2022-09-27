@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if grep -Fxq "BeagleBoard.org BeagleBone AI" /proc/device-tree/model 
-then
-  echo 1
-else
-  echo 0
-fi

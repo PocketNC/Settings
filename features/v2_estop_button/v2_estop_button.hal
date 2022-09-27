@@ -1,0 +1,28 @@
+# E-Stop button restarts E-Stop when in E-Stop
+# E-Stop button triggers an E-Stop when not in E-Stop
+
+newinst bb_gpio estop-button-pin pin=[POCKETNC_PINS]ESTOP_BUTTON_PIN direction=input
+setp estop-button-pin.invert 1
+
+newinst and2 estop-button-while-estopped.and
+addf estop-button-while-estopped.and servo-thread
+
+newinst and2 estop-while-not-estopped.and
+addf estop-while-not-estopped.and servo-thread
+
+newinst oneshot estop-button.oneshot
+setp estop-button.oneshot.width 0.1
+addf estop-button.oneshot servo-thread
+
+net estop-button-triggered estop-button-pin.in
+net estop-button-triggered estop-button.oneshot.in
+
+net estop-button-signal estop-button.oneshot.out
+net estop-button-signal estop-while-not-estopped.and.in0
+net estop-button-signal estop-button-while-estopped.and.in0
+
+net estop-is-not-activated estop-while-not-estopped.and.in1
+net estop-is-activated estop-button-while-estopped.and.in1
+
+net [PENTA]ESTOP_BUTTON_ESTOP_SIG estop-while-not-estopped.and.out
+net [PENTA]ESTOP_BUTTON_RESET_ESTOP_SIG estop-button-while-estopped.and.out

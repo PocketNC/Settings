@@ -1,0 +1,3 @@
+# Loop back estop
+net estop-loop iocontrol.0.user-enable-out
+net estop-loop iocontrol.0.emc-enable-in

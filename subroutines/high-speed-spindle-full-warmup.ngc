@@ -1,9 +1,5 @@
 O<high-speed-spindle-full-warmup> SUB
-(debug, More than 1 week since spindle last used, running full warm up routine, approx. 50 minutes)
 M70
-
-M150
-M152
 
 M3 S15000
 G4 P900
@@ -13,11 +9,6 @@ M3 S40000
 G4 P600
 M3 S50000
 G4 P900
-
-M151
-M153
-M154
-M5
 
 M72
 O<high-speed-spindle-full-warmup> ENDSUB

@@ -1,20 +1,11 @@
 #!/usr/bin/python3
 
-import hal
-import os
-import datetime
 import time
+import hal
 from i2c import I2C
-
-POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
-DETECT_SCRIPT = os.path.join(POCKETNC_DIRECTORY, "Settings/features/high_speed_spindle/detect_hss_mprls.py")
 
 # MPRLS is pressure sensor
 MPRLS_I2CADDR = 0x18
-# Upper end of the sensors scale in MPA (25 PSI)
-MPRLS_SCALE_MAX = 0.172369
-# Minimum pressure in MPA below which machine will E-Stop (equals 16 PSI)
-LOW_PRESSURE_CUTOFF = 0.110316
 
 # The MCP9808 has a default I2C address of 0x18, we set the address to 0x19 using the A0 address pin
 MCP9808_I2CADDR = 0x19
@@ -22,11 +13,6 @@ MCP9808_REG_CONFIG = 0x01
 MCP9808_REG_CONFIG_SHUTDOWN = 0x0100
 MCP9808_REG_AMBIENT_TEMP = 0x05
 MCP9808_REG_RESOLUTION = 0x08
-# Spindle min operating temp is 0C, lets put out cutoff at 1 to err on safe side
-LOW_TEMP_CUTOFF = 1
-# Spindle max operating temp is 40C, put cutoff at 39
-# Update: after some testing, have decided to move it to 48C.
-HIGH_TEMP_CUTOFF = 48
 
 #Value returned by sensor read methods if the read fails
 SENSOR_READ_FAIL_VALUE = -999
@@ -90,67 +76,26 @@ def readTemperature():
   except:
     return SENSOR_READ_FAIL_VALUE
 
-print("Initializing hss_sensors!")
-h = hal.component("hss_sensors")
+# outputs
+TEMPERATURE_PIN = "temperature"
+PRESSURE_PIN = "pressure"
 
-h.newpin("spindle_on", hal.HAL_BIT, hal.HAL_IN)
+if __name__ == "__main__":
+  h = hal.component('hss_sensors')
+  h.newpin(TEMPERATURE_PIN, hal.HAL_FLOAT, hal.HAL_OUT)
+  h.newpin(PRESSURE_PIN, hal.HAL_FLOAT, hal.HAL_OUT)
 
-# set to true when an E Stop should occur
-h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
-h['abort'] = False
+  h[TEMPERATURE_PIN] = SENSOR_READ_FAIL_VALUE
+  h[PRESSURE_PIN] = SENSOR_READ_FAIL_VALUE
 
-h.newpin('pressure', hal.HAL_FLOAT, hal.HAL_OUT)
-h['pressure'] = readPressure()
-h.newpin('p_detected', hal.HAL_BIT, hal.HAL_OUT)
-h['p_detected'] = (h['pressure'] != SENSOR_READ_FAIL_VALUE)
-h.newpin('temperature', hal.HAL_FLOAT, hal.HAL_OUT)
-h['temperature'] = readTemperature()
-h.newpin('t_detected', hal.HAL_BIT, hal.HAL_OUT)
-h['t_detected'] = (h['temperature'] != SENSOR_READ_FAIL_VALUE)
+  h.ready()
 
-# set to true if aborting due to low pressure
-h.newpin('p_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['p_abort'] = False
-# set to true if aborting because the pressure sensor is not detected
-h.newpin('p_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['p_detect_abort'] = False
-# set to true if aborting due to temperature reading outside bounds
-h.newpin('t_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['t_abort'] = False
-# set to true if aborting because the temperature sensor is not detected
-h.newpin('t_detect_abort', hal.HAL_BIT, hal.HAL_OUT)
-h['t_detect_abort'] = False
+  try:
+    while True:
+      h[PRESSURE_PIN] = readPressure()
+      h[TEMPERATURE_PIN] = readTemperature()
 
-h.ready()
+      time.sleep(1)
 
-abort = False
-
-
-try:
-  while True:
-    h['pressure'] = readPressure()
-    h['p_detected'] = (h['pressure'] != SENSOR_READ_FAIL_VALUE)
-    h['temperature'] = readTemperature()
-    h['t_detected'] = (h['temperature'] != SENSOR_READ_FAIL_VALUE)
-    abort = False
-    if h['spindle_on']:
-      if not h['p_detected']:
-        h['p_detect_abort'] = True
-        abort = True
-      elif h['pressure'] < LOW_PRESSURE_CUTOFF:
-        h['p_abort'] = True 
-        abort = True    
-      
-      if not h['t_detected']:
-        h['t_detect_abort'] = True
-        abort = True
-      elif h['temperature']  < LOW_TEMP_CUTOFF or h['temperature']  > HIGH_TEMP_CUTOFF:
-        h['t_abort'] = True 
-        abort = True
-    
-    h['abort'] = abort
-
-    time.sleep(1)
-
-except KeyboardInterrupt:
-  raise SystemExit
+  except KeyboardInterrupt:
+    raise SystemExit

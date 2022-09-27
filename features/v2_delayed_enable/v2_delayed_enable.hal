@@ -1,0 +1,11 @@
+# Machine power
+newinst bb_gpio enable-pin pin=[POCKETNC_PINS]ENABLE_PIN direction=output
+
+newinst timedelay enable.timedelay
+addf enable.timedelay servo-thread
+
+net estop-is-not-activated enable.timedelay.in
+
+net delayed-enable enable.timedelay.out
+net delayed-enable halui.machine.on
+net delayed-enable enable-pin.out
