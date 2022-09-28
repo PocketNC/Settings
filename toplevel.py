@@ -8,9 +8,7 @@ import oword
 import namedparams
 import probe
 import metrology
-sys.path.append("/opt/calib/ippclient")
 import ipp_tests
-sys.path.append("/opt/calib/cmmcalib")
 import calib
 
 reload(oword)

@@ -6,9 +6,7 @@ import importlib
 
 import asyncio
 import sys
-sys.path.append("/opt/calib/ippclient")
 import ipp_tests
-sys.path.append("/opt/calib/cmmcalib")
 import calib
 
 
