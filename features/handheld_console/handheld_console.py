@@ -1,5 +1,17 @@
 #!/usr/bin/python3
 
+#********************************************************************
+# Description:  Handheld Console
+#               This file, 'handheld_console.py', is a HAL component that 
+#               interfaces with a Made With CNC Handheld Console via USB.
+#
+# Author: Chris Myers <chris.myers@madewithcnc.com>
+# License: GPL Version 2
+#    
+# Copyright (c) 2022 Made With CNC All rights reserved.
+#
+#*******************************************************************
+
 import hal
 import linuxcnc
 import evdev
