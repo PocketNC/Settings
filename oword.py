@@ -488,6 +488,27 @@ def v2_calib_load_stage_probe_top_plane(self):
   except Exception as e:
     return str(e)
 
+def v2_calib_load_stage_homing_x(self):
+  try:
+    print('v2_calib_load_stage_homing_x')
+    calib.CalibManager.getInstance().load_stage_progress(calib.Stages.HOMING_X)
+  except Exception as e:
+    return str(e)
+
+def v2_calib_load_stage_homing_y(self):
+  try:
+    print('v2_calib_load_stage_homing_y')
+    calib.CalibManager.getInstance().load_stage_progress(calib.Stages.HOMING_Y)
+  except Exception as e:
+    return str(e)
+
+def v2_calib_load_stage_homing_z(self):
+  try:
+    print('v2_calib_load_stage_homing_z')
+    calib.CalibManager.getInstance().load_stage_progress(calib.Stages.HOMING_Z)
+  except Exception as e:
+    return str(e)
+
 def v2_calib_load_stage_characterize_x(self):
   try:
     print('v2_calib_load_stage_characterize_x')
