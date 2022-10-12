@@ -66,7 +66,7 @@ if __name__ == "__main__":
       elif value == "0" and feature in features:
         features.remove(feature)
         
-  for feature in sorted(features, key=lambda f: (float(priorities[f]), f)):
+  for feature in sorted(features, key=lambda f: (float(priorities.get(f, "1000")), f)):
     dir = os.path.join(FEATURES_DIR, feature)
 
     feature_overlay_path = os.path.join(dir, "overlay.inc")
