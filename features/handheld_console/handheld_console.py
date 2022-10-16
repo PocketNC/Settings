@@ -29,10 +29,7 @@ POCKETNC_INI_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini")
 
 LOOP_SLEEP = 50 / 1000 # 50 milliseconds
 
-ENCODER_COUNT_DIVIDER  = 4 
-MAX_ENCODER_DELTA      = 65530
-ENCODER_OVERFLOW_RESET = 2 ** 16 + ENCODER_COUNT_DIVIDER
-JOG_DIVISOR            = 4
+MAX_ENCODER_VALUE = 65535
 
 ABS_HAL_MAX_VALUE = 2.0
 ABS_DEADZONE      = 0.05
@@ -44,7 +41,7 @@ lcncStatus = None
 max_velocity = None
 # Reference to the evdev Input Device for the HID Controller
 hidConsole = None
-last_jog_count = None
+last_jog_count = 0
 
 lastDeviceCheck = datetime.datetime.utcnow()
 
@@ -132,8 +129,6 @@ def initHAL():
   halComponent.newpin('feed-hold', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('coolant', hal.HAL_BIT, hal.HAL_OUT)
 
-  #halComponent.newpin('is-idle', hal.HAL_BIT, hal.HAL_IN)
-  halComponent.newpin('joint-mode', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('selected-jog-incr', hal.HAL_FLOAT, hal.HAL_OUT)
   halComponent.newpin('joint-selected-count', hal.HAL_S32, hal.HAL_OUT)
   halComponent.newpin('joint-select-x', hal.HAL_BIT, hal.HAL_OUT)
@@ -193,7 +188,6 @@ def processOverrideEvent(event):
   # We have to scale the value up to make it an INT
   # the HAL sets the Scale to .001
   position = position / 0.001
-
   updateFunction(position)
 
 
@@ -203,30 +197,33 @@ def processJogEvent(event):
   if not okToJog():
     return
 
+  if lcncStatus.task_mode != linuxcnc.MODE_MANUAL:
+    lcncCommand.mode(linuxcnc.MODE_MANUAL)
+    lcncCommand.wait_complete()
+    lcncStatus.poll()
+
+  if lcncStatus.motion_mode == linuxcnc.TRAJ_MODE_TELEOP:
+    lcncCommand.teleop_enable(0)
+    lcncCommand.wait_complete()
+
   delta = 0
   jogEvendId = ecodes.ABS[event.event.code]
   updateFunction = jogEvents[jogEvendId]
   inputValue = event.event.value
 
-  setPinValue('joint-mode', 1)
-
   currentCount = halComponent['joint-selected-count']
 
-  if (last_jog_count is None):
-    last_jog_count = inputValue
-  else:
-    delta = inputValue - last_jog_count
+  delta = inputValue - last_jog_count
 
-    if(delta >= MAX_ENCODER_DELTA):
-        delta = delta - ENCODER_OVERFLOW_RESET
-    elif(delta <= -(MAX_ENCODER_DELTA)):
-        delta = delta + ENCODER_OVERFLOW_RESET
+  if(delta >= MAX_ENCODER_VALUE):
+      delta = -1
+  elif(delta <= -(MAX_ENCODER_VALUE)):
+      delta = 1
 
-    last_jog_count = inputValue
-    delta = delta / JOG_DIVISOR
-    updateFunction(currentCount + delta)
+  last_jog_count = inputValue
+  updateFunction(currentCount + delta)
 
-  setPinValue('joint-mode', 0)
+  
 
 if __name__ == "__main__":
   halComponent = hal.component("handheld_console")
@@ -252,8 +249,10 @@ if __name__ == "__main__":
           hidConsole =  deviceSearch()
           if hidConsole is not None:
               setPinValue("console-connected", 1)
-              last_jog_count = None
-              # Force a fresh report to be sent
+              last_jog_count = 0
+              # Toggle the NUM Lock LED to force a fresh report to be sent
+              hidConsole.set_led(ecodes.LED_NUML, 1)
+              hidConsole.set_led(ecodes.LED_NUML, 0)
               hidConsole.set_led(ecodes.LED_NUML, 1)
               hidConsole.set_led(ecodes.LED_NUML, 0)
 
@@ -286,7 +285,7 @@ if __name__ == "__main__":
 
         except Exception as e:
           hidConsole = None
-          last_jog_count = None
+          last_jog_count = 0
           setPinValue("console-connected", 0)
 
       time.sleep(LOOP_SLEEP)

@@ -26,7 +26,6 @@ net [HANDHELD_CONSOLE]BUTTON_3_SIGNAL        handheld_console.program-stop
 # Jogging
 #   Velocity Mode 0 is absolute mode, 1 discreet encoder increment = 1 axis movement
 #   Joint and Axis pins need to be incremented inorder to affect a move
-net console-joint-mode           handheld_console.joint-mode          =>  halui.mode.joint
 
 #  X Axis
 setp  joint.0.jog-vel-mode 0
