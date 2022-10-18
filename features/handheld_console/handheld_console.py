@@ -96,7 +96,7 @@ buttonEvents = {
 def selectAxis(value):
   # loop through all joints/axis and sent them
   # to unselected
-  for joint in range(1, 5):
+  for joint in range(1, 6):
     axis = selectedAxisMap[joint]
     setPinValue(f'joint-select-{axis}', 0)
   # hand held console selected 0 == no axis  
