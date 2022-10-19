@@ -26,33 +26,35 @@ net [HANDHELD_CONSOLE]BUTTON_3_SIGNAL        handheld_console.program-stop
 # Jogging
 #   Velocity Mode 0 is absolute mode, 1 discreet encoder increment = 1 axis movement
 #   Joint and Axis pins need to be incremented inorder to affect a move
+setp handheld_console.linear-jog-incr-base [HANDHELD_CONSOLE]LINEAR_JOG_INCR_BASE        
+setp handheld_console.rotary-jog-incr-base [HANDHELD_CONSOLE]ROTARY_JOG_INCR_BASE        
 
 #  X Axis
 setp  joint.0.jog-vel-mode 0
-net console-joint-x-select       handheld_console.joint-select-x       =>  joint.0.jog-enable
-net console-jog-incr             handheld_console.selected-jog-incr    =>  joint.0.jog-scale 
-net console-joint-selected-count handheld_console.joint-selected-count =>  joint.0.jog-counts
+net console-joint-x-select       handheld_console.joint-select-x              =>  joint.0.jog-enable
+net console-linear-jog-incr      handheld_console.selected-linear-jog-incr    =>  joint.0.jog-scale 
+net console-joint-selected-count handheld_console.joint-selected-count        =>  joint.0.jog-counts
 
 #  Y Axis
 setp  joint.1.jog-vel-mode 0
-net console-joint-y-select       handheld_console.joint-select-y       =>  joint.1.jog-enable
-net console-jog-incr             handheld_console.selected-jog-incr    =>  joint.1.jog-scale 
-net console-joint-selected-count handheld_console.joint-selected-count =>  joint.1.jog-counts
+net console-joint-y-select       handheld_console.joint-select-y              =>  joint.1.jog-enable
+net console-linear-jog-incr      handheld_console.selected-linear-jog-incr    =>  joint.1.jog-scale 
+net console-joint-selected-count handheld_console.joint-selected-count        =>  joint.1.jog-counts
 
 #  Z Axis
 setp  joint.2.jog-vel-mode 0
-net console-joint-z-select       handheld_console.joint-select-z       =>  joint.2.jog-enable
-net console-jog-incr             handheld_console.selected-jog-incr    =>  joint.2.jog-scale 
-net console-joint-selected-count handheld_console.joint-selected-count =>  joint.2.jog-counts
-
-#  A Axis
-setp  joint.3.jog-vel-mode 0
-net console-joint-a-select       handheld_console.joint-select-a       =>  joint.3.jog-enable
-net console-jog-incr             handheld_console.selected-jog-incr    =>  joint.3.jog-scale 
-net console-joint-selected-count handheld_console.joint-selected-count =>  joint.3.jog-counts
-
-#  B Axis
-setp  joint.4.jog-vel-mode 0
-net console-joint-b-select       handheld_console.joint-select-b       =>  joint.4.jog-enable
-net console-jog-incr             handheld_console.selected-jog-incr    =>  joint.4.jog-scale 
-net console-joint-selected-count handheld_console.joint-selected-count =>  joint.4.jog-counts
+net console-joint-z-select       handheld_console.joint-select-z              =>  joint.2.jog-enable
+net console-linear-jog-incr      handheld_console.selected-linear-jog-incr    =>  joint.2.jog-scale 
+net console-joint-selected-count handheld_console.joint-selected-count        =>  joint.2.jog-counts
+       
+#  A Axis       
+setp  joint.3.jog-vel-mode 0       
+net console-joint-r1-select      handheld_console.joint-select-r1             =>  joint.3.jog-enable
+net console-rotary-jog-incr      handheld_console.selected-rotary-jog-incr    =>  joint.3.jog-scale 
+net console-joint-selected-count handheld_console.joint-selected-count        =>  joint.3.jog-counts
+       
+#  B Axis       
+setp  joint.4.jog-vel-mode 0       
+net console-joint-r2-select      handheld_console.joint-select-r2             =>  joint.4.jog-enable
+net console-rotary-jog-incr      handheld_console.selected-rotary-jog-incr    =>  joint.4.jog-scale 
+net console-joint-selected-count handheld_console.joint-selected-count        =>  joint.4.jog-counts

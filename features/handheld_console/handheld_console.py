@@ -51,24 +51,14 @@ selectedAxisMap = {
   1: 'x',
   2: 'y',
   3: 'z',
-  4: 'a',
-  5: 'b',
+  4: 'r1',
+  5: 'r2',
 }
 
-imperialJogScale = {
-  0: 0.0001,
-  1: 0.001,
-  2: 0.01
-}
-
-# TODO: Determine machine units
-# ini does not appear to get updated when
-# display units is changed on the client
-# Look for units in the existing signals
-metricJogScale = {
-  1: 0.1,
-  2: 0.01,
-  3: 0.001
+jogScale = {
+  0: 100,
+  1: 10,
+  2: 1
 }
 
 overrideEvents = {
@@ -78,7 +68,7 @@ overrideEvents = {
 }
 
 selectEvents = {
-    'ABS_RX':lambda value: selectAxis(value), # axis-select
+    'ABS_RX':lambda value: selectAxis(value),         # axis-select
     'ABS_RY':lambda value: selectJogIncrement(value), # step-select
 }
 
@@ -107,8 +97,16 @@ def selectAxis(value):
     setPinValue(f'joint-select-{axis}', 1)
 
 def selectJogIncrement(value):
-  incr = imperialJogScale[value]
-  setPinValue('selected-jog-incr', incr)
+  selectedScale = jogScale[value]
+
+  linearJogIncrementBase = halComponent["linear-jog-incr-base"]
+  rotaryJogIncrementBase = halComponent["rotary-jog-incr-base"]
+  
+  linearIncrement = linearJogIncrementBase / selectedScale
+  rotaryIncrement = rotaryJogIncrementBase / selectedScale
+
+  setPinValue('selected-linear-jog-incr', linearIncrement)
+  setPinValue('selected-rotary-jog-incr', rotaryIncrement)
 
 def setPinValue(pinName, value):
   halComponent[pinName] = value
@@ -129,13 +127,17 @@ def initHAL():
   halComponent.newpin('feed-hold', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('coolant', hal.HAL_BIT, hal.HAL_OUT)
 
-  halComponent.newpin('selected-jog-incr', hal.HAL_FLOAT, hal.HAL_OUT)
+  halComponent.newpin('linear-jog-incr-base', hal.HAL_FLOAT, hal.HAL_IN)
+  halComponent.newpin('rotary-jog-incr-base', hal.HAL_FLOAT, hal.HAL_IN)
+
+  halComponent.newpin('selected-linear-jog-incr', hal.HAL_FLOAT, hal.HAL_OUT)
+  halComponent.newpin('selected-rotary-jog-incr', hal.HAL_FLOAT, hal.HAL_OUT)
   halComponent.newpin('joint-selected-count', hal.HAL_S32, hal.HAL_OUT)
   halComponent.newpin('joint-select-x', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('joint-select-y', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('joint-select-z', hal.HAL_BIT, hal.HAL_OUT)
-  halComponent.newpin('joint-select-a', hal.HAL_BIT, hal.HAL_OUT)
-  halComponent.newpin('joint-select-b', hal.HAL_BIT, hal.HAL_OUT)
+  halComponent.newpin('joint-select-r1', hal.HAL_BIT, hal.HAL_OUT)
+  halComponent.newpin('joint-select-r2', hal.HAL_BIT, hal.HAL_OUT)
 
 
 def hasAbsWheel(device):
@@ -153,19 +155,37 @@ def deviceSearch():
 def mapRange(value, input_min, input_max, output_min, output_max):
   return (value - input_min) * (output_max - output_min) / (input_max - input_min) + output_min;
 
-def processSelectevent(event):
-  selectEvendId = ecodes.ABS[event.event.code]
+# If the hal component is loaded after the device is connected
+# events are supressed unless a value on the console is changed
+#
+# manually pull all relevant axis values from the device
+# and process their values
+def syncInitialState():
+  feedOverride = hidConsole.absinfo(ecodes.ABS_X)
+  processOverrideEvent('ABS_X', feedOverride.value)
+
+  spindleOverride = hidConsole.absinfo(ecodes.ABS_Y)
+  processOverrideEvent('ABS_Y', spindleOverride.value)
+
+  velocityOveride = hidConsole.absinfo(ecodes.ABS_Z)
+  processOverrideEvent('ABS_Z', velocityOveride.value)
+
+  selectedIncrement = hidConsole.absinfo(ecodes.ABS_RY)
+  processSelectEvent('ABS_RY', selectedIncrement.value)
+
+  selectedAxis = hidConsole.absinfo(ecodes.ABS_RX)
+  processSelectEvent('ABS_RX', selectedAxis.value)
+
+def processSelectEvent(selectEvendId, inputValue):
   updateFunction = selectEvents[selectEvendId]
-  updateFunction(event.event.value)
+  updateFunction(inputValue)
 
 def processButtonEvent(buttonEventId, keyPressed):
   updateFunction = buttonEvents[buttonEventId]
   updateFunction(keyPressed)
 
-def processOverrideEvent(event):
-  overrideEvendId = ecodes.ABS[event.event.code]
+def processOverrideEvent(overrideEvendId, inputValue):
   updateFunction = overrideEvents[overrideEvendId]
-  inputValue = event.event.value
 
   overrideHalMidValue = max_velocity / 2.0 if overrideEvendId == "ABS_Z" else ABS_HAL_MID_VALUE
   overrideHalMaxValue = max_velocity if overrideEvendId == "ABS_Z" else ABS_HAL_MAX_VALUE
@@ -240,7 +260,6 @@ if __name__ == "__main__":
   inifile = linuxcnc.ini(POCKETNC_INI_FILE)
   max_velocity = float(inifile.find('TRAJ', 'MAX_LINEAR_VELOCITY') or 1.732)
 
-
   try:
     while True:
       if hidConsole is None:
@@ -251,10 +270,12 @@ if __name__ == "__main__":
               setPinValue("console-connected", 1)
               last_jog_count = 0
               # Toggle the NUM Lock LED to force a fresh report to be sent
-              hidConsole.set_led(ecodes.LED_NUML, 1)
               hidConsole.set_led(ecodes.LED_NUML, 0)
+              time.sleep(LOOP_SLEEP)
               hidConsole.set_led(ecodes.LED_NUML, 1)
-              hidConsole.set_led(ecodes.LED_NUML, 0)
+              time.sleep(LOOP_SLEEP)
+
+              syncInitialState()
 
           lastDeviceCheck = datetime.datetime.now()
 
@@ -265,7 +286,8 @@ if __name__ == "__main__":
             inputEvent = evdev.categorize(event)
 
             if isinstance(inputEvent, evdev.events.AbsEvent) and ecodes.ABS[inputEvent.event.code] in overrideEvents:
-              processOverrideEvent(inputEvent)
+              overrideEvendId = ecodes.ABS[inputEvent.event.code]
+              processOverrideEvent(overrideEvendId, inputEvent.event.value)
 
             if isinstance(inputEvent, evdev.events.KeyEvent):
               buttonEvendId = inputEvent.keycode
@@ -278,7 +300,8 @@ if __name__ == "__main__":
                 processButtonEvent(buttonEvendId, inputEvent.keystate == 1)  
 
             if isinstance(inputEvent, evdev.events.AbsEvent) and ecodes.ABS[inputEvent.event.code] in selectEvents:
-              processSelectevent(inputEvent)
+              selectEvendId = ecodes.ABS[inputEvent.event.code]
+              processSelectEvent(selectEvendId, inputEvent.event.value)
 
             if isinstance(inputEvent, evdev.events.AbsEvent) and ecodes.ABS[inputEvent.event.code] in jogEvents:
               processJogEvent(inputEvent)
