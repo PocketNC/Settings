@@ -79,7 +79,7 @@ jogEvents = {
 buttonEvents = {
     'BTN_0':lambda value: setPinValue('feed-hold', value),   # feedhold
     'BTN_1':lambda value: setPinValue('cycle-start', value), # cycle start
-    'BTN_2':lambda value: setPinValue('coolant', value),     # coolant
+    'BTN_2':lambda value: setPinValue('aux', value),         # aux
     'BTN_3':lambda value: setPinValue('program-stop', value) # stop
 }
 
@@ -125,7 +125,7 @@ def initHAL():
   halComponent.newpin('cycle-start', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('program-stop', hal.HAL_BIT, hal.HAL_OUT)
   halComponent.newpin('feed-hold', hal.HAL_BIT, hal.HAL_OUT)
-  halComponent.newpin('coolant', hal.HAL_BIT, hal.HAL_OUT)
+  halComponent.newpin('aux', hal.HAL_BIT, hal.HAL_OUT)
 
   halComponent.newpin('linear-jog-incr-base', hal.HAL_FLOAT, hal.HAL_IN)
   halComponent.newpin('rotary-jog-incr-base', hal.HAL_FLOAT, hal.HAL_IN)
