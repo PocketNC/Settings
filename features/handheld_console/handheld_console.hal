@@ -18,7 +18,7 @@ net console-velocity-override handheld_console.velocity-override-value  => halui
 newsig console-null-button bit
 net [HANDHELD_CONSOLE]BUTTON_0_SIGNAL        handheld_console.feed-hold
 net [HANDHELD_CONSOLE]BUTTON_1_SIGNAL        handheld_console.cycle-start 
-net [HANDHELD_CONSOLE]BUTTON_2_SIGNAL        handheld_console.coolant
+net [HANDHELD_CONSOLE]BUTTON_2_SIGNAL        handheld_console.aux
 net [HANDHELD_CONSOLE]BUTTON_3_SIGNAL        handheld_console.program-stop   
 
 
