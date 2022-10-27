@@ -1,0 +1,24 @@
+[JOINT_0]
+HOME_OFFSET=2.63
+
+
+[JOINT_1]
+HOME_OFFSET=2.4658
+
+
+[JOINT_3]
+HOME_OFFSET=-17.1878
+
+
+[JOINT_4]
+HOME_OFFSET=-5.0
+
+
+[POCKETNC]
+PAUSE_ON_TOOL_PROBE=1
+SPINDLE_HIGH_VOLTAGE=2.7888
+
+[TOOL_PROBE]
+PROBE_B_TABLE_OFFSET=0.8322
+# Zprobe-Z123 = Take the Z reading when the probe is triggered and subtract the Z reading when just touching the 123 block (the 3 side)
+PROBE_SENSOR_123_OFFSET=-0.3168
