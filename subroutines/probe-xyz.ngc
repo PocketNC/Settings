@@ -1,0 +1,57 @@
+O<probe-xyz> SUB
+M70                   ( save modal state )
+
+M5
+G49
+G90
+G94
+G40
+
+G30.1                 ( save current position in machine-units to #5181-#5185 )
+
+#<ReadyPosX0> = [#<_imperial>*#5181 + #<_metric>*25.4*#5181]  ( start from the current position )
+#<ReadyPosY0> = [#<_imperial>*#5182 + #<_metric>*25.4*#5182]
+#<ReadyPosZ0> = [#<_imperial>*#5183 + #<_metric>*25.4*#5183]
+
+#<OffsetX> = 0
+#<OffsetY> = 0
+#<OffsetZ> = 0
+
+O1 if [ EXISTS[#<I>] ]
+  #<OffsetX> = #<I>
+O1 endif
+
+O2 if [ EXISTS[#<J>] ]
+  #<OffsetY> = #<J>
+O2 endif
+
+O3 if [ EXISTS[#<K>] ]
+  #<OffsetZ> = #<K>
+O3 endif
+
+#<Retract> = [#<_imperial>*.02 + #<_metric>*25.4*0.02]
+#<Mag> = SQRT[#<OffsetX>*#<OffsetX>+#<OffsetY>*#<OffsetY>+#<OffsetZ>*#<OffsetZ> ]
+
+#<RetractX> = [ -#<Retract>*#<OffsetX>/#<Mag> ]
+#<RetractY> = [ -#<Retract>*#<OffsetY>/#<Mag> ]
+#<RetractZ> = [ -#<Retract>*#<OffsetZ>/#<Mag> ]
+
+#<FastFeedRate> = [#<_imperial>*5 + #<_metric>*25.4*5]
+#<SlowFeedRate> = [#<_imperial>*.1 + #<_metric>*25.4*1]
+
+G91
+G38.2 X[#<OffsetX>] Y[#<OffsetY>] Z[#<OffsetZ>] F#<FastFeedRate>
+G0 X[#<RetractX>] Y[#<RetractY>] Z[#<RetractZ>]
+G4 P0.5 (let probe circuitry stabilize by waiting .1 seconds)
+G38.2 X[-#<RetractX>] Y[-#<RetractY>] Z[-#<RetractZ>] F#<SlowFeedRate>
+G90
+
+(LOGOPEN,/var/opt/pocketnc/xyz.txt)
+(LOG,#5061,#5062,#5063)
+(LOGCLOSE)
+
+G0 X[#<ReadyPosX0>] Y[#<ReadyPosY0>] Z[#<ReadyPosZ0>]
+
+M72
+O<probe-xyz> ENDSUB
+

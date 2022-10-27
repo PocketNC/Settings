@@ -183,11 +183,32 @@ def v2_calib_probe_spindle_pos(self, x_nominal, z_nominal):
     print(e)
     return str(e)
 
+def v2_calib_probe_spindle_at_tool_probe(self):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_SPINDLE_AT_TOOL_PROBE)
+  except Exception as e:
+    print(e)
+    return str(e)
+
 def v2_calib_probe_fixture_ball_pos(self, y_nominal):
   try:
-    print('v2_calib_probe_fixture_ball_pos')
     calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_FIXTURE_BALL_POS, y_nominal)
   except Exception as e:
+    print(e)
+    return str(e)
+
+def v2_calib_probe_fixture_plane_a90(self, y_nominal):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_FIXTURE_PLANE_A90, y_nominal)
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def v2_calib_tool_probe_offset(self):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.TOOL_PROBE_OFFSET)
+  except Exception as e:
+    print(e)
     return str(e)
 
 def v2_calib_setup_cnc_csy(self):
@@ -509,6 +530,20 @@ def v2_calib_load_stage_homing_z(self):
   except Exception as e:
     return str(e)
 
+def v2_calib_load_stage_homing_a(self):
+  try:
+    print('v2_calib_load_stage_homing_a')
+    calib.CalibManager.getInstance().load_stage_progress(calib.Stages.HOMING_A)
+  except Exception as e:
+    return str(e)
+
+def v2_calib_load_stage_homing_b(self):
+  try:
+    print('v2_calib_load_stage_homing_b')
+    calib.CalibManager.getInstance().load_stage_progress(calib.Stages.HOMING_B)
+  except Exception as e:
+    return str(e)
+
 def v2_calib_load_stage_characterize_x(self):
   try:
     print('v2_calib_load_stage_characterize_x')
@@ -541,6 +576,13 @@ def v2_calib_load_stage_characterize_b(self):
   try:
     print('v2_calib_load_stage_characterize_b')
     calib.CalibManager.getInstance().load_stage_progress(calib.Stages.CHARACTERIZE_B)
+  except Exception as e:
+    return str(e)
+
+def v2_calib_load_stage_tool_probe_offset(self):
+  try:
+    print('v2_calib_load_stage_tool_probe_offset')
+    calib.CalibManager.getInstance().load_stage_progress(calib.Stages.TOOL_PROBE_OFFSET)
   except Exception as e:
     return str(e)
 
