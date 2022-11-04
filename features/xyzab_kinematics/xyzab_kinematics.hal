@@ -1,0 +1,3 @@
+net kinstype-select motion.analog-out-03
+net kinstype-select motion.switchkins-type
+net tool-offset xyzab-trt-kins.tool-offset

@@ -1,0 +1,23 @@
+# Feedrate calculation
+loadrt feedrate-v2
+addf feedrate-v2.funct servo-thread   
+
+net x-pos feedrate-v2.x
+net x-pos joint.0.pos-cmd
+
+net y-pos feedrate-v2.y
+net y-pos joint.1.pos-cmd
+
+net z-pos feedrate-v2.z
+net z-pos joint.2.pos-cmd
+
+net tool-offset feedrate-v2.tz
+net tool-offset motion.tooloffset.z
+
+net a-pos feedrate-v2.a
+net a-pos joint.3.pos-cmd
+
+net b-pos feedrate-v2.b
+net b-pos joint.4.pos-cmd
+
+net calculated-feedrate feedrate-v2.feedrate

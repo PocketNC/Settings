@@ -1,0 +1,135 @@
+newinst [PRUCONF]DRIVER hpg [PRUCONF]PRUCODE [PRUCONF]PRUARGS
+
+addf hpg.capture-position servo-thread
+addf hpg.update servo-thread
+
+# ################
+# X [0] Axis
+# ################
+
+# axis enable chain
+net x-enable joint.0.amp-enable-out
+net x-enable hpg.stepgen.00.enable
+
+# position command and feedback
+net x-cmd joint.0.motor-pos-cmd
+net x-cmd hpg.stepgen.00.position-cmd
+net x-stepgen-feedback hpg.stepgen.00.position-fb
+net x-stepgen-feedback joint.0.motor-pos-fb
+
+# timing parameters
+setp hpg.stepgen.00.dirsetup        [JOINT_0]DIRSETUP
+setp hpg.stepgen.00.dirhold         [JOINT_0]DIRHOLD
+setp hpg.stepgen.00.steplen         [JOINT_0]STEPLEN
+setp hpg.stepgen.00.stepspace       [JOINT_0]STEPSPACE
+setp hpg.stepgen.00.position-scale  [JOINT_0]SCALE
+setp hpg.stepgen.00.maxvel          [JOINT_0]STEPGEN_MAX_VEL
+setp hpg.stepgen.00.maxaccel        [JOINT_0]STEPGEN_MAX_ACC
+
+setp hpg.stepgen.00.steppin         [POCKETNC_PINS]X_STEP_PIN
+setp hpg.stepgen.00.dirpin          [POCKETNC_PINS]X_DIR_PIN
+
+# ################
+# Y [1] Axis
+# ################
+
+# axis enable chain
+net y-enable joint.1.amp-enable-out
+net y-enable hpg.stepgen.01.enable
+
+# position command and feedback
+net y-cmd joint.1.motor-pos-cmd
+net y-cmd hpg.stepgen.01.position-cmd
+net y-stepgen-feedback hpg.stepgen.01.position-fb
+net y-stepgen-feedback joint.1.motor-pos-fb
+
+# timing parameters
+setp hpg.stepgen.01.dirsetup        [JOINT_1]DIRSETUP
+setp hpg.stepgen.01.dirhold         [JOINT_1]DIRHOLD
+setp hpg.stepgen.01.steplen         [JOINT_1]STEPLEN
+setp hpg.stepgen.01.stepspace       [JOINT_1]STEPSPACE
+setp hpg.stepgen.01.position-scale  [JOINT_1]SCALE
+setp hpg.stepgen.01.maxvel          [JOINT_1]STEPGEN_MAX_VEL
+setp hpg.stepgen.01.maxaccel        [JOINT_1]STEPGEN_MAX_ACC
+
+setp hpg.stepgen.01.steppin         [POCKETNC_PINS]Y_STEP_PIN
+setp hpg.stepgen.01.dirpin          [POCKETNC_PINS]Y_DIR_PIN
+
+# ################
+# Z [2] Axis
+# ################
+
+# axis enable chain
+net z-enable joint.2.amp-enable-out
+net z-enable hpg.stepgen.02.enable
+
+# position command and feedback
+net z-cmd joint.2.motor-pos-cmd
+net z-cmd hpg.stepgen.02.position-cmd
+net z-stepgen-feedback hpg.stepgen.02.position-fb
+net z-stepgen-feedback joint.2.motor-pos-fb
+
+# timing parameters
+setp hpg.stepgen.02.dirsetup        [JOINT_2]DIRSETUP
+setp hpg.stepgen.02.dirhold         [JOINT_2]DIRHOLD
+setp hpg.stepgen.02.steplen         [JOINT_2]STEPLEN
+setp hpg.stepgen.02.stepspace       [JOINT_2]STEPSPACE
+setp hpg.stepgen.02.position-scale  [JOINT_2]SCALE
+setp hpg.stepgen.02.maxvel          [JOINT_2]STEPGEN_MAX_VEL
+setp hpg.stepgen.02.maxaccel        [JOINT_2]STEPGEN_MAX_ACC
+
+setp hpg.stepgen.02.steppin         [POCKETNC_PINS]Z_STEP_PIN
+setp hpg.stepgen.02.dirpin          [POCKETNC_PINS]Z_DIR_PIN
+
+
+# ################
+# A [3] Axis
+# ################
+
+# axis enable chain
+net a-enable joint.3.amp-enable-out
+net a-enable hpg.stepgen.03.enable
+
+# position command and feedback
+net a-cmd joint.3.motor-pos-cmd
+net a-cmd hpg.stepgen.03.position-cmd
+net a-stepgen-feedback hpg.stepgen.03.position-fb
+net a-stepgen-feedback joint.3.motor-pos-fb
+
+# timing parameters
+setp hpg.stepgen.03.dirsetup        [JOINT_3]DIRSETUP
+setp hpg.stepgen.03.dirhold         [JOINT_3]DIRHOLD
+setp hpg.stepgen.03.steplen         [JOINT_3]STEPLEN
+setp hpg.stepgen.03.stepspace       [JOINT_3]STEPSPACE
+setp hpg.stepgen.03.position-scale  [JOINT_3]SCALE
+setp hpg.stepgen.03.maxvel          [JOINT_3]STEPGEN_MAX_VEL
+setp hpg.stepgen.03.maxaccel        [JOINT_3]STEPGEN_MAX_ACC
+
+setp hpg.stepgen.03.steppin         [POCKETNC_PINS]A_STEP_PIN
+setp hpg.stepgen.03.dirpin          [POCKETNC_PINS]A_DIR_PIN
+
+# ################
+# B [4] Axis
+# ################
+
+# axis enable chain
+net b-enable joint.4.amp-enable-out
+net b-enable hpg.stepgen.04.enable
+
+# position command and feedback
+net b-cmd joint.4.motor-pos-cmd
+net b-cmd hpg.stepgen.04.position-cmd
+net b-stepgen-feedback hpg.stepgen.04.position-fb
+net b-stepgen-feedback joint.4.motor-pos-fb
+
+# timing parameters
+setp hpg.stepgen.04.dirsetup        [JOINT_4]DIRSETUP
+setp hpg.stepgen.04.dirhold         [JOINT_4]DIRHOLD
+setp hpg.stepgen.04.steplen         [JOINT_4]STEPLEN
+setp hpg.stepgen.04.stepspace       [JOINT_4]STEPSPACE
+setp hpg.stepgen.04.position-scale  [JOINT_4]SCALE
+setp hpg.stepgen.04.maxvel          [JOINT_4]STEPGEN_MAX_VEL
+setp hpg.stepgen.04.maxaccel        [JOINT_4]STEPGEN_MAX_ACC
+
+setp hpg.stepgen.04.steppin         [POCKETNC_PINS]B_STEP_PIN
+setp hpg.stepgen.04.dirpin          [POCKETNC_PINS]B_DIR_PIN

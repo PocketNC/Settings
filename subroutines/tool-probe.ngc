@@ -89,5 +89,11 @@ M72                                          ( restore modal state )
 G[ #<backupMotionMode> / 10 ]
 F#<backupFeed>
 
+o100 if [ [ #<backupFeed> NE 0 ] AND [ #<backupMotionMode> EQ 1 ] ]
+  G1 F#<backupFeed>
+o100 elseif [ #<backupMotionMode> EQ 0 ]
+  G0
+o100 endif
+
 O<tool-probe> ENDSUB
 M2

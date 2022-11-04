@@ -4,6 +4,11 @@ import hal
 import os
 import datetime
 import time
+import json
+import penta_messages
+
+USER_MESSAGES_END_POINT = os.environ.get('USER_MESSAGES_END_POINT')
+messageClient = penta_messages.Client(USER_MESSAGES_END_POINT)
 
 POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
 LAST_SPINDLE_OFF_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "last-spindle-off-time.txt")
@@ -47,6 +52,7 @@ def checkWarmupNeeded():
 
 
 lastSpindleOn = False
+lastPaused = False
 abort = False
 
 print("Initializing hss_warmup!")
@@ -70,16 +76,28 @@ h.newpin("full_warmup_needed", hal.HAL_BIT, hal.HAL_OUT)
 # set to true when an E Stop should occur
 h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT)
 
-# set to true when aborted and reset by rockhopper after
-# the error has been reported
-h.newpin("aborted", hal.HAL_BIT, hal.HAL_OUT)
 
 h['abort'] = False
-h['aborted'] = False
 h['warmup_needed'] = checkWarmupNeeded()
 h['full_warmup_needed'] = checkFullWarmupNeeded()
 
 h.ready()
+
+def send_full_warmup_needed_message():
+  messageClient.send(json.dumps({ 
+    "type": "error", 
+    "kind": "spindle_warmup", 
+    "text": "You must run the full spindle warm up sequence (approx. 50 minutes) since it hasn't been turned on in over 1 week.",
+    "time": time.strftime("%Y-%m-%d %H:%M:%S")
+  }))
+
+def send_short_warmup_needed_message():
+  messageClient.send(json.dumps({ 
+    "type": "error", 
+    "kind": "spindle_warmup", 
+    "text": "You must run the short spindle warm up sequence (approx. 10 minutes) since it hasn't been turned on in over 12 hours.",
+    "time": time.strftime("%Y-%m-%d %H:%M:%S")
+  }))
 
 
 try:
@@ -100,10 +118,15 @@ try:
       needs_full_warmup = h['full_warmup_needed']
       abort = needs_warmup and not h['performing_warmup']
       abort = abort or ( needs_full_warmup and not h['performing_full_warmup'] )
-      if abort:
-        h['aborted'] = True
+      if needs_full_warmup and not h['performing_full_warmup']:
+        send_full_warmup_needed_message()
+      elif needs_warmup and not h['performing_warmup']:
+        send_short_warmup_needed_message()
     else:
       abort = False
+
+    if (h['performing_warmup'] or h['performing_full_warmup']) and (h['program_paused'] and not lastPaused):
+      abort = True
 
     h['abort'] = abort
     if not h['program_running'] and not h['program_paused']:
@@ -111,7 +134,6 @@ try:
       # the spindle doesn't stop automatically
       if h['spindle_on'] and (h['warmup_needed'] or h['performing_warmup']):
         h['abort'] = True
-        h['aborted'] = True
       # if the warm up sequence is canceled, then the performing_warmup
       # pin won't properly be turned off, so if a program isn't running (and it isn't paused)
       # turn it off here
@@ -119,6 +141,7 @@ try:
       h['performing_full_warmup'] = False
 
     lastSpindleOn = h['spindle_on']
+    lastPaused = h['program_paused']
     time.sleep(.1)
 except KeyboardInterrupt:
   raise SystemExit

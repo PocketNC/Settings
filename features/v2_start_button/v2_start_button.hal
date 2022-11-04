@@ -1,0 +1,30 @@
+# Start button behaves like cycle/start when not running
+# Start button behaves like feed hold when running
+newinst bb_gpio start-button-pin pin=[POCKETNC_PINS]START_BUTTON_PIN direction=input
+setp start-button-pin.invert 1
+
+newinst and2 start-button-while-running.and
+addf start-button-while-running.and servo-thread
+
+newinst and2 start-button-while-not-running.and
+addf start-button-while-not-running.and servo-thread
+
+newinst oneshot start-button.oneshot
+setp start-button.oneshot.width 0.1
+addf start-button.oneshot servo-thread
+
+net start-button-triggered start-button-pin.in
+net start-button-triggered start-button.oneshot.in
+
+net start-button-signal start-button.oneshot.out
+net start-button-signal start-button-while-running.and.in0
+net start-button-signal start-button-while-not-running.and.in0
+
+net program-is-running start-button-while-running.and.in1
+net program-is-not-running start-button-while-not-running.and.in1
+
+# start-button-while-running.and.out should trigger a feed hold
+net [PENTA]START_BUTTON_FEED_HOLD_SIG start-button-while-running.and.out
+
+# start-button-while-not-running.and.out should trigger a cycle/start
+net [PENTA]START_BUTTON_CYCLE_START_SIG start-button-while-not-running.and.out

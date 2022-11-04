@@ -1,0 +1,37 @@
+### Spindle ###
+
+newinst sum2 spindle-sum
+newinst scale spindle-scale
+newinst limit1 spindle-limit
+
+addf spindle-scale servo-thread
+addf spindle-limit servo-thread
+addf spindle-sum servo-thread
+
+newinst bb_gpio spindle-dir-pin pin=[POCKETNC_PINS]SPINDLE_DIR_PIN direction=output
+newinst bb_gpio spindle-on-pin pin=[POCKETNC_PINS]SPINDLE_ON_PIN direction=output
+
+net spindle-enable spindle.0.on
+net spindle-enable spindle-on-pin.out
+
+net spindle-direction spindle.0.forward
+net spindle-direction spindle-dir-pin.out
+
+setp spindle-scale.gain -0.000052
+setp spindle-scale.offset .63
+setp spindle-limit.min 0
+setp spindle-limit.max 100
+setp spindle-sum.in0 -2048
+
+net commanded-spindle-speed spindle-sum.in1
+
+net spindle-new-speed spindle-sum.out
+net spindle-new-speed spindle-scale.in
+net spindle-pwm spindle-scale.out
+net spindle-pwm spindle-limit.in
+net spindle-scale-limiter spindle-limit.out
+net spindle-scale-limiter hpg.pwmgen.00.out.00.value
+
+setp hpg.pwmgen.00.pwm_period       1000000
+setp hpg.pwmgen.00.out.00.pin       0x37
+setp hpg.pwmgen.00.out.00.enable    1

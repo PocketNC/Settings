@@ -1,0 +1,5 @@
+# Probe
+newinst bb_gpio probe-signal-pin pin=[POCKETNC_PINS]PROBE_SIGNAL_PIN direction=input
+setp probe-signal-pin.invert 1
+net tool-setter probe-signal-pin.in
+net tool-setter motion.probe-input

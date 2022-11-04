@@ -1,0 +1,232 @@
+# Core EMC
+
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+addf motion-command-handler        servo-thread
+addf motion-controller             servo-thread
+
+# halui info signals
+newinst not program-is-not-running.not
+addf program-is-not-running.not servo-thread
+
+net program-is-idle    halui.program.is-idle
+net program-is-running halui.program.is-running
+net program-is-running program-is-not-running.not.in
+net program-is-not-running program-is-not-running.not.out
+net program-is-paused  halui.program.is-paused
+
+# Feed hold
+newinst lut5 feed-hold-pins
+setp feed-hold-pins.function 0xfffffffe
+
+addf feed-hold-pins servo-thread
+
+net feed-hold-1 feed-hold-pins.in-0
+net feed-hold-2 feed-hold-pins.in-1
+net feed-hold-3 feed-hold-pins.in-2
+net feed-hold-4 feed-hold-pins.in-3
+net feed-hold-5 feed-hold-pins.in-4
+
+net feed-hold feed-hold-pins.out
+net feed-hold halui.program.pause
+
+# Cycle/start
+# When cycle/start is triggered, ensure it's ok to start or resume
+# then trigger the halui.program.start or halui.program.resume pins.
+newinst lut5 cycle-start-pins
+setp cycle-start-pins.function 0xfffffffe
+
+addf cycle-start-pins servo-thread
+
+net cycle-start-1 cycle-start-pins.in-0
+net cycle-start-2 cycle-start-pins.in-1
+net cycle-start-3 cycle-start-pins.in-2
+net cycle-start-4 cycle-start-pins.in-3
+net cycle-start-5 cycle-start-pins.in-4
+
+newinst and2 cycle-start-from-paused.and
+addf cycle-start-from-paused.and servo-thread
+
+newinst and2 cycle-start-from-idle.and
+addf cycle-start-from-idle.and servo-thread
+
+newinst lut5 ok-to-run-pins
+setp ok-to-run-pins.function 0x80000000
+
+addf ok-to-run-pins servo-thread
+
+net ok-to-run-1 ok-to-run-pins.in-0
+net ok-to-run-2 ok-to-run-pins.in-1
+net ok-to-run-3 ok-to-run-pins.in-2
+net ok-to-run-4 ok-to-run-pins.in-3
+net ok-to-run-5 ok-to-run-pins.in-4
+
+sets ok-to-run-1 1
+sets ok-to-run-2 1
+sets ok-to-run-3 1
+sets ok-to-run-4 1
+sets ok-to-run-5 1
+
+newinst and2 cycle-start-and-ok-to-run.and
+addf cycle-start-and-ok-to-run.and servo-thread
+
+net ok-to-run ok-to-run-pins.out
+net ok-to-run cycle-start-and-ok-to-run.and.in1
+
+net cycle-start-triggered cycle-start-pins.out
+net cycle-start-triggered cycle-start-and-ok-to-run.and.in0
+
+net cycle-start cycle-start-and-ok-to-run.and.out
+net cycle-start cycle-start-from-paused.and.in0
+net cycle-start cycle-start-from-idle.and.in0
+
+net program-is-idle cycle-start-from-idle.and.in1
+net program-is-paused cycle-start-from-paused.and.in1
+
+net cycle-start-and-is-idle cycle-start-from-idle.and.out
+net cycle-start-and-is-idle halui.program.run
+net cycle-start-and-is-idle halui.mode.auto
+
+net cycle-start-and-is-paused cycle-start-from-paused.and.out
+net cycle-start-and-is-paused halui.program.resume
+
+# Signals for various features to tie into
+newsig measured-spindle-speed float
+sets measured-spindle-speed 0
+
+newsig vice-released bit
+sets vice-released 0
+
+newsig tool-released bit
+sets tool-released 0
+
+newsig spindle-temperature float
+newsig spindle-pressure float
+sets spindle-temperature -999
+sets spindle-pressure -999
+
+newsig measured-spindle-voltage float
+sets measured-spindle-voltage 0
+
+newsig measured-spindle-current float
+sets measured-spindle-current 0
+
+newsig spindle-max-speed float
+sets spindle-max-speed 10000
+
+
+# Feed Inhibit Signals for features to tie into
+newinst lut5 inhibit-feed-pins
+setp inhibit-feed-pins.function 0xfffffffe
+
+addf inhibit-feed-pins servo-thread
+
+net inhibit-feed-1 inhibit-feed-pins.in-0
+net inhibit-feed-2 inhibit-feed-pins.in-1
+net inhibit-feed-3 inhibit-feed-pins.in-2
+net inhibit-feed-4 inhibit-feed-pins.in-3
+net inhibit-feed-5 inhibit-feed-pins.in-4
+
+net inhibit-feed motion.feed-inhibit
+net inhibit-feed inhibit-feed-pins.out
+
+# Inhibit feed signals for features to tie into
+newinst lut5 inhibit-spindle-pins
+setp inhibit-spindle-pins.function 0xfffffffe
+
+addf inhibit-spindle-pins servo-thread
+
+net inhibit-spindle-1 inhibit-spindle-pins.in-0
+net inhibit-spindle-2 inhibit-spindle-pins.in-1
+net inhibit-spindle-3 inhibit-spindle-pins.in-2
+net inhibit-spindle-4 inhibit-spindle-pins.in-3
+net inhibit-spindle-5 inhibit-spindle-pins.in-4
+
+net inhibit-spindle spindle.0.inhibit
+net inhibit-spindle inhibit-spindle-pins.out
+
+net commanded-spindle-speed spindle.0.speed-out-abs
+
+newinst lut5 spindle-stop-pins
+setp spindle-stop-pins.function 0xfffffffe
+
+addf spindle-stop-pins servo-thread
+
+net spindle-stop-1 spindle-stop-pins.in-0
+net spindle-stop-2 spindle-stop-pins.in-1
+net spindle-stop-3 spindle-stop-pins.in-2
+net spindle-stop-4 spindle-stop-pins.in-3
+net spindle-stop-5 spindle-stop-pins.in-4
+
+net spindle-stop halui.spindle.0.stop
+net spindle-stop spindle-stop-pins.out
+
+# E-Stop status signals for features to tie into
+
+newinst not estop-is-not-activated.not
+addf estop-is-not-activated.not servo-thread
+
+net estop-is-activated halui.estop.is-activated
+net estop-is-activated estop-is-not-activated.not.in
+
+net estop-is-not-activated estop-is-not-activated.not.out
+
+# E-Stop triggering signals for features to tie into
+
+newinst lut5 estop-pins
+setp estop-pins.function 0xfffffffe
+
+addf estop-pins servo-thread
+
+net estop-1 estop-pins.in-0
+net estop-2 estop-pins.in-1
+net estop-3 estop-pins.in-2
+net estop-4 estop-pins.in-3
+net estop-5 estop-pins.in-4
+
+net estop estop-pins.out
+net estop halui.estop.activate
+
+newinst lut5 reset-estop-pins
+setp reset-estop-pins.function 0xfffffffe
+
+addf reset-estop-pins servo-thread
+
+net reset-estop-1 reset-estop-pins.in-0
+net reset-estop-2 reset-estop-pins.in-1
+net reset-estop-3 reset-estop-pins.in-2
+net reset-estop-4 reset-estop-pins.in-3
+net reset-estop-5 reset-estop-pins.in-4
+
+net reset-estop reset-estop-pins.out
+net reset-estop halui.estop.reset
+
+# Abort signals for other features to tie into
+newinst lut5 abort-pins
+setp abort-pins.function 0xfffffffe
+
+addf abort-pins servo-thread
+
+net abort-1 abort-pins.in-0
+net abort-2 abort-pins.in-1
+net abort-3 abort-pins.in-2
+net abort-4 abort-pins.in-3
+net abort-5 abort-pins.in-4
+
+net abort abort-pins.out
+net abort halui.abort
+
+net is-spindle-enabled halui.spindle.0.is-on
+
+net is-mode-mdi halui.mode.is-mdi
+
+#
+loadusr -Wn cycle_start_reset /opt/pocketnc/Settings/features/penta/reset_pin.py cycle_start_reset
+loadusr -Wn feed_hold_reset /opt/pocketnc/Settings/features/penta/reset_pin.py feed_hold_reset
+
+setp cycle_start_reset.value 0
+setp feed_hold_reset.value 0
+
+net [PENTA]ROCKHOPPER_CYCLE_START_SIG cycle_start_reset.pin
+net [PENTA]ROCKHOPPER_FEED_HOLD_SIG feed_hold_reset.pin

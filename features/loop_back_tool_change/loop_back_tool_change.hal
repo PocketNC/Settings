@@ -1,0 +1,5 @@
+# create signals for tool loading loopback
+net tool-prep-loop iocontrol.0.tool-prepare
+net tool-prep-loop iocontrol.0.tool-prepared
+net tool-change-loop    <= iocontrol.0.tool-change
+net tool-change-loop    => iocontrol.0.tool-changed

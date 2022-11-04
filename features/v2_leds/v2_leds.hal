@@ -1,0 +1,55 @@
+# LED signals
+
+loadrt siggen names=blink-pattern-pins
+addf blink-pattern-pins.update servo-thread
+net blink-pattern blink-pattern-pins.clock
+
+newinst bb_gpio estop-led-pin pin=[POCKETNC_PINS]ESTOP_LED_PIN direction=output
+newinst bb_gpio start-led-pin pin=[POCKETNC_PINS]START_LED_PIN direction=output
+
+# E-Stop blinking when in E-Stop
+# E-Stop solid when out of E-Stop
+# So, the logic is the LED is on when:
+# blink-pattern is true AND in E-Stop
+# OR out of E-Stop
+
+newinst and2 blink-and-estop.and
+addf blink-and-estop.and servo-thread
+
+newinst or2 estop-led-blink-or-not-estop.or
+addf estop-led-blink-or-not-estop.or servo-thread
+
+net blink-pattern blink-and-estop.and.in0
+net estop-is-activated blink-and-estop.and.in1
+
+net estop-led-blink blink-and-estop.and.out
+
+net estop-led-blink estop-led-blink-or-not-estop.or.in0
+net estop-is-not-activated estop-led-blink-or-not-estop.or.in1
+
+net estop-led-output estop-led-blink-or-not-estop.or.out
+net estop-led-output estop-led-pin.out
+
+# Start button blinking when paused
+# Start button solid when running
+# Start button off when idle
+# So, the logic is the LED is on when:
+# blink-pattern is true AND program-is-paused
+# OR program-is-running
+
+newinst and2 blink-and-paused.and
+addf blink-and-paused.and servo-thread
+
+newinst or2 start-led-blink-or-running.or
+addf start-led-blink-or-running.or servo-thread
+
+net blink-pattern blink-and-paused.and.in0
+net program-is-paused blink-and-paused.and.in1
+
+net start-led-blink blink-and-paused.and.out
+
+net start-led-blink start-led-blink-or-running.or.in0
+net program-is-running start-led-blink-or-running.or.in1
+
+net start-led-output start-led-blink-or-running.or.out
+net start-led-output start-led-pin.out

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-halcmd setp hss_warmup.performing_full_warmup 1
