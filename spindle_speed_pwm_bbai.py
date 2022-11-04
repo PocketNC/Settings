@@ -47,7 +47,6 @@ try:
       t = currentRPM/hiRPMParam
       currentFrequency = t*hiFrequencyParam
       if currentFrequency > 0:
-        print "Setting frequency to %s" % currentFrequency
         period = 1./currentFrequency*1e9
         with open(periodPath, "w") as periodF:
           periodF.write("%s" % int(period))

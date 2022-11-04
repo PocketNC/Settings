@@ -36,7 +36,6 @@ try:
       t = currentRPM/hiRPMParam
       currentFrequency = t*hiFrequencyParam
       if currentFrequency > 0:
-        print "Setting frequency to %s" % currentFrequency
         PWM.set_frequency(pwmPin, currentFrequency)
       h['speed_measured'] = currentRPM
       lastRPM = currentRPM
