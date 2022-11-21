@@ -28,14 +28,46 @@ def _penta_average_magnitude(self):
 
 def _penta_points(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
-  print("in _penta_points: %s" % (len(feature.points()),))
+
+  if _DEBUG:
+    print("in _penta_points: %s" % (len(feature.points()),))
+
   return len(feature.points());
+
+def _penta_first_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  first = feature.first()
+
+  if _DEBUG:
+    print("in _penta_first_x: %s" % (first[0],))
+
+  return first[0]
+
+def _penta_first_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  first = feature.first()
+
+  if _DEBUG:
+    print("in _penta_first_y: %s" % (first[1],))
+
+  return first[1]
+
+def _penta_first_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  first = feature.first()
+
+  if _DEBUG:
+    print("in _penta_first_z: %s" % (first[2],))
+
+  return first[2]
+
 
 def _penta_average_x(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _penta_average_x: %s" % (avg[0],))
+  if _DEBUG:
+    print("in _penta_average_x: %s" % (avg[0],))
 
   return avg[0]
 
@@ -43,7 +75,8 @@ def _penta_average_y(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _penta_average_y: %s" % (avg[1],))
+  if _DEBUG:
+    print("in _penta_average_y: %s" % (avg[1],))
 
   return avg[1]
 
@@ -51,7 +84,8 @@ def _penta_average_z(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _penta_average_z: %s" % (avg[2],))
+  if _DEBUG:
+    print("in _penta_average_z: %s" % (avg[2],))
 
   return avg[2]
 
@@ -273,14 +307,30 @@ def _penta_plane_point_z(self):
 
   return plane[0][2]
 
-def _probe_compensation_x(self):
+def get_probe_compensation():
   cal = probe.getInstance()
-  return cal.getCompensationX()
+  comp = cal.getCompensation()
+
+  kinematicsStr = ini.get_parameter(INI_CACHE, "KINS", "KINEMATICS")["values"]["value"]
+
+  tcpc_mode = self.params["_hal[motion.switchkins-type]"]
+  if int(tcpc_mode) == 1:
+    position = [
+      self.params[5181],
+      self.params[5182],
+      self.params[5183],
+      self.params[5184],
+      self.params[5185],
+      self.params[5186]
+    ]
+    comp = kinematics.transform_direction_global_to_local(kinematicsStr, position, comp[0], comp[1], comp[2])
+  return comp
+
+def _probe_compensation_x(self):
+  return get_probe_compensation[0]
 
 def _probe_compensation_y(self):
-  cal = probe.getInstance()
-  return cal.getCompensationY()
+  return get_probe_compensation[1]
 
 def _probe_compensation_z(self):
-  cal = probe.getInstance()
-  return cal.getCompensationZ()
+  return get_probe_compensation[2]

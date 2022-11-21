@@ -2,6 +2,16 @@ import metrology
 import probe
 import math
 import numpy
+import kinematics
+import ini
+import os
+
+from importlib import reload
+reload(kinematics)
+
+POCKETNC_VAR_DIRECTORY = os.environ.get("POCKETNC_VAR_DIRECTORY")
+INI_PATH = os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini")
+INI_CACHE = ini.read_ini_data(INI_PATH)
 
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
@@ -49,8 +59,22 @@ def set_active_feature(self, id):
   featureSet.setActiveFeatureID(id)
 
 def set_probe_direction(self, dirx, diry, dirz):
+  kinematicsStr = ini.get_parameter(INI_CACHE, "KINS", "KINEMATICS")["values"]["value"]
+
+  tcpc_mode = self.params["_hal[motion.switchkins-type]"]
+  if int(tcpc_mode) == 1:
+    position = [
+      self.params[5181],
+      self.params[5182],
+      self.params[5183],
+      self.params[5184],
+      self.params[5185],
+      self.params[5186]
+    ]
+    (dirx, diry, dirz) = kinematics.transform_direction_local_to_global(kinematicsStr, position, dirx, diry, dirz)
+
   cal = probe.getInstance()
-  comp = cal.setProbeDirection(dirx, diry, dirz)
+  cal.setProbeDirection(dirx, diry, dirz)
 
 def disable_probe_calibration(self):
   cal = probe.getInstance()
@@ -59,6 +83,24 @@ def disable_probe_calibration(self):
 def enable_probe_calibration(self):
   cal = probe.getInstance()
   cal.enableCompensation()
+
+def intersect_lines(self, line1Id, line2Id, newId):
+  manager = metrology.FeatureManager.getInstance()
+  featureSet = manager.getActiveFeatureSet()
+
+  line1Feature = featureSet.getFeature(line1Id)
+  line2Feature = featureSet.getFeature(line2Id)
+  newFeature = featureSet.getFeature(newId)
+
+  newFeature.clearPoints()
+
+  line1 = line1Feature.line()
+  line2 = line2Feature.line()
+
+  pts = metrology.intersectLines(line1, line2)
+
+  for pt in pts:
+    newFeature.addPoint(pt[0], pt[1], pt[2])
 
 def project_points_onto_plane(self, pointsId, planeId, newId):
   manager = metrology.FeatureManager.getInstance()

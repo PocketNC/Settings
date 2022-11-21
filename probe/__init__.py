@@ -13,6 +13,8 @@ class ProbeCalibration():
     self._filename = filename
     self._enabled = True
     self._calibration = None
+    self._probeDiameter = 0
+    self._approximateTouchPoint = False
 
     path = os.path.join(directory, filename)
 
@@ -98,6 +100,7 @@ class ProbeCalibration():
     os.symlink(pathDateTime, path)
 
   def setProbeDirection(self, x, y, z):
+    # x, y, z are a normalized direction that the probe is traveling in
     print("in setProbeDirection (%s, %s, %s)" % (x, y, z))
     self._dirx = x
     self._diry = y
@@ -105,25 +108,15 @@ class ProbeCalibration():
 
     self._compensation = self.computeCompensation(-x, -y, -z)
 
-  def getCompensationX(self):
+  def getCompensation(self):
     if self._enabled:
-      return self._compensation[0]
+      return self._compensation
 
-    return 0
-
-  def getCompensationY(self):
-    if self._enabled:
-      return self._compensation[1]
-
-    return 0
-
-  def getCompensationZ(self):
-    if self._enabled:
-      return self._compensation[2]
-
-    return 0
+    return (0,0,0)
 
   def computeCompensation(self, x, y, z):
+    # x, y, z is a normalized direction that represents the normal of the surface
+    # that we're approaching
     print("computing compensation for direction (%s, %s, %s)" % (x,y,z))
 
     latAngle = math.degrees(math.acos(z))
@@ -173,15 +166,23 @@ class ProbeCalibration():
 
     compMag = compMag0*(1-latT)+compMag1*latT
 
-    comp = [ 
+    comp = ( 
       compMag*x,
       compMag*y,
       compMag*z
-    ]
+    )
 
     print("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
 
     return comp
+
+  def enableApproximateTouchPoint(self, probeDiameter):
+    self._approximateTouchPoint = True
+    self._probeDiameter = probeDiameter
+
+  def disableApproximateTouchPoint(self):
+    self._approximateTouchPoint = False
+    self._probeDiameter = probeDiameter
 
 def getInstance():
   global _instance

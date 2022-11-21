@@ -10,11 +10,17 @@ import math
 from importlib import reload
 reload(metrology.leastSquaresSphere)
 
-_DEBUG = True
+_DEBUG = False
 
 def setDebug(d):
   global _DEBUG
   _DEBUG = d
+
+def diff(v1,v2):
+  return [ v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2] ]
+
+def dot(v1,v2):
+  return v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2]
 
 def nearestPointOnLine(pt, line):
   dx = pt[0]-line[0][0]
@@ -174,11 +180,55 @@ def projectPointOntoPlane(point, plane):
   
   return numpy.subtract(point, numpy.multiply(planeN, numpy.dot(vec, planeN))) 
 
+def projectDirectionOntoPlane(direction, plane):
+  planePt = plane[0]
+  planeN = plane[1]
+
+  return numpy.subtract(direction, numpy.multiply(planeN, numpy.dot(direction, planeN))) 
+
+def projectLineOntoPlane(line, plane):
+  pt = projectPointOntoPlane(line[0], plane)
+  dir = projectDirectionOntoPlane(line[1], plane)
+
+  mag = math.sqrt(dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2])
+  return (pt, (dir[0]/mag, dir[1]/mag, dir[2]/mag))
+
+def intersectLines(line1, line2):
+  p1 = line1[0]
+  d1 = line1[1]
+
+  p2 = line2[0]
+  d2 = line2[1]
+
+  p2_dot_d1 = dot(p2, d1)
+  p1_dot_d1 = dot(p1, d1)
+
+  p2_dot_d2 = dot(p2, d2)
+  p1_dot_d2 = dot(p1, d2)
+
+  d1_dot_d1 = dot(d1, d1)
+  d1_dot_d2 = dot(d1, d2)
+  d2_dot_d2 = dot(d2, d2)
+
+  den = 1 - (d1_dot_d2)*(d1_dot_d2)/(d2_dot_d2*d1_dot_d1)
+  
+  if abs(den) < 0.000001:
+    t1 = 0
+  else:
+    t1 = ((p2_dot_d1-p1_dot_d1)/(d1_dot_d1) + (p1_dot_d2*d1_dot_d2 - p2_dot_d2*d1_dot_d2)/(d2_dot_d2*d1_dot_d1))/den
+
+  t2 = (p1_dot_d2 + t1*d1_dot_d2 - p2_dot_d2)/d2_dot_d2
+
+  A = (p1[0]+d1[0]*t1,p1[1]+d1[1]*t1,p1[2]+d1[2]*t1)
+  B = (p2[0]+d2[0]*t2,p2[1]+d2[1]*t2,p2[2]+d2[2]*t2)
+
+  return (A,B)
+
 class Feature:
-  def __init__(self):
+  def __init__(self, pts=[]):
     self._featureTransform = None
 
-    self._points = numpy.array([])
+    self._points = numpy.array(pts)
     self.makeDirty()
 
   def setTransformWithAxisAngle(self, axis, angle):
@@ -229,6 +279,9 @@ class Feature:
 
     return self._transformedPoints
 
+  def first(self):
+    return self.points()[0]
+    
   def average(self):
     if self._average is None:
       self._average = self.points().mean(axis=0)
