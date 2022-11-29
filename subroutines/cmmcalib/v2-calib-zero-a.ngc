@@ -2,13 +2,14 @@
 o<v2-calib-zero-a> sub
   g21
   g0 z0
-  #<yPos> = -63
+  #<yPos> = 0
   g0 y[#<yPos>]
 
   #<aAngle> = 0
   #<aAngleMeas> = 0
   #<aErrAbs> = 0
   o100 do
+    g0 a-5
     g0 a[#<aAngle>]
     M66 E0 L0
     o<v2_calib_find_pos_a> call [#<yPos>] [#<aAngle>]

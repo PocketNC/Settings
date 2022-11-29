@@ -120,7 +120,7 @@ def save_probe_calibration(self):
 
 def cmm_connect(self):
   try:
-    calib.CalibManager.getInstance().run_step(calib.Steps.CONNECT_TO_CMM)
+    asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().connect_to_cmm())
   except Exception as e:
     print(e)
     return str(e)
@@ -129,8 +129,9 @@ def cmm_disconnect(self):
   try:
     cm = calib.CalibManager.getInstance()
     if cm.client and cm.client.stream:
-      cm.run_step(calib.Steps.DISCONNECT_FROM_CMM)
+      asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().disconnect_from_cmm())
   except Exception as e:
+    print(e)
     return str(e)
 
 def cmm_setup(self):
@@ -161,6 +162,40 @@ def cmm_set_skip_cmm(self, val):
   except Exception as e:
     print(e)
     return str(e)
+
+def cmm_move_relative(self, x, y, z):
+  try:
+    print('cmm_move_relative oword')
+    asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().move_relative(x,y,z))
+
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def cmm_probe_sphere_relative(self, radius):
+  try:
+    print('cmm_probe_sphere_relative oword')
+    asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().probe_sphere_relative(radius))
+
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def v2_calib_connect(self):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.CONNECT_TO_CMM)
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def v2_calib_disconnect(self):
+  try:
+    cm = calib.CalibManager.getInstance()
+    if cm.client and cm.client.stream:
+      cm.run_step(calib.Steps.DISCONNECT_FROM_CMM)
+  except Exception as e:
+    return str(e)
+
 
 def v2_calib_probe_machine_pos(self):
   try:

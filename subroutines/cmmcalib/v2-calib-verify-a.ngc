@@ -1,7 +1,7 @@
 ;v2-calib-verify-a
 o<v2-calib-verify-a> sub
   g21
-  g0 y-63 a-25
+  g0 y0 a-25
   
   #1 = [-25]
 
@@ -9,7 +9,7 @@ o<v2-calib-verify-a> sub
     M66  E0 L0
     g0 a[#1]
     M66  E0 L0
-    o<v2_calib_verify_probe_a> call [-63] [#1]
+    o<v2_calib_verify_probe_a> call [0] [#1]
     M66  E0 L0
     #1 = [#1 + 5]
     M66  E0 L0

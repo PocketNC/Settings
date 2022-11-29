@@ -4,13 +4,13 @@ o<v2-calib-verify-b> sub
 
   #1 = [0]
 
-  g0 y-63 a0
+  g0 y0 a0
 
   o100 while [#1 LT 361]
     M66  E0 L0
     g0 b[#1]
     M66  E0 L0
-    o<v2_calib_verify_probe_b> call [-63] [#1]
+    o<v2_calib_verify_probe_b> call [0] [#1]
     M66  E0 L0
     #1 = [#1 + 5]
     M66  E0 L0
