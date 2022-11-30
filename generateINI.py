@@ -8,6 +8,7 @@ import sys
 from version import getVersion
 import subprocess
 
+DEV_MODE = os.environ.get('DEV') == 'true'
 POCKETNC_DIRECTORY = os.environ.get('POCKETNC_DIRECTORY')
 POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
 VERSION = getVersion()
@@ -15,6 +16,8 @@ VERSION = getVersion()
 sys.path.insert(0, os.path.join(POCKETNC_DIRECTORY, "Rockhopper"));
 from ini import read_ini_data, merge_ini_data, write_ini_data, append_ini_data, rename_section
 INI_DEFAULT_FILE = os.path.join(POCKETNC_DIRECTORY, "Settings/versions/%s/PocketNC.ini" % VERSION)
+
+DEV_OVERLAY_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "DevOverlay.inc")
 
 INI_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini")
 CALIBRATION_OVERLAY_FILE = os.path.join(POCKETNC_VAR_DIRECTORY, "CalibrationOverlay.inc")
@@ -117,5 +120,9 @@ if __name__ == "__main__":
                 'sections': {} }
 
   merged = merge_ini_data(merged, last_tool)
+
+  if DEV_MODE and os.path.isfile(DEV_OVERLAY_FILE):
+    dev_overlay = read_ini_data(DEV_OVERLAY_FILE)
+    merged = merge_ini_data(merged, dev_overlay)
 
   write_ini_data(merged, INI_FILE);

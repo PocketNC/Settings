@@ -157,8 +157,16 @@ def cmm_go_to_clearance_z(self):
 
 def cmm_set_skip_cmm(self, val):
   try:
-    tf = True if val > 0.1 else False
+    tf = abs(val) > 1e-6
     calib.CalibManager.getInstance().set_state('skip_cmm', tf)
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def cmm_set_skip_updates(self, val):
+  try:
+    tf = abs(val) > 1e-6
+    calib.CalibManager.getInstance().set_config("skip_updates", tf)
   except Exception as e:
     print(e)
     return str(e)
