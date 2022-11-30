@@ -1,0 +1,29 @@
+;v2-calib-align-fixture-perp-x
+o<v2-calib-align-fixture-perp-x> sub
+  g21
+  g0 z0
+  #<bNom> = #1
+  #<yPos> = 0
+  g0 y[#<yPos>]a90
+
+  #<bAngle> = [#<bNom>]
+  #<bAngleMeas> = [#<bNom>]
+  #<bErrAbs> = 0
+  o100 do
+    g0 b[#<bAngle>-5]
+    g0 b[#<bAngle>]
+    M66 E0 L0
+    ;o<v2_calib_find_pos_b> call [#<yPos>] [#<bAngle>]
+    o<v2_calib_find_pos_fixture_rel_x_perp> call [#<yPos>] [#<bAngle>]
+    #<bAngleErr> = [#<_value>]
+    
+    o103 if [#<bAngleErr> GT 0]
+      #<bErrAbs> = [#<bAngleErr>]
+    o103 else
+      #<bErrAbs> = [0 - #<bAngleErr>]
+    o103 endif
+    #<bAngle> = [#<bAngle> - #<bAngleErr>]
+
+  o100 while [#<bErrAbs> GT 0.003]
+o<v2-calib-align-fixture-perp-x> endsub
+M2

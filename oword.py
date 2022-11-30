@@ -260,6 +260,20 @@ def v2_calib_probe_top_plane(self, y_nominal):
     print(e)
     return str(e)
 
+def v2_calib_probe_home_offset_y(self, y, a, b):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_HOME_OFFSET_Y, y, a, b)
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def v2_calib_probe_home_offset_x(self, y, a, b):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_HOME_OFFSET_X, y, a, b)
+  except Exception as e:
+    print(e)
+    return str(e)
+
 def v2_calib_probe_x(self, x_nominal, z_nominal):
   try:
     calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_X, x_nominal, z_nominal)
