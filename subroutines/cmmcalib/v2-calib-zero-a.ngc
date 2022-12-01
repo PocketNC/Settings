@@ -15,13 +15,8 @@ o<v2-calib-zero-a> sub
     o<v2_calib_find_pos_a> call [#<yPos>] [#<aAngle>]
     #<aAngleMeas> = [#<_value>]
 
-    o101 if [#<aAngleMeas> GT 0]
-      #<aErrAbs> = [#<aAngleMeas>]
-    o101 else
-      #<aErrAbs> = [0 - #<aAngleMeas>]  
-    o101 endif
     #<aAngle> = [#<aAngle> - #<aAngleMeas>]
-    
+    #<aErrAbs> = [ ABS[ #<aAngleMeas>] ] 
   o100 while [#<aErrAbs> GT 0.003]
 
 o<v2-calib-zero-a> endsub [#<aAngle>]
