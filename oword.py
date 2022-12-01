@@ -343,6 +343,20 @@ def v2_calib_verify_z_home(self):
     print(e)
     return str(e)
 
+def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
+  try:
+    return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_FIXTURE_REL_Y_PERP, y, a, b)
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def v2_calib_find_pos_fixture_rel_x_perp(self, y, a, b):
+  try:
+    return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_FIXTURE_REL_X_PERP, y, a, b)
+  except Exception as e:
+    print(e)
+    return str(e)
+
 def v2_calib_find_pos_a(self, y_nominal, a_nominal):
   try:
     return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_A, y_nominal, a_nominal)
