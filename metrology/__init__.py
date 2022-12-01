@@ -373,6 +373,10 @@ class FeatureManager:
   def __init__(self):
     self.sets = [ FeatureSet() ]
 
+  def clear(self):
+    self.sets.clear()
+    self.sets.append( FeatureSet() )
+
   def push(self):
     self.sets.append( FeatureSet() )
 
