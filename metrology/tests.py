@@ -7,15 +7,6 @@ from pytest import approx
 import metrology
 import numpy
 
-def test_3d_line_intersection_precision():
-  line1 = ((0,0,0), ( 1./math.sqrt(3), 1./math.sqrt(3), 1./math.sqrt(3) ))
-  line2 = ((20,20,0), ( -1./math.sqrt(3), -1./math.sqrt(3), 1./math.sqrt(3) ))
-
-  intersections = metrology.intersectLines(line1, line2)
-
-  assert intersections[0] == approx(intersections[1])
-  assert intersections[0] == approx((10,10,10))
-
 def test_basic_3d_line_intersection():
   line1 = ( (0,0,0), (1,0,0) )
   line2 = ( (0,0,0), (0,0,1) )
@@ -34,6 +25,44 @@ def test_basic_3d_line_intersection2():
 # infinite number of closest points, simply picks the one closest to origin point of line1
   assert intersections[0] == approx((0,0,0))
   assert intersections[1] == approx((0,20,20))
+
+def test_basic_3d_line_intersection3():
+  line1 = ((0,0,0), ( 1./math.sqrt(3), 1./math.sqrt(3), 1./math.sqrt(3) ))
+  line2 = ((20,20,0), ( -1./math.sqrt(3), -1./math.sqrt(3), 1./math.sqrt(3) ))
+
+  intersections = metrology.intersectLines(line1, line2)
+
+  assert intersections[0] == approx(intersections[1])
+  assert intersections[0] == approx((10,10,10))
+
+def test_basic_3d_line_intersection_precision():
+
+  for i in range(1000):
+    while True:
+      p1 = 100*np.random.rand(3)
+      d1 = np.random.normal(size=3)
+      line1 = (p1,d1/np.linalg.norm(d1))
+
+      p2 = 100*np.random.rand(3)
+      d2 = np.random.normal(size=3)
+      line2 = (p2,d2/np.linalg.norm(d2))
+
+      planeP = 100*np.random.rand(3)
+      planeN = np.random.normal(size=3)
+      planeN = planeN/np.linalg.norm(planeN)
+      plane = (planeP,planeN)
+
+      line3 = metrology.projectLineOntoPlane(line1, plane)
+      line4 = metrology.projectLineOntoPlane(line2, plane)
+
+      if abs(np.dot(line3[1],line4[1])) < 1 - 1e-6:
+        # Do the calculations above until we have two lines that aren't parallel.
+        # This will almost always be the case, but every once and a while they will
+        # be parallel.
+        break
+
+    intersections = metrology.intersectLines(line3, line4)
+    assert intersections[0] == approx(intersections[1])
 
 def test_project_point_onto_xz_plane():
   plane = ( (0,0,0), (0,1,0) )
@@ -94,7 +123,7 @@ def test_3d_line_line_intersection():
 
   intersections = metrology.intersectLines(line3, line4)
 
-  assert intersections[0] == approx(intersections[1], abs=1e-6)
+  assert intersections[0] == approx(intersections[1])
 
 def test_best_fit_sphere():
   points = [ (1,0,0), (-1,0,0), (0,1,0), (0,-1,0), (0,0,1), (0,0,-1) ]
@@ -143,8 +172,8 @@ def test_best_fit_sphere_random4():
     feature = metrology.Feature(pts)
     sphere = feature.sphere()
 
-    assert sphere[0] == approx(1, abs=1e-10)
-    assert sphere[1] == approx((0,0,0), abs=1e-10)
+    assert sphere[0] == approx(1)
+    assert sphere[1] == approx((0,0,0))
 
 def test_best_fit_sphere_random_radius():
   tol = 2e-4
