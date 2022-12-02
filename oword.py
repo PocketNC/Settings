@@ -7,6 +7,7 @@ import importlib
 import asyncio
 import sys
 import ipp_tests
+import ipp
 import calib
 
 
@@ -264,6 +265,13 @@ def v2_calib_setup_cnc_csy(self):
 def v2_calib_probe_top_plane(self, y_nominal):
   try:
     calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_TOP_PLANE, y_nominal)
+  except Exception as e:
+    print(e)
+    return str(e)
+
+def experiment_with_cmm_movement(self):
+  try:
+    calib.CalibManager.getInstance().run_step(calib.Steps.EXPERIMENT_WITH_CMM_MOVEMENT)
   except Exception as e:
     print(e)
     return str(e)
@@ -679,6 +687,8 @@ def v2_calib_zmq_report(self):
     return str(e)
 
 def reload_calib(self):
+  cmm_disconnect(self)
   calib.reload()
+  importlib.reload(ipp)
   importlib.reload(ipp_tests)
   importlib.reload(calib)
