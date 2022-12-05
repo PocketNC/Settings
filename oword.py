@@ -9,7 +9,10 @@ import sys
 import ipp_tests
 import ipp
 import calib
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
@@ -360,8 +363,10 @@ def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
 
 def v2_calib_find_pos_fixture_rel_x_perp(self, y, a, b):
   try:
+    logger.debug('v2_calib_find_pos_fixture_rel_x_perp 1')
     return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_FIXTURE_REL_X_PERP, y, a, b)
   except Exception as e:
+    logger.error("find_pos_fixture_rel_y_perp exception: %s" % str(ex), exc_info=True)
     print(e)
     return str(e)
 
