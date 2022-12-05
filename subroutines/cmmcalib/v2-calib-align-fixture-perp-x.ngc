@@ -1,8 +1,8 @@
 ;v2-calib-align-fixture-perp-x
 o<v2-calib-align-fixture-perp-x> sub
-  #<yPos> = 0
-  #<aPos> = #1
-  #<bPos> = #2
+  #<yPos> = #1
+  #<aPos> = #2
+  #<bPos> = #3
 
   #<bAngle> = [#<bPos>]
   #<bAngleErr> = 0
@@ -18,5 +18,5 @@ o<v2-calib-align-fixture-perp-x> sub
     #<bErrAbs> = [ ABS[#<bAngleErr>] ]
   o100 while [#<bErrAbs> GT 0.003]
 
-o<v2-calib-align-fixture-perp-x> endsub
+o<v2-calib-align-fixture-perp-x> endsub [#<bAngle>]
 M2

@@ -13,7 +13,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
 #      - code you are dealing with either mm (G21) or inches (G20). We should probably 
@@ -363,9 +362,10 @@ def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
 
 def v2_calib_find_pos_fixture_rel_x_perp(self, y, a, b):
   try:
+    logger.debug('v2_calib_find_pos_fixture_rel_x_perp 1')
     return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_FIXTURE_REL_X_PERP, y, a, b)
   except Exception as e:
-    logger.debug(e, exc_info=True)
+    logger.error("find_pos_fixture_rel_y_perp exception: %s" % str(ex), exc_info=True)
     return str(e)
 
 def v2_calib_find_pos_a(self, y_nominal, a_nominal):
