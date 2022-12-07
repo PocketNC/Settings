@@ -472,6 +472,13 @@ def v2_calib_calc_calib(self):
     logger.debug(e, exc_info=True)
     return str(e)
 
+def v2_calib_calc_home_offsets(self):
+  try:
+    calib.CalibManager.getInstance().calc_home_offsets()
+  except Exception as e:
+    logger.debug(e, exc_info=True)
+    return str(e)
+
 def v2_calib_write_calib(self):
   try:
     calib.CalibManager.getInstance().run_step(calib.Steps.WRITE_CALIB)
