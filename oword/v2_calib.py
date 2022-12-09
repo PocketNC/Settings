@@ -1,196 +1,10 @@
-import metrology
-import probe
-import math
-import numpy
-import importlib
-
 import asyncio
-import sys
-import ipp_tests
-import ipp
 import calib
 import logging
+import ipp_tests
+import ipp
 
 logger = logging.getLogger(__name__)
-
-# TODO - Take into account units, leaving the metrology and probe modules units agnostic.
-#      - The metrology and probe modules don't really need to know about units, but in G
-#      - code you are dealing with either mm (G21) or inches (G20). We should probably 
-#      - convert to machine units (whatever is set in [TRAJ]LINEAR_UNITS) from whatever
-#      - the current mode is (mm when in G21 or inches when in G20). 
-#      - We should do this conversion in oword.py and namedparams.py when point data
-#      - is stored or requested by the user. This comment is duplicated in oword.py and namedparams.py.
-#      - See SOFT-846.
-
-def add_point(self, x=0, y=0, z=0):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
-  feature.addPoint(x,y,z)
-
-def clear_points(self):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
-  feature.clearPoints()
-
-def set_feature_transform_with_axis_angle(self, x, y, z, angle):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
-  feature.setTransformWithAxisAngle([x,y,z], math.radians(angle))
-
-# Used for allocating a new feature set to avoid stomping on data from
-# other contexts. In a given routine that is using feature numbers,
-# start the routine with "o<push_feature_set> call" and end it with
-# "o<pop_feature_set> call" and the routine will have free reign to modify
-# any feature without stomping on other's data
-def push_feature_set(self):
-  manager = metrology.FeatureManager.getInstance()
-  manager.push()
-
-def pop_feature_set(self):
-  manager = metrology.FeatureManager.getInstance()
-  manager.pop()
-
-def set_active_feature(self, id):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  featureSet.setActiveFeatureID(id)
-
-def set_probe_direction(self, dirx, diry, dirz):
-  cal = probe.getInstance()
-  comp = cal.setProbeDirection(dirx, diry, dirz)
-
-def disable_probe_calibration(self):
-  cal = probe.getInstance()
-  cal.disableCompensation()
-
-def enable_probe_calibration(self):
-  cal = probe.getInstance()
-  cal.enableCompensation()
-
-def project_points_onto_plane(self, pointsId, planeId, newId):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  pointsFeature = featureSet.getFeature(pointsId)
-  planeFeature = featureSet.getFeature(planeId)
-  newFeature = featureSet.getFeature(newId)
-
-  newFeature.clearPoints()
-  plane = planeFeature.plane()
-  points = pointsFeature.points()
-
-  for p in points:
-    pointOnPlane = metrology.projectPointOntoPlane(p, plane)
-    newFeature.addPoint(pointOnPlane[0], pointOnPlane[1], pointOnPlane[2])
-
-def point_deviations_from_plane(self, pointsId, planeId, newId):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  pointsFeature = featureSet.getFeature(pointsId)
-  planeFeature = featureSet.getFeature(planeId)
-  newFeature = featureSet.getFeature(newId)
-
-  newFeature.clearPoints()
-  plane = planeFeature.plane()
-  points = pointsFeature.points()
-
-  for p in points:
-    pointOnPlane = metrology.projectPointOntoPlane(p, plane)
-
-    logger.debug("point: (%s, %s, %s)" % (p[0], p[1], p[2]))
-    logger.debug("point on plane: (%s, %s, %s)" % (pointOnPlane[0], pointOnPlane[1], pointOnPlane[2]))
-
-    dx = p[0]-pointOnPlane[0]
-    dy = p[1]-pointOnPlane[1]
-    dz = p[2]-pointOnPlane[2]
-    logger.debug("mag: (%s)" % (math.sqrt(dx*dx+dy*dy+dz*dz),))
-
-    newFeature.addPoint(dx,dy,dz)
-
-def set_probe_calibration(self, actualDiameter, probeTipDiameter, rings, samplesPerRing, theta):
-  manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
-  cal = probe.getInstance()
-
-  cal.setProbeCalibration(actualDiameter, probeTipDiameter, feature, rings, samplesPerRing, theta)
-
-def save_probe_calibration(self):
-  cal = probe.getInstance()
-  cal.saveProbeCalibration()
-
-def cmm_connect(self):
-  try:
-    asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().connect_to_cmm())
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_disconnect(self):
-  try:
-    cm = calib.CalibManager.getInstance()
-    if cm.client and cm.client.is_connected():
-      asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().disconnect_from_cmm())
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_setup(self):
-  try:
-    calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CMM)
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_go_to_clearance_y(self):
-  try:
-    calib.CalibManager.getInstance().run_step(calib.Steps.GO_TO_CLEARANCE_Y)
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_go_to_clearance_z(self):
-  try:
-    calib.CalibManager.getInstance().run_step(calib.Steps.GO_TO_CLEARANCE_Z)
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_set_skip_cmm(self, val):
-  try:
-    tf = abs(val) > 1e-6
-    calib.CalibManager.getInstance().set_config('skip_cmm', tf)
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_set_skip_updates(self, val):
-  try:
-    tf = abs(val) > 1e-6
-    calib.CalibManager.getInstance().set_config("skip_updates", tf)
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_move_relative(self, x, y, z):
-  try:
-    logger.debug('cmm_move_relative oword')
-    asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().move_relative(x,y,z))
-
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
-
-def cmm_probe_sphere_relative(self, radius):
-  try:
-    logger.debug('cmm_probe_sphere_relative oword')
-    asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().probe_sphere_relative(radius))
-
-  except Exception as e:
-    logger.debug(e, exc_info=True)
-    return str(e)
 
 def v2_calib_connect(self):
   try:
@@ -702,3 +516,10 @@ def reload_calib(self):
   importlib.reload(ipp)
   importlib.reload(ipp_tests)
   importlib.reload(calib)
+
+def v2_calib_complete_stage(self, stage):
+  try:
+    calib.CalibManager.getInstance().complete_stage(calib.Stages(int(stage)))
+  except Exception as e:
+    logger.debug(e, exc_info=True)
+    return str(e)

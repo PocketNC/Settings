@@ -1,5 +1,5 @@
 print("in metrology __init__.py 4")
-import numpy
+import numpy as np
 from enum import Enum
 import scipy.optimize
 import metrology.leastSquaresSphere
@@ -15,6 +15,62 @@ _DEBUG = False
 def setDebug(d):
   global _DEBUG
   _DEBUG = d
+
+'''
+Following two methods (unit_vector and angle_between) adapted from:
+https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python
+'''
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+def angle_between(v1, v2):
+    """ Returns the angle in degrees between vectors 'v1' and 'v2'::
+            >>> angle_between((1, 0, 0), (0, 1, 0))
+            180/pi * 1.5707963267948966
+            >>> angle_between((1, 0, 0), (1, 0, 0))
+            180/pi * 0.0
+            >>> angle_between((1, 0, 0), (-1, 0, 0))
+            180/pi * 3.141592653589793
+    """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return (180/math.pi)*np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+def angle_between_ccw_2d(v1,v2):
+  logger.debug('angle_between_ccw_2d %s %s' % (v1, v2))
+  dot = v1[0] * v2[0] + v1[1] * v2[1]
+  det = v1[0] * v2[1] - v1[1] * v2[0]
+  return math.atan2(det,dot) * 180/math.pi
+
+
+def line_plane_intersect(dir_line, pt_line, dir_plane, pt_plane):
+  dir_line = np.array(dir_line)
+  dir_line = np.array(pt_line)
+  dir_line = np.array(dir_plane)
+  dir_line = np.array(pt_plane)
+
+  norm_dot_vec = np.dot(dir_plane, dir_line)
+  if( abs(norm_dot_vec) < EPSILON):
+    return None
+
+  w = pt_line - pt_plane
+  si = -np.dot(dir_plane, w) / norm_dot_vec
+  pos_intersect = w + si * dir_line + pt_plane
+  return pos_intersect
+
+def line_intersection_2d(p1,v1,p2,v2):
+  v1 = np.array(v1[0:2])
+  v2 = np.array(v2[0:2])
+  p1 = np.array(p1[0:2])
+  p2 = np.array(p2[0:2])
+
+  v12 = p1 - p2
+  v1_perp = np.array([-v1[1], v1[0]])
+  denom = np.dot(v1_perp, v2)
+  num = np.dot(v1_perp, v12)
+  return (num / denom.astype(float))*v2 + p2
+
 
 def diff(v1,v2):
   return [ v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2] ]
@@ -65,7 +121,7 @@ def bestFitCylinder(pts):
 
     # So what we're returning here is a numpy array of distances from our cylinder.
     # When we minimize this value, we'll have our pt, dir and radius for a best fit cylinder
-    return numpy.sqrt(u*u + v*v + w*w) - r
+    return np.sqrt(u*u + v*v + w*w) - r
 
 # Using the Jacobian matrix can result in fewer iterations of the least squares solver
 # But this doesn't always seem to give the correct answer.
@@ -87,7 +143,7 @@ def bestFitCylinder(pts):
     v = dirX*(z - ptZ) - dirZ*(x - ptX)
     w = dirY*(x - ptX) - dirX*(y - ptY)
 
-    d = numpy.sqrt(u*u + v*v + w*w)
+    d = np.sqrt(u*u + v*v + w*w)
 
     ddPtX = (v*dirZ - w*dirY)/d
     ddPtY = (-u*dirZ + w*dirX)/d
@@ -95,11 +151,11 @@ def bestFitCylinder(pts):
     ddDirX = (v*(z - ptZ) + w*(-y+ptY))*(1-dirX*dirX)/dirMag/d
     ddDirY = (u*(-z+ptZ) + w*(x-ptX))*(1-dirY*dirY)/dirMag/d
     ddDirZ = (u*(y-ptY) + v*(-x+ptX))*(1-dirZ*dirZ)/dirMag/d
-    ddR = numpy.full((x.size,), -1)
+    ddR = np.full((x.size,), -1)
 
-    return numpy.column_stack((ddPtX, ddPtY, ddPtZ, ddDirX, ddDirY, ddDirZ, ddR))
+    return np.column_stack((ddPtX, ddPtY, ddPtZ, ddDirX, ddDirY, ddDirZ, ddR))
     
-  (cylinder, ier) = scipy.optimize.leastsq(distFromCylinder, numpy.array([ x.mean(), y.mean(), z.mean(), 0, 0, 1, 1 ]))
+  (cylinder, ier) = scipy.optimize.leastsq(distFromCylinder, np.array([ x.mean(), y.mean(), z.mean(), 0, 0, 1, 1 ]))
 
   (ptX, ptY, ptZ, dirX, dirY, dirZ, r) = cylinder
 
@@ -122,19 +178,19 @@ def bestFitCircle(pts):
   planeOrigin = plane[0]
   planeN = plane[1]
   up = [ 1, 0, 0 ]
-  if abs(abs(numpy.dot(up, planeN))-1) < .0001:
+  if abs(abs(np.dot(up, planeN))-1) < .0001:
     up = [ 0, 1, 0 ]
 
-  xvec = numpy.cross(planeN, up)
-  xvec = xvec / numpy.linalg.norm(xvec)
+  xvec = np.cross(planeN, up)
+  xvec = xvec / np.linalg.norm(xvec)
 
-  yvec = numpy.cross(planeN, xvec)
+  yvec = np.cross(planeN, xvec)
 
   planePts = []
   for p in pts:
-    planePt = numpy.subtract(projectPointOntoPlane(p, plane), planeOrigin)
-    x = numpy.dot(planePt, xvec)
-    y = numpy.dot(planePt, yvec)
+    planePt = np.subtract(projectPointOntoPlane(p, plane), planeOrigin)
+    x = np.dot(planePt, xvec)
+    y = np.dot(planePt, yvec)
 
     planePts.append([ x, y, 0 ])
 
@@ -146,25 +202,25 @@ def bestFitCircle(pts):
     print("xvec", xvec)
     print("yvec", yvec)
     print("planeOrigin", planeOrigin)
-    print("numpy.multiply(circle2d[0][0], xvec)", numpy.multiply(circle2d[0][0], xvec))
-    print("numpy.multiply(circle2d[0][1], yvec)", numpy.multiply(circle2d[0][1], yvec))
+    print("np.multiply(circle2d[0][0], xvec)", np.multiply(circle2d[0][0], xvec))
+    print("np.multiply(circle2d[0][1], yvec)", np.multiply(circle2d[0][1], yvec))
 
-  center = numpy.multiply(circle2d[0][0], xvec)+numpy.multiply(circle2d[0][1], yvec)+planeOrigin
+  center = np.multiply(circle2d[0][0], xvec)+np.multiply(circle2d[0][1], yvec)+planeOrigin
 
   return (center, circle2d[1], planeN)
 
 def bestFitPlane(pts):
-  pts_array = numpy.array(pts)
-  mean = numpy.mean(pts_array, axis=0)
-  svd = numpy.linalg.svd((pts_array-mean).T)
+  pts_array = np.array(pts)
+  mean = np.mean(pts_array, axis=0)
+  svd = np.linalg.svd((pts_array-mean).T)
 
   # return tuple with (pt on plane, normal of plane)
   return (mean, svd[0].T[2])
 
 def bestFitLine(pts):
-  pts_array = numpy.array(pts)
-  mean = numpy.mean(pts_array, axis=0)
-  svd = numpy.linalg.svd(pts_array-mean)
+  pts_array = np.array(pts)
+  mean = np.mean(pts_array, axis=0)
+  svd = np.linalg.svd(pts_array-mean)
 
   if _DEBUG:
     print("SVD", svd)
@@ -176,15 +232,15 @@ def projectPointOntoPlane(point, plane):
   planePt = plane[0]
   planeN = plane[1]
 
-  vec = numpy.subtract(point, planePt)
+  vec = np.subtract(point, planePt)
   
-  return numpy.subtract(point, numpy.multiply(planeN, numpy.dot(vec, planeN))) 
+  return np.subtract(point, np.multiply(planeN, np.dot(vec, planeN))) 
 
 def projectDirectionOntoPlane(direction, plane):
   planePt = plane[0]
   planeN = plane[1]
 
-  return numpy.subtract(direction, numpy.multiply(planeN, numpy.dot(direction, planeN))) 
+  return np.subtract(direction, np.multiply(planeN, np.dot(direction, planeN))) 
 
 def projectLineOntoPlane(line, plane):
   pt = projectPointOntoPlane(line[0], plane)
@@ -228,7 +284,7 @@ class Feature:
   def __init__(self, pts=[]):
     self._featureTransform = None
 
-    self._points = numpy.array(pts)
+    self._points = np.array(pts)
     self.makeDirty()
 
   def setTransformWithAxisAngle(self, axis, angle):
@@ -248,10 +304,10 @@ class Feature:
 
   def addPoint(self, x, y, z):
     if len(self._points) == 0:
-      self._points = numpy.append(self._points, numpy.array([x,y,z])).reshape(1,3)
+      self._points = np.append(self._points, np.array([x,y,z])).reshape(1,3)
       self._points.setflags(write=False)
     else:
-      self._points = numpy.append(self._points, numpy.array([[x,y,z]]), axis=0)
+      self._points = np.append(self._points, np.array([[x,y,z]]), axis=0)
       self._points.setflags(write=False)
     self.makeDirty()
 
@@ -261,7 +317,7 @@ class Feature:
         print("%s\t%s\t%s" % ( p[0], p[1], p[2] ))
 
   def clearPoints(self):
-    self._points = numpy.array([])
+    self._points = np.array([])
     self.makeDirty()
 
     if _DEBUG:
@@ -270,11 +326,11 @@ class Feature:
   def points(self):
     if self._transformedPoints is None:
       if self._featureTransform is None:
-        self._transformedPoints = numpy.array(self._points)
+        self._transformedPoints = np.array(self._points)
         self._transformedPoints.setflags(write=False)
       else:
         transformed = [ self._featureTransform @ [ p[0], p[1], p[2], 1 ] for p in self._points ]
-        self._transformedPoints = numpy.array([ (p[0],p[1],p[2]) for p in transformed ])
+        self._transformedPoints = np.array([ (p[0],p[1],p[2]) for p in transformed ])
         self._transformedPoints.setflags(write=False)
 
     return self._transformedPoints
@@ -336,7 +392,7 @@ class Feature:
   def circle2D(self):
     if self._circle2D is None:
       ptData = self.points().T
-      pts = numpy.array([ ptData[0],ptData[1] ]).T
+      pts = np.array([ ptData[0],ptData[1] ]).T
       circle = skg.nsphere.nsphere_fit(pts)
       self._circle2D = (circle[1], circle[0])
 
@@ -351,6 +407,9 @@ class FeatureSet:
   def __init__(self):
     self.features = {}
     self.activeFeatureID = 0
+
+  def setFeature(self, id, feat):
+    self.features[id] = feat
 
   def setActiveFeatureID(self, id):
     self.activeFeatureID = int(id)

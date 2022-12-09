@@ -32,8 +32,8 @@ reload(calib)
 def __init__(self):
 # handle any per-module initialisation tasks here
   remap.init_stdglue(self)
-  logger.debug("interp __init__",self.task,os.getpid())
+  logger.debug("interp __init__ %s, %s",self.task,os.getpid())
 
 def __delete__(self):
 # handle any per-module shutdown tasks here
-  logger.debug("interp __delete__",self.task,os.getpid())
+  logger.debug("interp __delete__ %s, %s",self.task,os.getpid())

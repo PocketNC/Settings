@@ -1,7 +1,7 @@
-print("named paramed average magnitude");
 import metrology
-import math
-import probe
+import logging
+
+logger = logging.getLogger(__name__)
 
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
@@ -273,14 +273,4 @@ def _penta_plane_point_z(self):
 
   return plane[0][2]
 
-def _probe_compensation_x(self):
-  cal = probe.getInstance()
-  return cal.getCompensationX()
-
-def _probe_compensation_y(self):
-  cal = probe.getInstance()
-  return cal.getCompensationY()
-
-def _probe_compensation_z(self):
-  cal = probe.getInstance()
-  return cal.getCompensationZ()
+__all__ = [ k for k in globals().keys() if k.startswith("_penta") ]
