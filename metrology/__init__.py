@@ -404,9 +404,20 @@ class Feature:
 featureManagerInstance = None
 
 class FeatureSet:
-  def __init__(self):
+  def __init__(self, data={}):
     self.features = {}
+
+    for (key,value) in data.items():
+      self.features[key] = Feature(value)
+
     self.activeFeatureID = 0
+
+  def setNewActiveFeature(self):
+    keys = [ k for k in self.features.keys() if type(k) == int ]
+    maxID = -1 if len(keys) == 0 else max(keys)
+    self.activeFeatureID = maxID+1
+
+    return self.getActiveFeature()
 
   def setFeature(self, id, feat):
     self.features[id] = feat
