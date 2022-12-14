@@ -1,3 +1,5 @@
+import metrology
+
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
 #      - code you are dealing with either mm (G21) or inches (G20). We should probably 

@@ -6,6 +6,9 @@ import metrology.leastSquaresSphere
 import metrology.helpers
 import skg
 import math
+import logging
+
+logger = logging.getLogger(__name__)
 
 from importlib import reload
 reload(metrology.leastSquaresSphere)
@@ -42,7 +45,6 @@ def angle_between_ccw_2d(v1,v2):
   dot = v1[0] * v2[0] + v1[1] * v2[1]
   det = v1[0] * v2[1] - v1[1] * v2[0]
   return math.atan2(det,dot) * 180/math.pi
-
 
 def line_plane_intersect(dir_line, pt_line, dir_plane, pt_plane):
   dir_line = np.array(dir_line)
@@ -401,6 +403,19 @@ class Feature:
 
     return self._circle2D
 
+  def projectToPlane(self, plane):
+    feat = Feature()
+    points = self.points()
+
+    for pt in points:
+      proj_pt = projectPointOntoPlane(pt, plane)
+      feat.addPoint(proj_pt[0], proj_pt[1], proj_pt[2])
+
+    return feat
+
+  def reverse(self):
+    return Feature([ p for p in self.points()[::-1] ])
+
 featureManagerInstance = None
 
 class FeatureSet:
@@ -428,7 +443,30 @@ class FeatureSet:
   def getActiveFeatureID(self):
     return self.activeFeatureID
 
+  def __getattr__(self, id):
+    """
+    Gets the feature by id, throwing an error if it doesn't exist.
+    This is helpful calibration where we want an error to be thrown
+    if the feature doesn't exist that we're trying to access, meaning
+    the data hasn't been collected yet.
+    """
+    return self.features[id]
+
+  def __getitem__(self, id):
+    """
+    Gets the feature by id, throwing an error if it doesn't exist.
+    This is helpful calibration where we want an error to be thrown
+    if the feature doesn't exist that we're trying to access, meaning
+    the data hasn't been collected yet.
+    """
+    return self.features[id]
+
   def getFeature(self, id):
+    """
+    Gets the feature by id, returning an empty feature if it doesn't exist.
+    This is helpful in G code where you can set the active feature to an integer
+    and start adding points to it without worrying if it's been initialized.
+    """
     feature = self.features.get(id, None)
     if feature == None:
       feature = Feature()

@@ -7,6 +7,24 @@ from pytest import approx
 import metrology
 import numpy
 
+def test_angle_between_ccw_2d():
+  line1 = [ 0, 1 ]
+  line2 = [ -1, 0 ]
+
+  assert metrology.angle_between_ccw_2d(line1, line2) == approx(90)
+
+  line1 = [ .5*math.sqrt(2), .5*math.sqrt(2) ]
+  line2 = [ 0, 1 ]
+  assert metrology.angle_between_ccw_2d(line1, line2) == approx(45)
+
+  line1 = [ .5*math.sqrt(2), .5*math.sqrt(2) ]
+  line2 = [ -.5*math.sqrt(2), -.5*math.sqrt(2) ]
+  assert metrology.angle_between_ccw_2d(line1, line2) == approx(180)
+
+  line1 = [ 1, 0 ]
+  line2 = [ -.5*math.sqrt(2), -.5*math.sqrt(2) ]
+  assert 360+metrology.angle_between_ccw_2d(line1, line2) == approx(225)
+
 def test_basic_3d_line_intersection():
   line1 = ( (0,0,0), (1,0,0) )
   line2 = ( (0,0,0), (0,0,1) )

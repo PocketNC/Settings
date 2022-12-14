@@ -1,14 +1,10 @@
-from importlib import reload
-
 import remap
 import os
 import oword
 import namedparams
-import probe
-import metrology
-import ipp_tests
-import calib
 import logging
+import sys
+import importlib
 
 POCKETNC_VAR_DIR = os.environ.get('POCKETNC_VAR_DIRECTORY')
 logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
@@ -19,15 +15,7 @@ logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
 )
 logger = logging.getLogger(__name__)
 
-logger.debug("in toplevel.py 8")
-
-
-reload(oword)
-reload(metrology)
-reload(probe)
-reload(namedparams)
-reload(ipp_tests)
-reload(calib)
+logger.debug("in toplevel.py 36")
 
 def __init__(self):
 # handle any per-module initialisation tasks here
@@ -37,3 +25,28 @@ def __init__(self):
 def __delete__(self):
 # handle any per-module shutdown tasks here
   logger.debug("interp __delete__ %s, %s",self.task,os.getpid())
+
+
+def reload_python():
+  logger.debug("in reload_python");
+  for (k,v) in list(sys.modules.items()):
+    if k.startswith('__main__'):
+      logger.debug("starts with __main__, skipping... %s" % k)
+      continue
+
+    try:
+      if(v.__file__.startswith('/opt/cmm-calib') or
+         v.__file__.startswith('/opt/ippclient') or
+         v.__file__.startswith('/opt/pocketnc')):
+        try:
+          logger.debug("reloading... %s" % k)
+          importlib.reload(v)
+        except NotImplementedError:
+          pass
+        except:
+          logger.debug("Error reloading module (%s,%s)", k, v, exc_info=True)
+    except:
+      pass
+
+if os.environ.get('DEV') == "true":
+  reload_python();

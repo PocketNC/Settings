@@ -1,34 +1,64 @@
-import calib
+from metrology import Feature
+from cmmmanager import Cmm
 import asyncio
+from ipp import float3, readPointData
+import ipp_routines as routines
+from oword.penta import add_point
 
-def cmm_connect(self):
-  asyncio.get_event_loop().run_until_complete(calib.CalibManager.getInstance().connect_to_cmm())
+async def cmm_connect(self):
+  cmm = Cmm.getInstance()
+
+  if cmm.is_connected():
+    return
+
+  await cmm.connect()
+  await cmm.EndSession().complete()
+  await cmm.StartSession().complete()
 
 async def cmm_disconnect(self):
-  cm = calib.CalibManager.getInstance()
-  if cm.client and cm.client.is_connected():
-    await calib.CalibManager.getInstance().disconnect_from_cmm()
+  cmm = Cmm.getInstance()
 
-def cmm_setup(self):
-  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CMM)
+  if cmm.is_connected():
+    await cmm.EndSession().send()
+    await cmm.disconnect()
 
-def cmm_go_to_clearance_y(self):
-  calib.CalibManager.getInstance().run_step(calib.Steps.GO_TO_CLEARANCE_Y)
+async def cmm_go_to_clearance_y(self, y=-250):
+  cmm = Cmm.getInstance()
 
-def cmm_go_to_clearance_z(self):
-  calib.CalibManager.getInstance().run_step(calib.Steps.GO_TO_CLEARANCE_Z)
+  await cmm.GoTo("Y(%s)" % y).complete()
+
+async def cmm_go_to_clearance_z(self, z=250):
+  cmm = Cmm.getInstance()
+
+  await cmm.GoTo("Z(%s)" % z).complete()
 
 def cmm_set_skip_cmm(self, val):
+  cmm = Cmm.getInstance()
   tf = abs(val) > 1e-6
-  calib.CalibManager.getInstance().set_config('skip_cmm', tf)
+  cmm.set_skip_cmm(tf)
+
+async def cmm_set_part_csy(self,x,y,z,theta,psi,phi):
+  cmm = Cmm.getInstance()
+
+  await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (x, y, z, theta, psi, phi)).complete()
+  await cmm.SetCoordSystem("PartCsy").complete()
+
+async def cmm_move_relative(self, x, y, z):
+  cmm = Cmm.getInstance()
+
+  getCurrPosCmd = await cmm.Get("X(),Y(),Z()").data()
+  startPos = readPointData(getCurrPosCmd.data_list[0])
+
+  await cmm.GoTo((startPos + float3(x,y,z)).ToXYZString()).complete()
+
+async def cmm_probe_sphere_relative(self, radius):
+  cmm = Cmm.getInstance()
+
+  pts = cmm.routines.probe_sphere_relative(radius)
+  for pt in pts:
+    add_point(self, pt.x, pt.y, pt.z)
+
 
 def cmm_set_skip_updates(self, val):
   tf = abs(val) > 1e-6
-  calib.CalibManager.getInstance().set_config("skip_updates", tf)
-
-async def cmm_move_relative(self, x, y, z):
-  await calib.CalibManager.getInstance().move_relative(x,y,z)
-
-async def cmm_probe_sphere_relative(self, radius):
-  await calib.CalibManager.getInstance().probe_sphere_relative(radius)
-
+  #calib.CalibManager.getInstance().set_config("skip_updates", tf)

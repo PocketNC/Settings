@@ -14,8 +14,14 @@ logger.debug("imported oword")
 
 from .v2_calib import *
 from .cmm import *
-from .metrology import *
+from .penta import *
 from .probe import *
+
+def do_nothing(self):
+  logger.debug("in do_nothing")
+  logger.debug("in do_nothing again")
+  logger.debug("in do_nothing again2")
+  pass
 
 def return_exception_as_string(func):
   def wrapper(*args, **kwargs):
