@@ -6,24 +6,12 @@ from v2routines import Z_CLEARANCE_PART_CSY
 
 logger = logging.getLogger(__name__)
 
-async def v2_calib_setup_cmm_for_v2(self):
+async def v2_calib_setup_cmm(self):
   """
   Sets up the basics so we can command the CMM:
   1) Clears all errors.
   2) Homes all axes.
   3) Loads the tool we use during the calibration routines.
-  4) Sets up an approximate Part CSY (coordinate system). The
-     origin is approximately the back right corner of the
-     L-bracket on the V2. The +X direction of the Part CSY
-     is oriented in the +Z direction of the V2. The +Y direction 
-     of the Part CSY is aligned with the +X direction of the V2.
-     The +Z direction of the Part CSY is aligned with the +Y 
-     direction of the V2. 
-     TODO - make these axes all align with the V2's for more
-     intuitive way points and routines. See SOFT-1010.
-  5) Probes the V2 to setup a more accurate Part CSY relative
-     to the back right corner of the L bracket.
-
   """
   cmm = Cmm.getInstance()
   CMM_SPEED = 500
@@ -35,32 +23,48 @@ async def v2_calib_setup_cmm_for_v2(self):
   await cmm.SetProp("Tool.GoToPar.Speed(%s)" % CMM_SPEED).ack()
   await cmm.SetProp("Tool.GoToPar.Accel(%s)" % CMM_ACCEL).ack()
 
+async def v2_calib_probe_machine_pos
+  """
+  1) Sets up a Part CSY (coordinate system) for a specific
+     slot (currently the front right slot). The
+     origin is approximately the back right corner of the
+     L-bracket on the V2. The +X direction of the Part CSY
+     is oriented in the +Z direction of the V2. The +Y direction 
+     of the Part CSY is aligned with the +X direction of the V2.
+     The +Z direction of the Part CSY is aligned with the +Y 
+     direction of the V2. 
+  2) Probes the V2 to setup a Part CSY with the origin at the
+     the back right corner of the L bracket with the X, Y and Z
+     axes aligned roughly with the V2 (as closely as they can
+     be without fully characterizing their motion).
+  3) Retract to a safe
+  """
   # TODO - implement some kind of slot system so we can
   # have multiple machines on a single CMM. For now these
   # are setup for a machine in the front right of the CMM.
 
-  await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (approx_origin[0], approx_origin[1], approx_origin[2], approx_euler[0], approx_euler[1], approx_euler[2])).complete()
-  await cmm.SetCoordSystem("PartCsy").complete()
+  APPROX_CSY_FRONT_RIGHT_SLOT = Csy(653.0, 134.0, 126.5, 0, -90, 0)
+  cmm.routines.set_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT)
 
   (L_bracket_top_face, L_bracket_back_line, L_bracket_right_line) = await cmm.v2routines.probe_machine_pos()
 
   state = CalibState.getInstance()
-  features = state.getStage(Stages.SETUP_CMM_FOR_V2)
+  features = state.getStage(Stages.PROBE_MACHINE_POS)
   features.setFeature("L_bracket_top_face", L_bracket_top_face)
   features.setFeature("L_bracket_back_line", L_bracket_back_line)
   features.setFeature("L_bracket_right_line", L_bracket_right_line)
   state.saveStage(Stages.SETUP_CMM_FOR_V2)
 
-  csy = calc_part_csy(L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
+  csy = calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
 
-  await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (csy.origin[0], csy.origin[1], csy.origin[2], csy.euler[0], csy.euler[1], csy.euler[2])).complete()
-  await cmm.SetCoordSystem("PartCsy").complete()
-  await cmm.GoTo("Z(%s)" % Z_CLEARANCE_PART_CSY).complete()
+  cmm.routines.set_part_csy(csy)
+  await cmm.GoTo("Y(%s)" % Y_CLEARANCE_PART_CSY).complete()
+
 
 async def v2_calib_load_part_csy(self):
   state = CalibState.getInstance()
 
-  features = state.getStage(Stages.SETUP_CMM_FOR_V2)
+  features = state.getStage(Stages.PROBE_MACHINE_POS)
   L_bracket_top_face = features.L_bracket_top_face
   L_bracket_back_line = features.L_bracket_back_line
   L_bracket_right_line = features.L_bracket_right_line

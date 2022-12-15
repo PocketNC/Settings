@@ -37,11 +37,10 @@ def cmm_set_skip_cmm(self, val):
   tf = abs(val) > 1e-6
   cmm.set_skip_cmm(tf)
 
-async def cmm_set_part_csy(self,x,y,z,theta,psi,phi):
+async def cmm_set_part_csy(self,csy):
   cmm = Cmm.getInstance()
 
-  await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (x, y, z, theta, psi, phi)).complete()
-  await cmm.SetCoordSystem("PartCsy").complete()
+  cmm.routines.set_part_csy(csy)
 
 async def cmm_move_relative(self, x, y, z):
   cmm = Cmm.getInstance()
