@@ -22,15 +22,15 @@ async def cmm_disconnect(self):
     await cmm.EndSession().send()
     await cmm.disconnect()
 
-async def cmm_go_to_clearance_y(self, y=-250):
+async def cmm_go_to_clearance_y(self, y=250):
   cmm = Cmm.getInstance()
 
-  await cmm.GoTo("Y(%s)" % y).complete()
+  await cmm.v2routines.go_to_clearance_y(y)
 
-async def cmm_go_to_clearance_z(self, z=250):
+async def cmm_go_to_clearance_x(self, x=-250):
   cmm = Cmm.getInstance()
 
-  await cmm.GoTo("Z(%s)" % z).complete()
+  await cmm.v2routines.go_to_clearance_x(x)
 
 def cmm_set_skip_cmm(self, val):
   cmm = Cmm.getInstance()

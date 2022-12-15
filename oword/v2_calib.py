@@ -2,7 +2,7 @@ import logging
 from cmmmanager import Cmm
 from v2calculations import Csy, calc_part_csy
 from calibstate import CalibState, Stages
-from v2routines import Z_CLEARANCE_PART_CSY
+from v2routines import Z_CLEARANCE_PART_CSY, V2_10, V2_50
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ async def v2_calib_setup_cmm(self):
   await cmm.SetProp("Tool.GoToPar.Speed(%s)" % CMM_SPEED).ack()
   await cmm.SetProp("Tool.GoToPar.Accel(%s)" % CMM_ACCEL).ack()
 
-async def v2_calib_probe_machine_pos
+async def v2_calib_probe_machine_pos(self):
   """
   1) Sets up a Part CSY (coordinate system) for a specific
      slot (currently the front right slot). The
@@ -37,14 +37,16 @@ async def v2_calib_probe_machine_pos
      the back right corner of the L bracket with the X, Y and Z
      axes aligned roughly with the V2 (as closely as they can
      be without fully characterizing their motion).
-  3) Retract to a safe
+  3) Retract to a safety clearance
   """
+  cmm = Cmm.getInstance()
+
   # TODO - implement some kind of slot system so we can
   # have multiple machines on a single CMM. For now these
   # are setup for a machine in the front right of the CMM.
 
   APPROX_CSY_FRONT_RIGHT_SLOT = Csy(653.0, 134.0, 126.5, 0, -90, 0)
-  cmm.routines.set_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT)
+  await cmm.routines.set_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT)
 
   (L_bracket_top_face, L_bracket_back_line, L_bracket_right_line) = await cmm.v2routines.probe_machine_pos()
 
@@ -53,12 +55,12 @@ async def v2_calib_probe_machine_pos
   features.setFeature("L_bracket_top_face", L_bracket_top_face)
   features.setFeature("L_bracket_back_line", L_bracket_back_line)
   features.setFeature("L_bracket_right_line", L_bracket_right_line)
-  state.saveStage(Stages.SETUP_CMM_FOR_V2)
+  state.saveStage(Stages.PROBE_MACHINE_POS)
 
   csy = calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
 
-  cmm.routines.set_part_csy(csy)
-  await cmm.GoTo("Y(%s)" % Y_CLEARANCE_PART_CSY).complete()
+  await cmm.routines.set_part_csy(csy)
+  await cmm.v2routines.go_to_clearance_y()
 
 
 async def v2_calib_load_part_csy(self):
@@ -74,7 +76,25 @@ async def v2_calib_load_part_csy(self):
   await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (csy.origin[0], csy.origin[1], csy.origin[2], csy.euler[0], csy.euler[1], csy.euler[2])).complete()
   await cmm.SetCoordSystem("PartCsy").complete()
 
-def v2_calib_probe_spindle_pos(self, x_nominal, z_nominal):
+def _save_zero_spindle_pos(zero_spindle_pos):
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  features.setFeature("zero_spindle_pos", zero_spindle_pos)
+  state.saveStage(Stages.PROBE_SPINDLE_POS)
+
+async def v2_calib_probe_spindle_pos_v2_10(self, x, z):
+  cmm = Cmm.getInstance()
+
+  zero_spindle_pos = await cmm.v2routines.probe_spindle_pos(V2_10, x, z)
+  _save_zero_spindle_pos(zero_spindle_pos)
+  await cmm.v2routines.go_to_clearance_y()
+
+async def v2_calib_probe_spindle_pos_v2_50(self, x, z):
+  cmm = Cmm.getInstance()
+
+  zero_spindle_pos = await cmm.v2routines.probe_spindle_pos(V2_50, x, z)
+  _save_zero_spindle_pos(zero_spindle_pos)
+  await cmm.v2routines.go_to_clearance_y()
 
 
 
