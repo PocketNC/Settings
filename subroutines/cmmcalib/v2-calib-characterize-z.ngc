@@ -6,15 +6,20 @@ o<v2-calib-characterize-z> sub
   g0 y63.5x0a0
   M66  E0 L0
 
-  o100 while [#1 GT -25.65]
+  o100 while [#1 GT -87]
     M66  E0 L0
     g0 z[#1]
     M66  E0 L0
     o<v2_calib_probe_z> call [0][#1]
     M66  E0 L0
-    #1 = [#1 - 25]
+    #1 = [#1 - 15]
     M66  E0 L0
   o100 endwhile
+
+  M66  E0 L0
+  g0 z-87
+  M66  E0 L0
+  o<v2_calib_probe_z> call [0][-87]
 
 
 o<v2-calib-characterize-z> endsub
