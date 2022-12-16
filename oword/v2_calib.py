@@ -2,7 +2,7 @@ import logging
 from cmmmanager import Cmm
 from v2calculations import Csy, calc_part_csy
 from calibstate import CalibState, Stages
-from v2routines import Z_CLEARANCE_PART_CSY, V2_10, V2_50
+from v2routines import V2_10, V2_50
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +96,19 @@ async def v2_calib_probe_spindle_pos_v2_50(self, x, z):
   _save_zero_spindle_pos(zero_spindle_pos)
   await cmm.v2routines.go_to_clearance_y()
 
+async def v2_calib_probe_x_home(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  features = state.getStage(Stages.HOMING_X)
+  id = features.getNextID()
+  features.setFeature(id, spindle_pos)
+  state.saveStage(Stages.HOMING_X)
 
 
 #def v2_calib_probe_spindle_at_tool_probe(self):
@@ -138,9 +151,6 @@ async def v2_calib_probe_spindle_pos_v2_50(self, x, z):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_X, x_nominal, z_nominal)
 #  pass
 #
-#def v2_calib_probe_x_home(self, x_nominal, z_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_X_HOME, x_nominal, z_nominal)
-#  pass
 #
 #def v2_calib_verify_x_home(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_X_HOME)

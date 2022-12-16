@@ -427,10 +427,13 @@ class FeatureSet:
 
     self.activeFeatureID = 0
 
-  def setNewActiveFeature(self):
+  def getNextID(self):
     keys = [ k for k in self.features.keys() if type(k) == int ]
     maxID = -1 if len(keys) == 0 else max(keys)
-    self.activeFeatureID = maxID+1
+    return maxID+1
+
+  def setNewActiveFeature(self):
+    self.activeFeatureID = self.getNextID()
 
     return self.getActiveFeature()
 
