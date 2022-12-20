@@ -77,10 +77,8 @@ async def v2_calib_load_part_csy(self):
   L_bracket_back_line = features.L_bracket_back_line
   L_bracket_right_line = features.L_bracket_right_line
 
-  csy = v2calculations.calc_part_csy(L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
-
-  await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (csy.origin[0], csy.origin[1], csy.origin[2], csy.euler[0], csy.euler[1], csy.euler[2])).complete()
-  await cmm.SetCoordSystem("PartCsy").complete()
+  csy = calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
+  await cmm.routines.set_part_csy(csy)
 
 def _save_zero_spindle_pos(zero_spindle_pos):
   state = CalibState.getInstance()
