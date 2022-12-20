@@ -29,7 +29,7 @@ def return_exception_as_string(func):
       return func(*args, **kwargs)
     except Exception as e:
       msg = "%s: %s" % (type(e).__name__, str(e))
-      logger.debug(msg, exc_info=True)
+      logger.error(msg, exc_info=True)
       return msg
   return wrapper
 
@@ -39,7 +39,7 @@ def await_return_exception_as_string(func):
       return asyncio.get_event_loop().run_until_complete(func(*args, **kwargs))
     except Exception as e:
       msg = "%s: %s" % (type(e).__name__, str(e))
-      logger.debug(msg, exc_info=True)
+      logger.error(msg, exc_info=True)
       return msg
   return wrapper
 

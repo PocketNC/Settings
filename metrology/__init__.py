@@ -418,17 +418,24 @@ class Feature:
 
 featureManagerInstance = None
 
+def is_int(s):
+  try:
+    i = int(s)
+    return True
+  except:
+    return False
+
 class FeatureSet:
   def __init__(self, data={}):
     self.features = {}
 
     for (key,value) in data.items():
-      self.features[key] = Feature(value)
+      self.features[str(key)] = Feature(value)
 
     self.activeFeatureID = 0
 
   def getNextID(self):
-    keys = [ k for k in self.features.keys() if type(k) == int ]
+    keys = [ int(k) for k in self.features.keys() if k == int ]
     maxID = -1 if len(keys) == 0 else max(keys)
     return maxID+1
 
@@ -437,7 +444,8 @@ class FeatureSet:
 
     return self.getActiveFeature()
 
-  def setFeature(self, id, feat):
+  def setFeature(self, key, feat):
+    id = str(key)
     self.features[id] = feat
 
   def setActiveFeatureID(self, id):
@@ -446,30 +454,33 @@ class FeatureSet:
   def getActiveFeatureID(self):
     return self.activeFeatureID
 
-  def __getattr__(self, id):
+  def __getattr__(self, key):
     """
     Gets the feature by id, throwing an error if it doesn't exist.
     This is helpful calibration where we want an error to be thrown
     if the feature doesn't exist that we're trying to access, meaning
     the data hasn't been collected yet.
     """
+    id = str(key)
     return self.features[id]
 
-  def __getitem__(self, id):
+  def __getitem__(self, key):
     """
     Gets the feature by id, throwing an error if it doesn't exist.
     This is helpful calibration where we want an error to be thrown
     if the feature doesn't exist that we're trying to access, meaning
     the data hasn't been collected yet.
     """
+    id = str(key)
     return self.features[id]
 
-  def getFeature(self, id):
+  def getFeature(self, key):
     """
     Gets the feature by id, returning an empty feature if it doesn't exist.
     This is helpful in G code where you can set the active feature to an integer
     and start adding points to it without worrying if it's been initialized.
     """
+    id = str(key)
     feature = self.features.get(id, None)
     if feature == None:
       feature = Feature()
@@ -479,6 +490,14 @@ class FeatureSet:
 
   def getActiveFeature(self):
     return self.getFeature(self.activeFeatureID)
+
+  def items(self):
+    return self.features.items()
+  def keys(self):
+    return self.features.keys()
+  def values(self):
+    return self.features.values()
+
 
 class FeatureManager:
   def __init__(self):

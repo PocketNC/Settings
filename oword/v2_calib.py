@@ -1,10 +1,16 @@
 import logging
 from cmmmanager import Cmm
-from v2calculations import Csy, calc_part_csy
+from ipp import Csy
+import v2calculations
 from calibstate import CalibState, Stages
-from v2routines import V2_10, V2_50
+from v2routines import V2_10, V2_50, PROBE_DIA, BEST_FIT_SPHERE_ERROR, SPINDLE_BALL_DIA_10, SPINDLE_BALL_DIA_50
+import numpy as np
 
 logger = logging.getLogger(__name__)
+
+class CalibException(Exception):
+  pass
+
 
 async def v2_calib_setup_cmm(self):
   """
@@ -57,7 +63,7 @@ async def v2_calib_probe_machine_pos(self):
   features.setFeature("L_bracket_right_line", L_bracket_right_line)
   state.saveStage(Stages.PROBE_MACHINE_POS)
 
-  csy = calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
+  csy = v2calculations.calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
 
   await cmm.routines.set_part_csy(csy)
   await cmm.v2routines.go_to_clearance_y()
@@ -71,7 +77,7 @@ async def v2_calib_load_part_csy(self):
   L_bracket_back_line = features.L_bracket_back_line
   L_bracket_right_line = features.L_bracket_right_line
 
-  csy = calc_part_csy(L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
+  csy = v2calculations.calc_part_csy(L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
 
   await cmm.SetCsyTransformation("PartCsy, %s, %s, %s, %s, %s, %s" % (csy.origin[0], csy.origin[1], csy.origin[2], csy.euler[0], csy.euler[1], csy.euler[2])).complete()
   await cmm.SetCoordSystem("PartCsy").complete()
@@ -82,19 +88,41 @@ def _save_zero_spindle_pos(zero_spindle_pos):
   features.setFeature("zero_spindle_pos", zero_spindle_pos)
   state.saveStage(Stages.PROBE_SPINDLE_POS)
 
+#TODO check the radius of best-fit sphere here
 async def v2_calib_probe_spindle_pos_v2_10(self, x, z):
   cmm = Cmm.getInstance()
 
   zero_spindle_pos = await cmm.v2routines.probe_spindle_pos(V2_10, x, z)
+  
+  expected_dia = SPINDLE_BALL_DIA_10 + PROBE_DIA
+  if abs(zero_spindle_pos.sphere()[0] - expected_dia) > BEST_FIT_SPHERE_ERROR:
+    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
+
   _save_zero_spindle_pos(zero_spindle_pos)
   await cmm.v2routines.go_to_clearance_y()
 
+#TODO check the radius of best-fit sphere here
 async def v2_calib_probe_spindle_pos_v2_50(self, x, z):
   cmm = Cmm.getInstance()
 
   zero_spindle_pos = await cmm.v2routines.probe_spindle_pos(V2_50, x, z)
+
+  expected_dia = SPINDLE_BALL_DIA_50 + PROBE_DIA
+  if abs(zero_spindle_pos.sphere()[0] - expected_dia) > BEST_FIT_SPHERE_ERROR:
+    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
+
   _save_zero_spindle_pos(zero_spindle_pos)
   await cmm.v2routines.go_to_clearance_y()
+
+async def v2_calib_probe_fixture_ball_pos(self, y_nominal):
+  cmm = Cmm.getInstance()
+  APPROX_FIXTURE_BALL_HOME = float3(-137.2, -123.4, -112.4)
+  
+  fixture_ball_pos = await cmm.v2routines.probe_fixture_ball_pos(APPROX_FIXTURE_BALL_HOME,y_nominal)
+  features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
+  id = features.getNextID()
+  features.setFeature(id, fixture_ball_pos)
+  state.saveStage(Stages.PROBE_FIXTURE_BALL_POS)
 
 async def v2_calib_probe_x_home(self, x, z):
   cmm = Cmm.getInstance()
@@ -102,21 +130,149 @@ async def v2_calib_probe_x_home(self, x, z):
   state = CalibState.getInstance()
   spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
   zero_spindle_pos = spindle_features.zero_spindle_pos;
+  logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
 
   spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+  logger.debug('spindle_pos points %s, sphere %s', spindle_pos.points(), spindle_pos.sphere())
 
   features = state.getStage(Stages.HOMING_X)
   id = features.getNextID()
   features.setFeature(id, spindle_pos)
   state.saveStage(Stages.HOMING_X)
 
+async def v2_calib_probe_y_home(self, y):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos_features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
+  fixture_ball_pos = fixture_ball_pos_features.fixture_ball_pos;
+  logger.debug('fixture_ball_pos points %s, sphere %s', fixture_ball_pos.points(), fixture_ball_pos.sphere())
+
+  fixture_ball_pos = await cmm.v2routines.probe_fixture_ball_pos(fixture_ball_pos.sphere()[1], fixture_ball_pos.sphere()[0]*2, y)
+
+  features = state.getStage(Stages.HOMING_Y)
+  id = features.getNextID()
+  features.setFeature(id, fixture_ball_pos)
+  state.saveStage(Stages.HOMING_Y)
+
+async def v2_calib_probe_z_home(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+  logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  features = state.getStage(Stages.HOMING_Z)
+  id = features.getNextID()
+  features.setFeature(id, spindle_pos)
+  state.saveStage(Stages.HOMING_Z)
+
+async def v2_calib_probe_x(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+  logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  features = state.getStage(Stages.CHARACTERIZE_X)
+  id = features.getNextID()
+  features.setFeature(id, spindle_pos)
+  state.saveStage(Stages.CHARACTERIZE_X)
+
+async def v2_calib_probe_y(self, y_nominal):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
+  fixture_ball_pos = fixture_ball_features.fixture_ball_pos;
+  logger.debug(fixture_ball_pos)
+  logger.debug(fixture_ball_pos.sphere())
+
+  y_pos = await cmm.v2routines.probe_spindle_tip(fixture_ball_pos.sphere()[1], fixture_ball_pos.sphere()[0]*2, x, z)
+
+  features = state.getStage(Stages.CHARACTERIZE_Y)
+  id = features.getNextID()
+  features.setFeature(id, y_pos)
+  state.saveStage(Stages.CHARACTERIZE_Y)
+
+async def v2_calib_probe_z(self, x_nominal, z_nominal):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+  logger.debug(zero_spindle_pos)
+  logger.debug(zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  features = state.getStage(Stages.CHARACTERIZE_Z)
+  id = features.getNextID()
+  features.setFeature(id, spindle_pos)
+  state.saveStage(Stages.CHARACTERIZE_Z)
+
+async def v2_calib_probe_top_plane(self, y):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+  logger.debug(zero_spindle_pos)
+  logger.debug(zero_spindle_pos.sphere())
+
+  top_plane = await cmm.v2routines.probe_top_plane(y)
+
+  features = state.getStage(Stages.PROBE_TOP_PLANE)
+  id = features.getNextID()
+  features.setFeature(id, top_plane)
+  state.saveStage(Stages.PROBE_TOP_PLANE)
+
+LINEAR_HOMING_REPEATABILITY = 0.001 * 25.4 # 0.001 inches, 0.0254 mm
+
+def v2_calib_verify_x_home(self):
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.HOMING_X)
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+  spindle_sphere_radius = zero_spindle_pos.sphere()[0]
+
+  expected_dia = 2*spindle_sphere_radius
+  for f in features.values():
+    (rad, pos) = f.sphere()
+    dia = rad*2
+    if abs(dia - expected_dia) > BEST_FIT_SPHERE_ERROR:
+      raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
+
+  feature_centers = v2calculations.calc_sphere_centers(features)
+  repeatability = v2calculations.calc_max_dist(feature_centers.average(),feature_centers)
+  logger.debug('repeatability %s', repeatability)
+
+  if repeatability > LINEAR_HOMING_REPEATABILITY:
+    raise CalibException("X Homing repeatability failure, expected <= %s, got %s" % (LINEAR_HOMING_REPEATABILITY, repeatability))
+
+def v2_calib_verify_y_home(self):
+#  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_Y_HOME)
+  pass
+
+def v2_calib_verify_z_home(self):
+#  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_Z_HOME)
+  pass
+
+#def v2_calib_setup_cnc_csy(self):
+##  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CNC_CSY)
+#  pass
+#
 
 #def v2_calib_probe_spindle_at_tool_probe(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_SPINDLE_AT_TOOL_PROBE)
-#  pass
-#
-#def v2_calib_probe_fixture_ball_pos(self, y_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_FIXTURE_BALL_POS, y_nominal)
 #  pass
 #
 #def v2_calib_probe_fixture_plane_a90(self, y_nominal):
@@ -127,14 +283,7 @@ async def v2_calib_probe_x_home(self, x, z):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.TOOL_PROBE_OFFSET)
 #  pass
 #
-#def v2_calib_setup_cnc_csy(self):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CNC_CSY)
-#  pass
-#
-#def v2_calib_probe_top_plane(self, y_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_TOP_PLANE, y_nominal)
-#  pass
-#
+
 #def experiment_with_cmm_movement(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.EXPERIMENT_WITH_CMM_MOVEMENT)
 #  pass
@@ -147,34 +296,7 @@ async def v2_calib_probe_x_home(self, x, z):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_HOME_OFFSET_X, y, a, b)
 #  pass
 #
-#def v2_calib_probe_x(self, x_nominal, z_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_X, x_nominal, z_nominal)
-#  pass
-#
-#
-#def v2_calib_verify_x_home(self):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_X_HOME)
-#  pass
-#
-#def v2_calib_probe_y(self, y_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_Y, y_nominal)
-#  pass
-#
-#def v2_calib_probe_y_home(self, y_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_Y_HOME, y_nominal)
-#  pass
-#
-#def v2_calib_verify_y_home(self):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_Y_HOME)
-#
-#def v2_calib_probe_z(self, x_nominal, z_nominal):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_Z, x_nominal, z_nominal)
-#
-#def v2_calib_probe_z_home(self, x_nominal, z_nominal):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_Z_HOME, x_nominal, z_nominal)
-#
-#def v2_calib_verify_z_home(self):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_Z_HOME)
+
 #
 #def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
 #  return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_FIXTURE_REL_Y_PERP, y, a, b)

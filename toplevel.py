@@ -15,7 +15,7 @@ logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
 )
 logger = logging.getLogger(__name__)
 
-logger.debug("in toplevel.py 36")
+logger.debug("in toplevel.py 48")
 
 def __init__(self):
 # handle any per-module initialisation tasks here
@@ -50,3 +50,6 @@ def reload_python():
 
 if os.environ.get('DEV') == "true":
   reload_python();
+  reload_python(); #Call second time so all references are reloaded
+  #For example oword might be reloaded before oword.v2_calib
+  #The second reload will bring in the new references to oword.v2_calib
