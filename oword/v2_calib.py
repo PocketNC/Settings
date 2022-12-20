@@ -3,7 +3,7 @@ from cmmmanager import Cmm
 from ipp import Csy
 import v2calculations
 from calibstate import CalibState, Stages
-from v2routines import V2_10, V2_50, PROBE_DIA, BEST_FIT_SPHERE_ERROR, SPINDLE_BALL_DIA_10, SPINDLE_BALL_DIA_50
+from v2routines import V2_10, V2_50, PROBE_DIA, BEST_FIT_SPHERE_ERROR, SPINDLE_BALL_DIA_10, SPINDLE_BALL_DIA_50, APPROX_FIXTURE_BALL_HOME, FIXTURE_BALL_DIA
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -91,11 +91,6 @@ async def v2_calib_probe_spindle_pos_v2_10(self, x, z):
   cmm = Cmm.getInstance()
 
   zero_spindle_pos = await cmm.v2routines.probe_spindle_pos(V2_10, x, z)
-  
-  expected_dia = SPINDLE_BALL_DIA_10 + PROBE_DIA
-  if abs(zero_spindle_pos.sphere()[0] - expected_dia) > BEST_FIT_SPHERE_ERROR:
-    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
-
   _save_zero_spindle_pos(zero_spindle_pos)
   await cmm.v2routines.go_to_clearance_y()
 
@@ -104,23 +99,66 @@ async def v2_calib_probe_spindle_pos_v2_50(self, x, z):
   cmm = Cmm.getInstance()
 
   zero_spindle_pos = await cmm.v2routines.probe_spindle_pos(V2_50, x, z)
-
-  expected_dia = SPINDLE_BALL_DIA_50 + PROBE_DIA
-  if abs(zero_spindle_pos.sphere()[0] - expected_dia) > BEST_FIT_SPHERE_ERROR:
-    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
-
   _save_zero_spindle_pos(zero_spindle_pos)
   await cmm.v2routines.go_to_clearance_y()
 
-async def v2_calib_probe_fixture_ball_pos(self, y_nominal):
+async def v2_calib_verify_spindle_pos_v2_10(self):
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = features.zero_spindle_pos
+
+  (radius, center) = zero_spindle_pos.sphere()
+  dia = 2*radius
+
+  expected_dia = SPINDLE_BALL_DIA_10 + PROBE_DIA
+  if abs(dia - expected_dia) > BEST_FIT_SPHERE_ERROR:
+    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia))  
+
+  logger.info("Spindle ball diameter: %s, expected: %s, diff: %s, allowed_error <= %s", dia, expected_dia, abs(dia - expected_dia), BEST_FIT_SPHERE_ERROR)
+  logger.info("Spindle ball position: %s", center)
+
+async def v2_calib_verify_spindle_pos_v2_50(self, x, z):
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = features.zero_spindle_pos
+
+  (radius, center) = zero_spindle_pos.sphere()
+  dia = 2*radius
+
+  expected_dia = SPINDLE_BALL_DIA_50 + PROBE_DIA
+  if abs(dia - expected_dia) > BEST_FIT_SPHERE_ERROR:
+    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia))  
+
+  logger.info("Spindle ball diameter: %s, expected: %s, diff: %s, allowed_error <= %s", dia, expected_dia, abs(dia - expected_dia), BEST_FIT_SPHERE_ERROR)
+  logger.info("Spindle ball position: %s", center)
+
+async def v2_calib_probe_fixture_ball_pos(self, y):
   cmm = Cmm.getInstance()
-  APPROX_FIXTURE_BALL_HOME = float3(-137.2, -123.4, -112.4)
   
-  fixture_ball_pos = await cmm.v2routines.probe_fixture_ball_pos(APPROX_FIXTURE_BALL_HOME,y_nominal)
+  fixture_ball_pos = await cmm.v2routines.probe_fixture_ball_pos(APPROX_FIXTURE_BALL_HOME,y)
+
+  state = CalibState.getInstance()
   features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
-  id = features.getNextID()
-  features.setFeature(id, fixture_ball_pos)
+  features.setFeature("fixture_ball_pos", fixture_ball_pos)
   state.saveStage(Stages.PROBE_FIXTURE_BALL_POS)
+
+async def v2_calib_verify_fixture_ball_pos(self):
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
+
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
+  fixture_ball_pos = features.fixture_ball_pos;
+  
+  (radius, center) = fixture_ball_pos.sphere()
+
+  expected_dia = FIXTURE_BALL_DIA + PROBE_DIA
+  dia = 2*radius
+  if abs(dia - expected_dia) > BEST_FIT_SPHERE_ERROR:
+    raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))
+
+  logger.info("Fixture ball diameter: %s, expected: %s, diff: %s, allowed error <= %s", dia, expected_dia, abs(dia - expected_dia), BEST_FIT_SPHERE_ERROR)
+  logger.info("Fixture ball center: %s", center)
 
 async def v2_calib_probe_x_home(self, x, z):
   cmm = Cmm.getInstance()
@@ -146,11 +184,11 @@ async def v2_calib_probe_y_home(self, y):
   fixture_ball_pos = fixture_ball_pos_features.fixture_ball_pos;
   logger.debug('fixture_ball_pos points %s, sphere %s', fixture_ball_pos.points(), fixture_ball_pos.sphere())
 
-  fixture_ball_pos = await cmm.v2routines.probe_fixture_ball_pos(fixture_ball_pos.sphere()[1], fixture_ball_pos.sphere()[0]*2, y)
+  y_pos = await cmm.v2routines.probe_fixture_ball_pos(fixture_ball_pos.sphere()[1], y)
 
   features = state.getStage(Stages.HOMING_Y)
   id = features.getNextID()
-  features.setFeature(id, fixture_ball_pos)
+  features.setFeature(id, y_pos)
   state.saveStage(Stages.HOMING_Y)
 
 async def v2_calib_probe_z_home(self, x, z):
@@ -162,6 +200,7 @@ async def v2_calib_probe_z_home(self, x, z):
   logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
 
   spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+  logger.debug('spindle_pos points %s, sphere %s', spindle_pos.points(), spindle_pos.sphere())
 
   features = state.getStage(Stages.HOMING_Z)
   id = features.getNextID()
@@ -250,19 +289,62 @@ def v2_calib_verify_x_home(self):
       raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
 
   feature_centers = v2calculations.calc_sphere_centers(features)
-  repeatability = v2calculations.calc_max_dist(feature_centers.average(),feature_centers)
-  logger.debug('repeatability %s', repeatability)
+  repeatability = v2calculations.calc_max_dist_between_points(feature_centers)
+  logger.info('X Homing Repeatability: %s, expected <= %s', repeatability, LINEAR_HOMING_REPEATABILITY)
 
   if repeatability > LINEAR_HOMING_REPEATABILITY:
     raise CalibException("X Homing repeatability failure, expected <= %s, got %s" % (LINEAR_HOMING_REPEATABILITY, repeatability))
 
-def v2_calib_verify_y_home(self):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_Y_HOME)
-  pass
-
 def v2_calib_verify_z_home(self):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_Z_HOME)
-  pass
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.HOMING_Z)
+
+  state = CalibState.getInstance()
+  spindle_features = state.getStage(Stages.PROBE_SPINDLE_POS)
+  zero_spindle_pos = spindle_features.zero_spindle_pos;
+  spindle_sphere_radius = zero_spindle_pos.sphere()[0]
+
+  expected_dia = 2*spindle_sphere_radius
+  for f in features.values():
+    (rad, pos) = f.sphere()
+    dia = rad*2
+    if abs(dia - expected_dia) > BEST_FIT_SPHERE_ERROR:
+      raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
+
+  feature_centers = v2calculations.calc_sphere_centers(features)
+  repeatability = v2calculations.calc_max_dist_between_points(feature_centers)
+  logger.info('Z Homing Repeatability: %s, expected <= %s', repeatability, LINEAR_HOMING_REPEATABILITY)
+
+  if repeatability > LINEAR_HOMING_REPEATABILITY:
+    raise CalibException("Z Homing repeatability failure, expected <= %s, got %s" % (LINEAR_HOMING_REPEATABILITY, repeatability))
+
+def v2_calib_probe_fixture_ball(self):
+  cmm = Cmm.getInstance()
+  
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.PROBE_FIXTURE_BALL)
+
+  fixture_ball = cmm.v2routines.probe_fixture_ball_pos(APPROX_FIXTURE_BALL_HOME, 0)
+  features.setFeature("fixture_ball", fixture_ball)
+  state.saveStage(Stages.PROBE_FIXTURE_BALL)
+
+def v2_calib_verify_y_home(self):
+  state = CalibState.getInstance()
+  features = state.getStage(Stages.HOMING_Y)
+
+  expected_dia = FIXTURE_BALL_DIA + PROBE_DIA
+  for f in features.values():
+    (rad, pos) = f.sphere()
+    dia = rad*2
+    if abs(dia - expected_dia) > BEST_FIT_SPHERE_ERROR:
+      raise CalibException("Deviation in best-fit sphere diameter. Expected %s found %s" % (expected_dia, dia,))  
+
+  feature_centers = v2calculations.calc_sphere_centers(features)
+  repeatability = v2calculations.calc_max_dist_between_points(feature_centers)
+  logger.info('Y Homing Repeatability: %s, expected <= %s', repeatability, LINEAR_HOMING_REPEATABILITY)
+
+  if repeatability > LINEAR_HOMING_REPEATABILITY:
+    raise CalibException("Y Homing repeatability failure, expected <= %s, got %s" % (LINEAR_HOMING_REPEATABILITY, repeatability))
 
 #def v2_calib_setup_cnc_csy(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CNC_CSY)
