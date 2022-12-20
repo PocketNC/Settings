@@ -435,7 +435,7 @@ class FeatureSet:
     self.activeFeatureID = 0
 
   def getNextID(self):
-    keys = [ int(k) for k in self.features.keys() if k == int ]
+    keys = [ int(k) for k in self.features.keys() if is_int(k) ]
     maxID = -1 if len(keys) == 0 else max(keys)
     return maxID+1
 
