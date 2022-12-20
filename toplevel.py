@@ -5,13 +5,14 @@ import namedparams
 import logging
 import sys
 import importlib
+import logging_constants
 
 POCKETNC_VAR_DIR = os.environ.get('POCKETNC_VAR_DIRECTORY')
 logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
   filemode='a',
   level=logging.DEBUG,
-  format='%(asctime)s,%(msecs)d %(name)s %(levelname)s line %(lineno)d: %(message)s',
-  datefmt='%H:%M:%S',
+  format=logging_constants.FORMAT,
+  datefmt=logging_constants.DATEFMT
 )
 logger = logging.getLogger(__name__)
 
