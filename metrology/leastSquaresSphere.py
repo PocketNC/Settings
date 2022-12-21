@@ -1,4 +1,3 @@
-print("in leastSquaresSphere.py")
 # From https://github.com/cjekel/cjekel.github.io/blob/master/assets/2015-09-13/demo.py
 
 # The MIT License (MIT)

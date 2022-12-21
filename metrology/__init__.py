@@ -1,4 +1,3 @@
-print("in metrology __init__.py 4")
 import numpy as np
 from enum import Enum
 import scipy.optimize
@@ -200,12 +199,12 @@ def bestFitCircle(pts):
   circle2d = (circle[1], circle[0])
 
   if _DEBUG:
-    print("Circle2D", circle2d)
-    print("xvec", xvec)
-    print("yvec", yvec)
-    print("planeOrigin", planeOrigin)
-    print("np.multiply(circle2d[0][0], xvec)", np.multiply(circle2d[0][0], xvec))
-    print("np.multiply(circle2d[0][1], yvec)", np.multiply(circle2d[0][1], yvec))
+    logger.debug("Circle2D %s", circle2d)
+    logger.debug("xvec %s", xvec)
+    logger.debug("yvec %s", yvec)
+    logger.debug("planeOrigin %s", planeOrigin)
+    logger.debug("np.multiply(circle2d[0][0], xvec) %s, %s", np.multiply(circle2d[0][0], xvec))
+    logger.debug("np.multiply(circle2d[0][1], yvec) %s, %s", np.multiply(circle2d[0][1], yvec))
 
   center = np.multiply(circle2d[0][0], xvec)+np.multiply(circle2d[0][1], yvec)+planeOrigin
 
@@ -225,7 +224,7 @@ def bestFitLine(pts):
   svd = np.linalg.svd(pts_array-mean)
 
   if _DEBUG:
-    print("SVD", svd)
+    logger.debug("SVD %s", svd)
 
   # return tuple with (pt on line, direction of line)
   return (mean, svd[2][0])
@@ -282,12 +281,61 @@ def intersectLines(line1, line2):
 
   return (A,B)
 
-class Feature:
-  def __init__(self, pts=[]):
-    self._featureTransform = None
+def convertJSONDataToFeatures(data):
+  if Feature.isJSONObjectAFeature(data):
+    return Feature(data)
 
+  if type(data) == list:
+    d = []
+    for obj in data:
+      d.append(convertJSONDataToFeatures(obj))
+    return d
+  elif type(data) == dict:
+    d = {}
+    for (k,v) in data.items():
+      d[k] = convertJSONDataToFeatures(v)
+    return d
+
+  return data
+
+class Feature:
+  def isJSONObjectAFeature(data):
+    return type(data) == dict and data.get("isFeature", False)
+
+  def toJSON(self):
+    obj = {
+      "isFeature": True,
+      "points": self._points.tolist()
+    }
+    
+    if self._featureTransform:
+      obj["transform"] = self._featureTransform.tolist()
+
+    return obj
+
+  def initFromJSON(self, data):
+    t = data.get("transform", None)
+    self._featureTransform = np.array(t) if t else None
+    self._points = np.array(data["points"])
+
+  def initFromList(self, data):
+    self._featureTransform = None
     self._points = np.array(pts)
     self.makeDirty()
+
+  def __init__(self, data=[]):
+    if Feature.isJSONObjectAFeature(data):
+      self.initFromJSON(data)
+    elif type(data) == list:
+      self.initFromList(data)
+
+  def __copy__(self):
+    f = Feature(self._points)
+    f._featureTransform = self._featureTransform
+    return f
+
+  def __deepcopy__(self, memo):
+    return self.__copy__(self)
 
   def setTransformWithAxisAngle(self, axis, angle):
     self._featureTransform = metrology.helpers.makeRotationAxis(axis, angle)
@@ -314,16 +362,16 @@ class Feature:
     self.makeDirty()
 
     if _DEBUG:
-      print("Points: ")
+      logger.debug("Points: ")
       for p in self._points:
-        print("%s\t%s\t%s" % ( p[0], p[1], p[2] ))
+        logger.debug("%s\t%s\t%s" % ( p[0], p[1], p[2] ))
 
   def clearPoints(self):
     self._points = np.array([])
     self.makeDirty()
 
     if _DEBUG:
-      print("Cleared points!")
+      logger.debug("Cleared points!")
 
   def points(self):
     if self._transformedPoints is None:
@@ -345,7 +393,7 @@ class Feature:
       self._average = self.points().mean(axis=0)
 
     if _DEBUG:
-      print("Average: ", self._average)
+      logger.debug("Average: ", self._average)
 
     return self._average
 
@@ -360,7 +408,7 @@ class Feature:
       self._line = bestFitLine(self.points())
 
     if _DEBUG:
-      print("Line: ", self._line)
+      logger.debug("Line: ", self._line)
 
     return self._line
 
@@ -369,7 +417,7 @@ class Feature:
       self._cylinder = bestFitCylinder(self.points())
 
     if _DEBUG:
-      print("Cylinder: ", self._cylinder)
+      logger.debug("Cylinder: ", self._cylinder)
 
     return self._cylinder
 
@@ -378,7 +426,7 @@ class Feature:
       self._sphere = skg.nsphere.nsphere_fit(self.points())
 
     if _DEBUG:
-      print("Sphere: ", self._sphere)
+      logger.debug("Sphere: ", self._sphere)
 
     return self._sphere
 
@@ -387,7 +435,7 @@ class Feature:
       self._circle = metrology.bestFitCircle(self.points())
 
     if _DEBUG:
-      print("Circle: ", self._circle)
+      logger.debug("Circle: ", self._circle)
 
     return self._circle
 
@@ -399,7 +447,7 @@ class Feature:
       self._circle2D = (circle[1], circle[0])
 
     if _DEBUG:
-      print("Circle2D: ", self._circle2D)
+      logger.debug("Circle2D: ", self._circle2D)
 
     return self._circle2D
 
@@ -425,7 +473,8 @@ def is_int(s):
   except:
     return False
 
-class FeatureSet:
+
+class FeatureMap:
   def __init__(self, data={}):
     self.features = {}
 
@@ -445,46 +494,49 @@ class FeatureSet:
     return self.getActiveFeature()
 
   def setFeature(self, key, feat):
-    id = str(key)
-    self.features[id] = feat
+    if not isinstance(feat, Feature):
+      raise TypeError("FeatureMap can only contain Features")
 
-  def setActiveFeatureID(self, id):
-    self.activeFeatureID = int(id)
+    fid = str(key)
+    self.features[fid] = feat
+
+  def setActiveFeatureID(self, fid):
+    self.activeFeatureID = int(fid)
 
   def getActiveFeatureID(self):
     return self.activeFeatureID
 
   def __getattr__(self, key):
     """
-    Gets the feature by id, throwing an error if it doesn't exist.
+    Gets the feature by fid, throwing an error if it doesn't exist.
     This is helpful calibration where we want an error to be thrown
     if the feature doesn't exist that we're trying to access, meaning
     the data hasn't been collected yet.
     """
-    id = str(key)
-    return self.features[id]
+    fid = str(key)
+    return self.features[fid]
 
   def __getitem__(self, key):
     """
-    Gets the feature by id, throwing an error if it doesn't exist.
+    Gets the feature by fid, throwing an error if it doesn't exist.
     This is helpful calibration where we want an error to be thrown
     if the feature doesn't exist that we're trying to access, meaning
     the data hasn't been collected yet.
     """
-    id = str(key)
-    return self.features[id]
+    fid = str(key)
+    return self.features[fid]
 
   def getFeature(self, key):
     """
-    Gets the feature by id, returning an empty feature if it doesn't exist.
+    Gets the feature by fid, returning an empty feature if it doesn't exist.
     This is helpful in G code where you can set the active feature to an integer
     and start adding points to it without worrying if it's been initialized.
     """
-    id = str(key)
-    feature = self.features.get(id, None)
+    fid = str(key)
+    feature = self.features.get(fid, None)
     if feature == None:
       feature = Feature()
-      self.features[id] = feature
+      self.features[fid] = feature
 
     return feature
 
@@ -493,27 +545,29 @@ class FeatureSet:
 
   def items(self):
     return self.features.items()
+
   def keys(self):
     return self.features.keys()
+
   def values(self):
     return self.features.values()
 
 
 class FeatureManager:
   def __init__(self):
-    self.sets = [ FeatureSet() ]
+    self.sets = [ FeatureMap() ]
 
   def clear(self):
     self.sets.clear()
-    self.sets.append( FeatureSet() )
+    self.sets.append( FeatureMap() )
 
   def push(self):
-    self.sets.append( FeatureSet() )
+    self.sets.append( FeatureMap() )
 
   def pop(self):
     self.sets.pop()
 
-  def getActiveFeatureSet(self):
+  def getActiveFeatureMap(self):
     return self.sets[-1]
 
   def getInstance():

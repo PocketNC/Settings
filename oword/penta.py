@@ -11,20 +11,20 @@ import metrology
 
 def add_point(self, x=0, y=0, z=0):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
+  featureMap = manager.getActiveFeatureMap()
+  feature = featureMap.getActiveFeature()
   feature.addPoint(x,y,z)
 
 def clear_points(self):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
+  featureMap = manager.getActiveFeatureMap()
+  feature = featureMap.getActiveFeature()
   feature.clearPoints()
 
 def set_feature_transform_with_axis_angle(self, x, y, z, angle):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
+  featureMap = manager.getActiveFeatureMap()
+  feature = featureMap.getActiveFeature()
   feature.setTransformWithAxisAngle([x,y,z], math.radians(angle))
 
 # Used for allocating a new feature set to avoid stomping on data from
@@ -42,15 +42,15 @@ def pop_feature_set(self):
 
 def set_active_feature(self, id):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  featureSet.setActiveFeatureID(id)
+  featureMap = manager.getActiveFeatureMap()
+  featureMap.setActiveFeatureID(id)
 
 def project_points_onto_plane(self, pointsId, planeId, newId):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  pointsFeature = featureSet.getFeature(pointsId)
-  planeFeature = featureSet.getFeature(planeId)
-  newFeature = featureSet.getFeature(newId)
+  featureMap = manager.getActiveFeatureMap()
+  pointsFeature = featureMap.getFeature(pointsId)
+  planeFeature = featureMap.getFeature(planeId)
+  newFeature = featureMap.getFeature(newId)
 
   newFeature.clearPoints()
   plane = planeFeature.plane()
@@ -62,10 +62,10 @@ def project_points_onto_plane(self, pointsId, planeId, newId):
 
 def point_deviations_from_plane(self, pointsId, planeId, newId):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  pointsFeature = featureSet.getFeature(pointsId)
-  planeFeature = featureSet.getFeature(planeId)
-  newFeature = featureSet.getFeature(newId)
+  featureMap = manager.getActiveFeatureMap()
+  pointsFeature = featureMap.getFeature(pointsId)
+  planeFeature = featureMap.getFeature(planeId)
+  newFeature = featureMap.getFeature(newId)
 
   newFeature.clearPoints()
   plane = planeFeature.plane()
