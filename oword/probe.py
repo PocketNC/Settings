@@ -1,3 +1,6 @@
+"""
+`owords` for interacting with a probe.
+"""
 import logging
 
 logger = logging.getLogger(__name__)

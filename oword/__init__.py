@@ -1,3 +1,7 @@
+"""
+Python functions that can be called from a G code context using o<name_of_function> call syntax. See
+[LinuxCNC](http://linuxcnc.org/docs/2.8/html/remap/remap.html) documentation for more info.
+"""
 import metrology
 import probe
 import math

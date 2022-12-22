@@ -1,3 +1,6 @@
+"""
+`oword`s for interacting with calibration routines.
+"""
 import logging
 from cmmmanager import Cmm
 from ipp import Csy

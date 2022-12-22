@@ -1,3 +1,6 @@
+"""
+`oword`s for interacting with a CMM.
+"""
 from metrology import Feature
 from cmmmanager import Cmm
 import asyncio

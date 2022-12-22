@@ -1,3 +1,23 @@
+"""
+Metrology package for calculating best fit features from sets of points. The most
+useful class is `Feature`. A `Feature` object is a set of
+points, which has methods such as `Feature.line`, `Feature.plane`, or `Feature.sphere`
+for returning information that defines those types of features based on the points added to the
+`Feature`. 
+
+There is also a `FeatureManager` class and `FeatureMap` class intended to
+be used by `oword`s and `namedparams` for easier interactions with Features from a G code context where
+the only data type is floating point numbers.
+
+This package, coupled with `oword`s, `namedparams` and a probing interface that allows
+users to plan out probing routines will provide a powerful way of inspecting parts
+made on Penta machines.
+
+This package is also used in combination with a Mitutyo CMM + Renishaw UCC Server
+to calibrate Penta machines internally.
+
+Copyright Penta Machine Company 2023
+"""
 import numpy as np
 from enum import Enum
 import scipy.optimize
@@ -8,9 +28,6 @@ import math
 import logging
 
 logger = logging.getLogger(__name__)
-
-from importlib import reload
-reload(metrology.leastSquaresSphere)
 
 _DEBUG = False
 
@@ -208,7 +225,7 @@ def bestFitCircle(pts):
 
   center = np.multiply(circle2d[0][0], xvec)+np.multiply(circle2d[0][1], yvec)+planeOrigin
 
-  return (center, circle2d[1], planeN)
+  return (circle2d[1], center, planeN)
 
 def bestFitPlane(pts):
   pts_array = np.array(pts)
@@ -299,10 +316,22 @@ def convertJSONDataToFeatures(data):
   return data
 
 class Feature:
+  """
+  A Feature object represents a set of points. Methods include a number
+  of best fit primitives. Most methods cache the result of any calculations
+  performed on the points. In a G code context, where only a single floating
+  point value can be returned at a time, this helps to avoid unnecessary
+  recalculations when calling it multiple times in succession to get the X, Y and Z
+  components of a point or direction vector.
+  """
   def isJSONObjectAFeature(data):
+    """Returns True if a dict object has the "isFeature" key. This is used by
+    `convertJSONDataToFeatures` to automatically convert a deserialized JSON
+    data structure to Feature objects."""
     return type(data) == dict and data.get("isFeature", False)
 
   def toJSON(self):
+    """Convert this `Feature` object to dict, suitable for being serialized to JSON."""
     obj = {
       "isFeature": True,
       "points": self._points.tolist()
@@ -313,21 +342,21 @@ class Feature:
 
     return obj
 
-  def initFromJSON(self, data):
+  def _initFromJSON(self, data):
     t = data.get("transform", None)
     self._featureTransform = np.array(t) if t else None
     self._points = np.array(data["points"])
 
-  def initFromList(self, data):
+  def _initFromList(self, data):
     self._featureTransform = None
-    self._points = np.array(pts)
+    self._points = np.array(data)
     self.makeDirty()
 
   def __init__(self, data=[]):
     if Feature.isJSONObjectAFeature(data):
-      self.initFromJSON(data)
+      self._initFromJSON(data)
     elif type(data) == list:
-      self.initFromList(data)
+      self._initFromList(data)
 
   def __copy__(self):
     f = Feature(self._points)
@@ -338,11 +367,13 @@ class Feature:
     return self.__copy__(self)
 
   def setTransformWithAxisAngle(self, axis, angle):
+    """Sets the transform on the feature to a rotation about axis, by angle radians. Can be useful when
+    measuring a feature that is rotating with a rotary axis."""
     self._featureTransform = metrology.helpers.makeRotationAxis(axis, angle)
     self.makeDirty()
 
   def makeDirty(self):
-    """Clears any cached calculations, such as average position, best fit circle, etc."""
+    """Clears any cached calculations, such as average position, best fit circle, etc. Automatically called after adding a point to the `Feature`."""
     self._average = None
     self._circle2D = None
     self._sphere = None
@@ -353,6 +384,9 @@ class Feature:
     self._transformedPoints = None
 
   def addPoint(self, x, y, z):
+    """
+    Adds a point to the feature. Will clear any cached best fit feature calculations.
+    """
     if len(self._points) == 0:
       self._points = np.append(self._points, np.array([x,y,z])).reshape(1,3)
       self._points.setflags(write=False)
@@ -367,6 +401,7 @@ class Feature:
         logger.debug("%s\t%s\t%s" % ( p[0], p[1], p[2] ))
 
   def clearPoints(self):
+    """Removes all points from the feature."""
     self._points = np.array([])
     self.makeDirty()
 
@@ -374,6 +409,8 @@ class Feature:
       logger.debug("Cleared points!")
 
   def points(self):
+    """Returns all the points with the `Feature`'s transform applied if the transform was specified. Simply returns the added points if
+    no transform was specified."""
     if self._transformedPoints is None:
       if self._featureTransform is None:
         self._transformedPoints = np.array(self._points)
@@ -386,9 +423,11 @@ class Feature:
     return self._transformedPoints
 
   def first(self):
+    """Returns the first point added to the Feature."""
     return self.points()[0]
     
   def average(self):
+    """Returns the mathematical mean of the points: `np.array`([x, y, z])"""
     if self._average is None:
       self._average = self.points().mean(axis=0)
 
@@ -398,12 +437,14 @@ class Feature:
     return self._average
 
   def plane(self):
+    """Returns (pointOnPlane, normalOfPlane)"""
     if self._plane is None:
       self._plane = bestFitPlane(self.points())
 
     return self._plane
 
   def line(self):
+    """Returns (pointOnLine, directionOfLine)"""
     if self._line is None:
       self._line = bestFitLine(self.points())
 
@@ -413,6 +454,7 @@ class Feature:
     return self._line
 
   def cylinder(self):
+    """Requires at least 7 points. Returns (pointOnMainAxis, directionOfMainAxis, radius)."""
     if self._cylinder is None:
       self._cylinder = bestFitCylinder(self.points())
 
@@ -422,6 +464,7 @@ class Feature:
     return self._cylinder
 
   def sphere(self):
+    """Returns (radius, center)"""
     if self._sphere is None:
       self._sphere = skg.nsphere.nsphere_fit(self.points())
 
@@ -431,6 +474,7 @@ class Feature:
     return self._sphere
 
   def circle(self):
+    """Returns (radius, center, normalOfPlane)"""
     if self._circle is None:
       self._circle = metrology.bestFitCircle(self.points())
 
@@ -440,11 +484,16 @@ class Feature:
     return self._circle
 
   def circle2D(self):
+    """
+    Returns (radius, center) of a circle using only the X and Y components of 
+    the points.
+    """
+
     if self._circle2D is None:
       ptData = self.points().T
       pts = np.array([ ptData[0],ptData[1] ]).T
       circle = skg.nsphere.nsphere_fit(pts)
-      self._circle2D = (circle[1], circle[0])
+      self._circle2D = (circle[0], circle[1])
 
     if _DEBUG:
       logger.debug("Circle2D: ", self._circle2D)
@@ -452,6 +501,8 @@ class Feature:
     return self._circle2D
 
   def projectToPlane(self, plane):
+    """Returns a new `Feature` with all the points projected onto the provided plane. The plane argument must
+    be specified as it is returned from the `Feature.plane()` method."""
     feat = Feature()
     points = self.points()
 
@@ -462,6 +513,8 @@ class Feature:
     return feat
 
   def reverse(self):
+    """Returns a new `Feature` with all the points reversed. This can be helpful for reversing the direction 
+    of a best fit line, for example."""
     return Feature([ p for p in self.points()[::-1] ])
 
 featureManagerInstance = None
@@ -475,6 +528,8 @@ def is_int(s):
 
 
 class FeatureMap:
+  """A key/value mapping for storing Features. This is meant to be used in an `oword.penta` or `namedparams.penta` context in
+  combination with `FeatureManager`."""
   def __init__(self, data={}):
     self.features = {}
 

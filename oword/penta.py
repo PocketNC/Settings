@@ -1,3 +1,6 @@
+"""
+`oword`s for interacting with `metrology.Feature` objects.
+"""
 import metrology
 
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.

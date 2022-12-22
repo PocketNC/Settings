@@ -1,3 +1,7 @@
+"""
+Python functions that can be called from a G code context using #<_function_name> syntax. See
+[LinuxCNC](http://linuxcnc.org/docs/2.8/html/remap/remap.html#remap:adding-predefined-named-parameters) documentation for more info.
+"""
 import math
 import sys
 import inspect
