@@ -5,6 +5,7 @@ import logging
 from cmmmanager import Cmm
 from ipp import Csy
 import v2calculations
+import v2state
 from calibstate import CalibState, Stages
 from v2routines import V2_10, V2_50, PROBE_DIA, BEST_FIT_SPHERE_ERROR, SPINDLE_BALL_DIA_10, SPINDLE_BALL_DIA_50, APPROX_FIXTURE_BALL_HOME, FIXTURE_BALL_DIA
 import numpy as np
@@ -398,6 +399,114 @@ def v2_calib_verify_y_home(self):
   if repeatability > LINEAR_HOMING_REPEATABILITY:
     raise CalibException("Y Homing repeatability failure, expected <= %s, got %s" % (LINEAR_HOMING_REPEATABILITY, repeatability))
 
+def v2_calib_probe_a(self, y, a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
+  fixture_ball_pos = fixture_features.fixture_ball_pos
+
+  a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
+  features = state.getStage(Stages.CHARACTERIZE_A)
+  fid = features.getNextID()
+  features.setFeature(fid, a_pos)
+  state.saveStage(Stages.CHARACTERIZE_A)
+
+def v2_calib_find_pos_a(self, y, a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  (x_line,y_line,z_line) = v2state.getAxisLines(state)
+
+  a_line = await cmm.v2routines.probe_a_line(y, a)
+  a_pos = calc_pos_a(a_line, x_line, y_line, z_line, APPROX_COR)
+  return a_pos
+
+def v2_calib_find_pos_b(self, y, b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  (x_line,y_line,z_line) = v2state.getAxisLines(state)
+
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  b_pos = calc_pos_b(b_line, x_line, y_line, z_line, APPROX_COR)
+  return b_pos
+
+def v2_calib_find_pos_fixture_rel_x_perp(self, y):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  (x_line,y_line,z_line) = v2state.getAxisLines(state)
+
+  vert_fixture_line = await cmm.v2routines.probe_fixture_vertical(y)
+  angle_rel_x = v2calculations.calc_ccw_angle_from_x(vert_fixture_line, x_line, y_line, z_line, APPROX_COR)
+  return angle_rel_x + 90
+
+def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  (x_line,y_line,z_line) = v2state.getAxisLines(state)
+
+  horiz_fixture_line = await cmm.v2routines.probe_fixture_horizontal(y)
+  angle_rel_y = v2calculations.calc_ccw_angle_from_y(horiz_fixture_line, x_line, y_line, z_line, APPROX_COR)
+  return angle_rel_y + 90
+
+async def v2_calib_init_home_offsets_state(self):
+  state = CalibState.getInstance()
+  stage = {
+    "x_features": [],
+    "x_positions": []
+    "y_features": [],
+    "y_positions": []
+  }
+  state.saveStage(Stages.PROBE_HOME_OFFSETS, stage)
+
+def v2_calib_probe_home_offset_x(self, y, a, b):
+  cmm = Cmm.getInstance()
+  feat = await cmm.v2routines.probe_home_offset_x(y, a, b)
+  stage = state.getStage(Stages.PROBE_HOME_OFFSET)
+  stage["x_features"].append(feat)
+  stage["x_positions"].append({ "y": y, "a": a, "b": b })
+  state.saveStage(Stages.PROBE_HOME_OFFSET)
+
+def v2_calib_probe_home_offset_y(self, y, a, b):
+  cmm = Cmm.getInstance()
+  feat = await cmm.v2routines.probe_home_offset_y(y, a, b)
+  stage = state.getStage(Stages.PROBE_HOME_OFFSET)
+  stage["y_features"].append(feat)
+  stage["y_positions"].append({ "y": y, "a": a, "b": b })
+  state.saveStage(Stages.PROBE_HOME_OFFSET)
+
+def v2_calib_calc_home_offsets(self):
+  pass
+
+async def v2_calib_init_a_home_state(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.HOMING_A, stage)
+
+async def v2_calib_prep_probe_a(self):
+  cmm = Cmm.getInstance()
+  await cmm.v2_routines.initial_probe_a(0,0)
+  
+async def v2_calib_probe_a_home(self, y, a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  probe_a_home_stage = state.getStage(Stages.PROBE_A_HOME)
+  
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+  logger.debug('spindle_pos points %s, sphere %s', spindle_pos.points(), spindle_pos.sphere())
+
+  stage = state.getStage(Stages.HOMING_X)
+  stage["features"].append(spindle_pos)
+  stage["positions"].append({ "x": x, "z": z })
+  state.saveStage(Stages.HOMING_X, stage)
+
 #def v2_calib_setup_cnc_csy(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CNC_CSY)
 #  pass
@@ -420,15 +529,6 @@ def v2_calib_verify_y_home(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.EXPERIMENT_WITH_CMM_MOVEMENT)
 #  pass
 #
-#def v2_calib_probe_home_offset_y(self, y, a, b):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_HOME_OFFSET_Y, y, a, b)
-#  pass
-#
-#def v2_calib_probe_home_offset_x(self, y, a, b):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_HOME_OFFSET_X, y, a, b)
-#  pass
-#
-
 #
 #def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
 #  return calib.CalibManager.getInstance().run_step(calib.Steps.FIND_POS_FIXTURE_REL_Y_PERP, y, a, b)
@@ -481,9 +581,6 @@ def v2_calib_verify_y_home(self):
 #
 #def v2_calib_calc_calib(self):
 #  calib.CalibManager.getInstance().run_step(calib.Steps.CALC_CALIB)
-#
-#def v2_calib_calc_home_offsets(self):
-#  calib.CalibManager.getInstance().run_step(calib.Steps.CALC_HOME_OFFSETS)
 #
 #def v2_calib_write_calib(self):
 #  calib.CalibManager.getInstance().run_step(calib.Steps.WRITE_CALIB)
