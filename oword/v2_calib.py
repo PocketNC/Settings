@@ -399,7 +399,7 @@ def v2_calib_verify_y_home(self):
   if repeatability > LINEAR_HOMING_REPEATABILITY:
     raise CalibException("Y Homing repeatability failure, expected <= %s, got %s" % (LINEAR_HOMING_REPEATABILITY, repeatability))
 
-def v2_calib_probe_a(self, y, a):
+async def v2_calib_probe_a(self, y, a):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -412,7 +412,7 @@ def v2_calib_probe_a(self, y, a):
   features.setFeature(fid, a_pos)
   state.saveStage(Stages.CHARACTERIZE_A)
 
-def v2_calib_find_pos_a(self, y, a):
+async def v2_calib_find_pos_a(self, y, a):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -422,7 +422,7 @@ def v2_calib_find_pos_a(self, y, a):
   a_pos = calc_pos_a(a_line, x_line, y_line, z_line, APPROX_COR)
   return a_pos
 
-def v2_calib_find_pos_b(self, y, b):
+async def v2_calib_find_pos_b(self, y, b):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -432,7 +432,7 @@ def v2_calib_find_pos_b(self, y, b):
   b_pos = calc_pos_b(b_line, x_line, y_line, z_line, APPROX_COR)
   return b_pos
 
-def v2_calib_find_pos_fixture_rel_x_perp(self, y):
+async def v2_calib_find_pos_fixture_rel_x_perp(self, y):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -442,7 +442,7 @@ def v2_calib_find_pos_fixture_rel_x_perp(self, y):
   angle_rel_x = v2calculations.calc_ccw_angle_from_x(vert_fixture_line, x_line, y_line, z_line, APPROX_COR)
   return angle_rel_x + 90
 
-def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
+async def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -456,13 +456,13 @@ async def v2_calib_init_home_offsets_state(self):
   state = CalibState.getInstance()
   stage = {
     "x_features": [],
-    "x_positions": []
+    "x_positions": [],
     "y_features": [],
     "y_positions": []
   }
   state.saveStage(Stages.PROBE_HOME_OFFSETS, stage)
 
-def v2_calib_probe_home_offset_x(self, y, a, b):
+async def v2_calib_probe_home_offset_x(self, y, a, b):
   cmm = Cmm.getInstance()
   feat = await cmm.v2routines.probe_home_offset_x(y, a, b)
   stage = state.getStage(Stages.PROBE_HOME_OFFSET)
@@ -470,7 +470,7 @@ def v2_calib_probe_home_offset_x(self, y, a, b):
   stage["x_positions"].append({ "y": y, "a": a, "b": b })
   state.saveStage(Stages.PROBE_HOME_OFFSET)
 
-def v2_calib_probe_home_offset_y(self, y, a, b):
+async def v2_calib_probe_home_offset_y(self, y, a, b):
   cmm = Cmm.getInstance()
   feat = await cmm.v2routines.probe_home_offset_y(y, a, b)
   stage = state.getStage(Stages.PROBE_HOME_OFFSET)
