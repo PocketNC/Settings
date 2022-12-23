@@ -70,8 +70,8 @@ def test_basic_3d_line_intersection_precision():
       planeN = planeN/np.linalg.norm(planeN)
       plane = (planeP,planeN)
 
-      line3 = metrology.projectLineOntoPlane(line1, plane)
-      line4 = metrology.projectLineOntoPlane(line2, plane)
+      line3 = metrology.projectLineToPlane(line1, plane)
+      line4 = metrology.projectLineToPlane(line2, plane)
 
       if abs(np.dot(line3[1],line4[1])) < 1 - 1e-6:
         # Do the calculations above until we have two lines that aren't parallel.
@@ -86,7 +86,7 @@ def test_project_point_onto_xz_plane():
   plane = ( (0,0,0), (0,1,0) )
   point = ( 0,1,0)
 
-  projected = metrology.projectPointOntoPlane(point, plane)
+  projected = metrology.projectPointToPlane(point, plane)
 
   assert projected == approx((0,0,0))
 
@@ -94,7 +94,7 @@ def test_project_point_onto_yz_plane():
   plane = ( (0,0,0), (1,0,0) )
   point = ( 1,0,0)
 
-  projected = metrology.projectPointOntoPlane(point, plane)
+  projected = metrology.projectPointToPlane(point, plane)
 
   assert projected == approx((0,0,0))
 
@@ -102,7 +102,7 @@ def test_project_point_onto_xy_plane():
   plane = ( (0,0,0), (0,0,1) )
   point = ( 0,0,1)
 
-  projected = metrology.projectPointOntoPlane(point, plane)
+  projected = metrology.projectPointToPlane(point, plane)
 
   assert projected == approx((0,0,0))
 
@@ -128,8 +128,8 @@ def test_3d_line_line_intersection():
 
   assert numpy.linalg.norm(line2[1]) == approx(1)
 
-  line3 = metrology.projectLineOntoPlane(line1, plane)
-  line4 = metrology.projectLineOntoPlane(line2, plane)
+  line3 = metrology.projectLineToPlane(line1, plane)
+  line4 = metrology.projectLineToPlane(line2, plane)
 
   assert numpy.linalg.norm(line3[1]) == approx(1)
   assert numpy.linalg.norm(line4[1]) == approx(1)
@@ -177,7 +177,7 @@ def test_best_fit_sphere_random4():
           # floating point tolerance. Since the 4 points that define a sphere shouldn't be coplanar, this seems
           # like the best place to increase the tolerance.
           planeFeature = metrology.Feature(pts)
-          projectedPt = metrology.projectPointOntoPlane(pt, planeFeature.plane())
+          projectedPt = metrology.projectPointToPlane(pt, planeFeature.plane())
           if projectedPt == approx(pt, abs=1e-2):
             needNewPt = True
           else:

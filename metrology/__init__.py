@@ -206,7 +206,7 @@ def bestFitCircle(pts):
 
   planePts = []
   for p in pts:
-    planePt = np.subtract(projectPointOntoPlane(p, plane), planeOrigin)
+    planePt = np.subtract(projectPointToPlane(p, plane), planeOrigin)
     x = np.dot(planePt, xvec)
     y = np.dot(planePt, yvec)
 
@@ -246,7 +246,7 @@ def bestFitLine(pts):
   # return tuple with (pt on line, direction of line)
   return (mean, svd[2][0])
 
-def projectPointOntoPlane(point, plane):
+def projectPointToPlane(point, plane):
   planePt = plane[0]
   planeN = plane[1]
 
@@ -254,15 +254,15 @@ def projectPointOntoPlane(point, plane):
   
   return np.subtract(point, np.multiply(planeN, np.dot(vec, planeN))) 
 
-def projectDirectionOntoPlane(direction, plane):
+def projectDirectionToPlane(direction, plane):
   planePt = plane[0]
   planeN = plane[1]
 
   return np.subtract(direction, np.multiply(planeN, np.dot(direction, planeN))) 
 
-def projectLineOntoPlane(line, plane):
-  pt = projectPointOntoPlane(line[0], plane)
-  dir = projectDirectionOntoPlane(line[1], plane)
+def projectLineToPlane(line, plane):
+  pt = projectPointToPlane(line[0], plane)
+  dir = projectDirectionToPlane(line[1], plane)
 
   mag = math.sqrt(dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2])
   return (pt, (dir[0]/mag, dir[1]/mag, dir[2]/mag))
@@ -350,13 +350,13 @@ class Feature:
   def _initFromList(self, data):
     self._featureTransform = None
     self._points = np.array(data)
-    self.makeDirty()
 
   def __init__(self, data=[]):
     if Feature.isJSONObjectAFeature(data):
       self._initFromJSON(data)
     elif type(data) == list:
       self._initFromList(data)
+    self.makeDirty()
 
   def __copy__(self):
     f = Feature(self._points)
@@ -507,7 +507,7 @@ class Feature:
     points = self.points()
 
     for pt in points:
-      proj_pt = projectPointOntoPlane(pt, plane)
+      proj_pt = projectPointToPlane(pt, plane)
       feat.addPoint(proj_pt[0], proj_pt[1], proj_pt[2])
 
     return feat

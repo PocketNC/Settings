@@ -12,7 +12,7 @@ o<v2-calib-characterize-y> sub
 
   o100 while [#<i> LT #<numPoints>]
     #<t> = [ #<i> / [ #<numPoints> - 1 ] ]
-    #<y> = [[ #<yMax> * (1-#<t>) ] + [ #<yMin> * #<t> ]]
+    #<y> = [[ #<yMax> * [ 1 - #<t> ]] + [ #<yMin> * #<t> ]]
     g0 y[#<y>]
     M66  E0 L0
     o<v2_calib_probe_y> call [#<y>]

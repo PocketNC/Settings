@@ -60,7 +60,7 @@ def project_points_onto_plane(self, pointsId, planeId, newId):
   points = pointsFeature.points()
 
   for p in points:
-    pointOnPlane = metrology.projectPointOntoPlane(p, plane)
+    pointOnPlane = metrology.projectPointToPlane(p, plane)
     newFeature.addPoint(pointOnPlane[0], pointOnPlane[1], pointOnPlane[2])
 
 def point_deviations_from_plane(self, pointsId, planeId, newId):
@@ -75,7 +75,7 @@ def point_deviations_from_plane(self, pointsId, planeId, newId):
   points = pointsFeature.points()
 
   for p in points:
-    pointOnPlane = metrology.projectPointOntoPlane(p, plane)
+    pointOnPlane = metrology.projectPointToPlane(p, plane)
 
     logger.debug("point: (%s, %s, %s)" % (p[0], p[1], p[2]))
     logger.debug("point on plane: (%s, %s, %s)" % (pointOnPlane[0], pointOnPlane[1], pointOnPlane[2]))

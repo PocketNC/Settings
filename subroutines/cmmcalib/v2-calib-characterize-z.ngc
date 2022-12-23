@@ -14,7 +14,7 @@ o<v2-calib-characterize-z> sub
 
   o100 while [#<i> LT #<numPoints>]
     #<t> = [ #<i> / [ #<numPoints> - 1 ] ]
-    #<z> = [[ #<zMax> * (1-#<t>) ] + [ #<zMin> * #<t> ]]
+    #<z> = [[ #<zMax> * [ 1 - #<t> ]] + [ #<zMin> * #<t> ]]
     g0 z[#<z>]
     M66  E0 L0
     o<v2_calib_probe_z> call [0][#<z>]

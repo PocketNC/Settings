@@ -11,7 +11,7 @@ g0 x63.5 y63.5 a0b0
 
 o100 while [#<i> LT #<numPoints>]
   #<t> = [ #<i> / [ #<numPoints> - 1 ] ]
-  #<x> = [[ #<xMax> * (1-#<t>) ] + [ #<xMin> * #<t> ]]
+  #<x> = [[ #<xMax> * [ 1 - #<t> ] ] + [ #<xMin> * #<t> ]]
   g0 x[#<x>]
   M66  E0 L0
   o<v2_calib_probe_x> call [#<x>][0]
