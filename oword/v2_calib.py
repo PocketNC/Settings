@@ -405,7 +405,19 @@ async def v2_calib_find_pos_b(self, y, b):
   b_pos = v2calculations.calc_pos_b(b_line, x_dir, y_dir, z_dir, APPROX_COR)
   return b_pos
 
-async def v2_calib_find_pos_fixture_rel_x_perp(self, y):
+async def v2_calib_find_pos_b_near_home(self, y, b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  b_pos = v2calculations.calc_pos_b(b_line, x_dir, y_dir, z_dir, APPROX_COR)
+  if b_pos > 180:
+    b_pos = b_pos - 360
+  return b_pos
+
+async def v2_calib_find_pos_fixture_rel_x_perp(self, y, a, b):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -466,21 +478,58 @@ async def v2_calib_init_a_home_state(self):
 
 async def v2_calib_prep_probe_a(self):
   cmm = Cmm.getInstance()
-  await cmm.v2_routines.initial_probe_a(0,0)
-  
+  await cmm.v2routines.initial_probe_a(0,0)
+
 async def v2_calib_probe_a_home(self, y, a):
   cmm = Cmm.getInstance()
 
-  state = CalibState.getInstance()
-  probe_a_home_stage = state.getStage(Stages.PROBE_A_HOME)
-  
-  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
-  logger.debug('spindle_pos points %s, sphere %s', spindle_pos.points(), spindle_pos.sphere())
+  a_line = await cmm.v2routines.probe_a_line(y, a)
+  logger.debug('a_line points %s', a_line.points())
 
-  stage = state.getStage(Stages.HOMING_X)
-  stage["features"].append(spindle_pos)
-  stage["positions"].append({ "x": x, "z": z })
-  state.saveStage(Stages.HOMING_X, stage)
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.HOMING_A)
+  stage["features"].append(a_line)
+  stage["positions"].append({ "y": y, "a": a })
+  state.saveStage(Stages.HOMING_A, stage)
+
+def v2_calib_verify_a_home(self):
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  stage = state.getStage(Stages.HOMING_A)
+  (repeatability, expected) = v2verifications.verify_a_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('A Homing Repeatability: %s, expected <= %s', repeatability, expected)
+
+async def v2_calib_init_b_home_state(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.HOMING_B, stage)
+
+async def v2_calib_prep_probe_b(self):
+  cmm = Cmm.getInstance()
+  await cmm.v2routines.initial_probe_b(0,0)
+
+async def v2_calib_probe_b_home(self, y, b):
+  cmm = Cmm.getInstance()
+
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  logger.debug('b_line points %s', b_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.HOMING_B)
+  stage["features"].append(b_line)
+  stage["positions"].append({ "y": y, "b": b })
+  state.saveStage(Stages.HOMING_B, stage)
+
+def v2_calib_verify_b_home(self):
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  stage = state.getStage(Stages.HOMING_B)
+  (repeatability, expected) = v2verifications.verify_b_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('B Homing Repeatability: %s, expected <= %s', repeatability, expected)
+
 
 #def v2_calib_setup_cnc_csy(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CNC_CSY)

@@ -12,14 +12,10 @@ o<v2-calib-zero-b> sub
     g0 b-5
     g0 b[#<bAngle>]
     M66 E0 L0
-    o<v2_calib_find_pos_b> call [#<yPos>] [#<bAngle>]
+    o<v2_calib_find_pos_b_near_home> call [#<yPos>] [#<bAngle>]
     #<bAngleMeas> = [#<_value>]
+    #<bErrAbs> = [ ABS[ #<bAngleMeas>] ] 
 
-    o101 if [#<bAngleMeas> GT 0]
-      #<bErrAbs> = [#<bAngleMeas>]
-    o101 else
-      #<bErrAbs> = [0 - #<bAngleMeas>]
-    o101 endif
     #<bAngle> = [#<bAngle> - #<bAngleMeas>]
     
   o100 while [#<bErrAbs> GT 0.003]
