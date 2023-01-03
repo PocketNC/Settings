@@ -242,6 +242,22 @@ async def v2_calib_init_characterize_z(self):
   }
   state.saveStage(Stages.CHARACTERIZE_Z, stage)
 
+async def v2_calib_init_characterize_a(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_A, stage)
+
+async def v2_calib_init_characterize_b(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_B, stage)
+
 async def v2_calib_probe_x(self, x, z):
   cmm = Cmm.getInstance()
 
@@ -376,14 +392,27 @@ async def v2_calib_probe_a(self, y, a):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
-  fixture_features = state.getStage(Stages.PROBE_FIXTURE_BALL_POS)
-  fixture_ball_pos = fixture_features.fixture_ball_pos
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
 
   a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
-  features = state.getStage(Stages.CHARACTERIZE_A)
-  fid = features.getNextID()
-  features.setFeature(fid, a_pos)
-  state.saveStage(Stages.CHARACTERIZE_A)
+
+  stage = state.getStage(Stages.CHARACTERIZE_A)
+  stage["features"].append(a_pos)
+  stage["positions"].append({ "y": y, "a": a })
+  state.saveStage(Stages.CHARACTERIZE_A, stage)
+
+async def v2_calib_probe_b(self, y, b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  b_pos = await cmm.v2routines.probe_b_pos(fixture_ball_pos.sphere()[1], y, b)
+  
+  stage = state.getStage(Stages.CHARACTERIZE_B)
+  stage["features"].append(b_pos)
+  stage["positions"].append({ "y": y, "b": b })
+  state.saveStage(Stages.CHARACTERIZE_B, stage)
 
 async def v2_calib_find_pos_a(self, y, a):
   cmm = Cmm.getInstance()
@@ -582,11 +611,7 @@ def v2_calib_verify_b_home(self):
 #
 #def v2_calib_verify_a_homing(self):
 #  calib.CalibManager.getInstance().run_step(calib.Steps.VERIFY_A_HOMING)
-#
-#def v2_calib_probe_b(self, y_nominal, b_nominal):
-#  feat_name = "probe_b_%+.6f" % b_nominal
-#  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_B, feat_name, y_nominal, b_nominal)
-#
+##
 #def v2_calib_probe_b_home(self, y_nominal, b_nominal):
 #  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_B_HOME, y_nominal, b_nominal)
 #
