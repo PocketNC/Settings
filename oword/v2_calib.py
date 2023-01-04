@@ -388,6 +388,19 @@ def v2_calib_verify_y_home(self):
   (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "Y")
   logger.info('Y Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
+async def v2_calib_probe_a0(self, y, a, v2_a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
+
+  stage = state.getStage(Stages.CHARACTERIZE_A)
+  stage["zero"] = a_pos
+  stage["zero_a_pos"] = v2_a
+  state.saveStage(Stages.CHARACTERIZE_A, stage)
+
 async def v2_calib_probe_a(self, y, a):
   cmm = Cmm.getInstance()
 
