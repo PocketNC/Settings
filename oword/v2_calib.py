@@ -388,6 +388,49 @@ def v2_calib_verify_y_home(self):
   (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "Y")
   logger.info('Y Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
+
+async def v2_calib_prep_probe_fixture_ball(self):
+  cmm = Cmm.getInstance()
+  await cmm.v2routines.prep_probe_fixture_ball(0,0)
+
+
+async def v2_calib_probe_spindle_at_tool_probe(self, x, y, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug(zero_spindle_pos)
+  logger.debug(zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  state = CalibState.getInstance()
+  stage = {}
+  stage["tool_probe_pos"] = spindle_pos
+  state.saveStage(Stages.TOOL_PROBE_OFFSET, stage)
+
+async def v2_calib_probe_fixture_plane_a90(self, y):
+  cmm = Cmm.getInstance()
+
+  plane = await cmm.v2routines.probe_fixture_plane_a90(y)
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.TOOL_PROBE_OFFSET)
+  stage["plane_a90"] = plane
+  state.saveStage(Stages.TOOL_PROBE_OFFSET, stage)
+
+def v2_calib_calc_tool_probe_offset(self):
+  state = CalibState.getInstance()
+  tool_probe_pos = v2state.getToolProbePos(state)
+  plane_a90 = v2state.getPlaneA90(state)
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+
+  tool_probe_offset = v2calculations.calc_tool_probe_offset(tool_probe_pos, plane_a90, x_dir, y_dir, z_dir, APPROX_COR)
+  
+  stage = state.getStage(Stages.TOOL_PROBE_OFFSET)
+
+  
+
 async def v2_calib_probe_a0(self, y, a, v2_a):
   cmm = Cmm.getInstance()
 
@@ -518,13 +561,10 @@ async def v2_calib_init_a_home_state(self):
   }
   state.saveStage(Stages.HOMING_A, stage)
 
-async def v2_calib_prep_probe_a_home(self):
+async def v2_calib_prep_probe_a_line(self):
   cmm = Cmm.getInstance()
-  await cmm.v2routines.prep_probe_a_home(0,0)
+  await cmm.v2routines.prep_probe_a_line(0,0)
 
-async def v2_calib_prep_probe_a(self):
-  cmm = Cmm.getInstance()
-  await cmm.v2routines.prep_probe_a(0,0)
 
 async def v2_calib_probe_a_home(self, y, a):
   cmm = Cmm.getInstance()
@@ -553,9 +593,9 @@ async def v2_calib_init_b_home_state(self):
   }
   state.saveStage(Stages.HOMING_B, stage)
 
-async def v2_calib_prep_probe_b(self):
+async def v2_calib_prep_probe_b_line(self):
   cmm = Cmm.getInstance()
-  await cmm.v2routines.initial_probe_b(0,0)
+  await cmm.v2routines.prep_probe_b_line(0,0)
 
 async def v2_calib_probe_b_home(self, y, b):
   cmm = Cmm.getInstance()
@@ -579,15 +619,6 @@ def v2_calib_verify_b_home(self):
 
 #def v2_calib_setup_cnc_csy(self):
 ##  calib.CalibManager.getInstance().run_step(calib.Steps.SETUP_CNC_CSY)
-#  pass
-#
-
-#def v2_calib_probe_spindle_at_tool_probe(self):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_SPINDLE_AT_TOOL_PROBE)
-#  pass
-#
-#def v2_calib_probe_fixture_plane_a90(self, y_nominal):
-##  calib.CalibManager.getInstance().run_step(calib.Steps.PROBE_FIXTURE_PLANE_A90, y_nominal)
 #  pass
 #
 #def v2_calib_tool_probe_offset(self):
