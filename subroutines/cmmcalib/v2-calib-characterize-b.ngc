@@ -15,9 +15,6 @@ o<v2-calib-characterize-b> sub
     #2 = [#2 + 5]
     M66  E0 L0
   o100 endwhile
-  
-  M66  E0 L0
-  o<cmm_go_to_clearance_z> call
 
 o<v2-calib-characterize-b> endsub
 M2
