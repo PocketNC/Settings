@@ -561,9 +561,9 @@ async def v2_calib_init_a_home_state(self):
   }
   state.saveStage(Stages.HOMING_A, stage)
 
-async def v2_calib_prep_probe_a_line(self):
+async def v2_calib_prep_probe_fixture_fin(self):
   cmm = Cmm.getInstance()
-  await cmm.v2routines.prep_probe_a_line(0,0)
+  await cmm.v2routines.prep_probe_fixture_fin(0,0)
 
 
 async def v2_calib_probe_a_home(self, y, a):
