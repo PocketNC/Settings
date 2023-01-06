@@ -617,9 +617,63 @@ class FeatureManager:
     self.sets.append( FeatureMap() )
 
   def push(self):
+    """
+    Pushes an empty FeatureMap to the top of the stack, making it the active FeatureMap in G code.
+    This can be useful to ensure a subroutine or chunk of G code doesn't modify Features from a
+    different context. 
+
+    G code Example:
+
+        ; Pushes a new feature set to be the active feature set
+        o<push_feature_set> call
+
+        ; Make any modifications to the active feature set by
+        ; adding points to any number of features. In this case,
+        ; we're simply creating a line. Normally, you would get
+        ; this point data from a probe.
+        o<add_point> call [0] [1] [2]
+        o<add_point> call [1] [2] [3]
+        o<add_point> call [4] [5] [6]
+
+        ; Perform any calculations with those features. In this case,
+        ; we're simply printing out a debug message with the line direction.
+        (debug,Line Direction #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
+
+        ; Pop the feature set stack, so it returns to the last active feature set.
+        o<pop_feature_set> call
+
+    Related: `FeatureManager.pop`, `oword.penta.push_feature_set`
+    """
     self.sets.append( FeatureMap() )
 
   def pop(self):
+    """
+    Pops the active FeatureMap off the stack, making the previously active FeatureMap active in G code.
+    This is used to clean up Features used in a local context, returning the FeatureManager to how it was
+    before the local context modified it.
+
+    G code Example:
+
+        ; Pushes a new feature set to be the active feature set
+        o<push_feature_set> call
+
+        ; Make any modifications to the active feature set by
+        ; adding points to any number of features. In this case,
+        ; we're simply creating a line. Normally, you would get
+        ; this point data from a probe.
+        o<add_point> call [0] [1] [2]
+        o<add_point> call [1] [2] [3]
+        o<add_point> call [4] [5] [6]
+
+        ; Perform any calculations with those features. In this case,
+        ; we're simply printing out a debug message with the line direction.
+        (debug,Line Direction #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
+
+        ; Pop the feature set stack, so it returns to the last active feature set.
+        o<pop_feature_set> call
+
+    Related: `FeatureManager.push`, `oword.penta.pop_feature_set`
+    """
     self.sets.pop()
 
   def getActiveFeatureMap(self):
