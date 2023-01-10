@@ -242,6 +242,14 @@ async def v2_calib_init_characterize_y(self):
   }
   state.saveStage(Stages.CHARACTERIZE_Y, stage)
 
+async def v2_calib_init_characterize_y_reverse(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_Y_REVERSE, stage)
+
 async def v2_calib_init_characterize_z(self):
   state = CalibState.getInstance()
   stage = {
@@ -330,6 +338,32 @@ async def v2_calib_probe_x_reverse(self, x, z):
   stage["positions"].append({ "x": x, "z": z })
   state.saveStage(Stages.CHARACTERIZE_X_REVERSE, stage)
 
+async def v2_calib_probe_y0(self, y):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  y_pos = await cmm.v2routines.probe_fixture_ball_top(fixture_ball_pos.sphere()[1], y)
+
+  stage = state.getStage(Stages.CHARACTERIZE_Y)
+  stage["zero"] = y_pos
+  stage["zero_pos"] = { "y": y }
+  state.saveStage(Stages.CHARACTERIZE_Y, stage)
+
+async def v2_calib_probe_y0_reverse(self, y):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  y_pos = await cmm.v2routines.probe_fixture_ball_top(fixture_ball_pos.sphere()[1], y)
+
+  stage = state.getStage(Stages.CHARACTERIZE_Y_REVERSE)
+  stage["zero"] = y_pos
+  stage["zero_pos"] = { "y": y }
+  state.saveStage(Stages.CHARACTERIZE_Y_REVERSE, stage)
+
 async def v2_calib_probe_y(self, y):
   cmm = Cmm.getInstance()
 
@@ -342,6 +376,19 @@ async def v2_calib_probe_y(self, y):
   stage["features"].append(y_pos)
   stage["positions"].append({ "y": y })
   state.saveStage(Stages.CHARACTERIZE_Y, stage)
+
+async def v2_calib_probe_y_reverse(self, y):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  y_pos = await cmm.v2routines.probe_fixture_ball_top(fixture_ball_pos.sphere()[1], y)
+
+  stage = state.getStage(Stages.CHARACTERIZE_Y_REVERSE)
+  stage["features"].append(y_pos)
+  stage["positions"].append({ "y": y })
+  state.saveStage(Stages.CHARACTERIZE_Y_REVERSE, stage)
 
 async def v2_calib_probe_z(self, x, z):
   cmm = Cmm.getInstance()
