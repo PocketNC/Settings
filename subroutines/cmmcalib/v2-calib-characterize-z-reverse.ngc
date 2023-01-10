@@ -1,15 +1,16 @@
-;v2-calib-characterize-z
-o<v2-calib-characterize-z> sub
+;v2-calib-characterize-z-reverse
+o<v2-calib-characterize-z-reverse> sub
   g21
   g90
-  #<zMax> = -12.7
-  #<zMin> = -76
+  #<zMax> = -76
+  #<zMin> = -12.7
   #<i> = 0
   #<numPoints> = #1
 
   g0 z0
   g0 x25.4
   g0 y63.5x0a0b0
+  g0 Z-87
   M66  E0 L0
 
   o100 while [#<i> LT #<numPoints>]
@@ -17,16 +18,14 @@ o<v2-calib-characterize-z> sub
     #<z> = [[ #<zMax> * [ 1 - #<t> ]] + [ #<zMin> * #<t> ]]
     g0 z[#<z>]
     M66  E0 L0
-    o<v2_calib_probe_z> call [0][#<z>]
+    o<v2_calib_probe_z_reverse> call [0][#<z>]
     #<i> = [#<i> + 1]
   o100 endwhile
 
-g0 Z0
-g0 z-25.4
-M66  E0 L0
-o<v2_calib_probe_z1> call [0] [-25.4]
+  G0 Z-50.8
+  g0 Z-25.4
+  M66  E0 L0
+  o<v2_calib_probe_z1_reverse> call [0] [-25.4]
 
-o<v2-calib-characterize-z> endsub
-
-
+o<v2-calib-characterize-z-reverse> endsub
 M2

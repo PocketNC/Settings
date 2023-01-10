@@ -1,0 +1,26 @@
+;v2-calib-characterize-x-reverse
+o<v2-calib-characterize-x-reverse> sub
+g21
+g90
+g0 z0
+g0 x-50.8 y63.5 a0b0
+#<xMax> = -38.01
+#<xMin> = 50.8
+#<i> = 0
+#<numPoints> = #1
+
+o100 while [#<i> LT #<numPoints>]
+  #<t> = [ #<i> / [ #<numPoints> - 1 ] ]
+  #<x> = [[ #<xMax> * [ 1 - #<t> ] ] + [ #<xMin> * #<t> ]]
+  g0 x[#<x>]
+  M66  E0 L0
+  o<v2_calib_probe_x_reverse> call [#<x>][0]
+  #<i> = [ #<i> + 1 ]
+o100 endwhile
+
+g0 X-25.4
+g0 x0
+M66  E0 L0
+o<v2_calib_probe_x0_reverse> call [0] [0]
+o<v2-calib-characterize-x-reverse> endsub
+M2

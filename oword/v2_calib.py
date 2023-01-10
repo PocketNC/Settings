@@ -218,6 +218,14 @@ async def v2_calib_probe_z_home(self, x, z):
   stage["positions"].append({ "x": x, "z": z })
   state.saveStage(Stages.HOMING_Z, stage)
 
+async def v2_calib_init_characterize_x_reverse(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_X_REVERSE, stage)
+
 async def v2_calib_init_characterize_x(self):
   state = CalibState.getInstance()
   stage = {
@@ -241,6 +249,14 @@ async def v2_calib_init_characterize_z(self):
     "positions": []
   }
   state.saveStage(Stages.CHARACTERIZE_Z, stage)
+
+async def v2_calib_init_characterize_z_reverse(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_Z_REVERSE, stage)
 
 async def v2_calib_init_characterize_a(self):
   state = CalibState.getInstance()
@@ -272,6 +288,48 @@ async def v2_calib_probe_x(self, x, z):
   stage["positions"].append({ "x": x, "z": z })
   state.saveStage(Stages.CHARACTERIZE_X, stage)
 
+async def v2_calib_probe_x0(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  stage = state.getStage(Stages.CHARACTERIZE_X)
+  stage["zero"] = spindle_pos
+  stage["zero_pos"] = { "x": x, "z": z }
+  state.saveStage(Stages.CHARACTERIZE_X, stage)
+
+async def v2_calib_probe_x0_reverse(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  stage = state.getStage(Stages.CHARACTERIZE_X_REVERSE)
+  stage["zero"] = spindle_pos
+  stage["zero_pos"] = { "x": x, "z": z }
+  state.saveStage(Stages.CHARACTERIZE_X_REVERSE, stage)
+  
+async def v2_calib_probe_x_reverse(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug('zero_spindle_pos points %s, sphere %s', zero_spindle_pos.points(), zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  stage = state.getStage(Stages.CHARACTERIZE_X_REVERSE)
+  stage["features"].append(spindle_pos)
+  stage["positions"].append({ "x": x, "z": z })
+  state.saveStage(Stages.CHARACTERIZE_X_REVERSE, stage)
+
 async def v2_calib_probe_y(self, y):
   cmm = Cmm.getInstance()
 
@@ -299,6 +357,51 @@ async def v2_calib_probe_z(self, x, z):
   stage["features"].append(spindle_pos)
   stage["positions"].append({ "x": x, "z": z })
   state.saveStage(Stages.CHARACTERIZE_Z, stage)
+
+async def v2_calib_probe_z_reverse(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug(zero_spindle_pos)
+  logger.debug(zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  stage = state.getStage(Stages.CHARACTERIZE_Z_REVERSE)
+  stage["features"].append(spindle_pos)
+  stage["positions"].append({ "x": x, "z": z })
+  state.saveStage(Stages.CHARACTERIZE_Z_REVERSE, stage)
+
+async def v2_calib_probe_z1(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug(zero_spindle_pos)
+  logger.debug(zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  stage = state.getStage(Stages.CHARACTERIZE_Z)
+  stage["one"] = spindle_pos
+  stage["one_pos"] = { "x": x, "z": z }
+  state.saveStage(Stages.CHARACTERIZE_Z, stage)
+
+async def v2_calib_probe_z1_reverse(self, x, z):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  logger.debug(zero_spindle_pos)
+  logger.debug(zero_spindle_pos.sphere())
+
+  spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
+
+  stage = state.getStage(Stages.CHARACTERIZE_Z_REVERSE)
+  stage["one"] = spindle_pos
+  stage["one_pos"] = { "x": x, "z": z }
+  state.saveStage(Stages.CHARACTERIZE_Z_REVERSE, stage)
 
 async def v2_calib_probe_top_plane(self, y):
   cmm = Cmm.getInstance()
