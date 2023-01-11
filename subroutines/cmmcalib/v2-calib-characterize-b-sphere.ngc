@@ -1,5 +1,5 @@
-;v2-calib-characterize-b
-o<v2-calib-characterize-b> sub
+;v2-calib-characterize-b-sphere
+o<v2-calib-characterize-b-sphere> sub
   g21
 
   #2 = [#1]
@@ -10,11 +10,11 @@ o<v2-calib-characterize-b> sub
     M66  E0 L0
     g0 b[#2]
     M66  E0 L0
-    o<v2_calib_probe_b> call [0] [#2]
+    o<v2_calib_probe_b_sphere> call [0] [#2]
     M66  E0 L0
     #2 = [#2 + 5]
     M66  E0 L0
   o100 endwhile
 
-o<v2-calib-characterize-b> endsub
+o<v2-calib-characterize-b-sphere> endsub
 M2

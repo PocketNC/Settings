@@ -1,0 +1,21 @@
+;v2-calib-characterize-b-sphere-reverse
+o<v2-calib-characterize-b-sphere-reverse> sub
+  g21
+
+  #2 = [#1]
+
+  g0 y0
+
+  o100 while [#2 GT -361]
+    M66  E0 L0
+    g0 b[#2]
+    M66  E0 L0
+    o<v2_calib_probe_b_sphere_reverse> call [0] [#2]
+    o<cmm_go_to_clearance_y> call [0]
+    M66  E0 L0
+    #2 = [#2 - 5]
+    M66  E0 L0
+  o100 endwhile
+
+o<v2-calib-characterize-b-sphere-reverse> endsub
+M2

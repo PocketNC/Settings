@@ -1,0 +1,24 @@
+;v2-calib-zero-b-reverse
+o<v2-calib-zero-b-reverse> sub
+  g21
+  g0 z0
+  #<yPos> = 0
+  g0 y[#<yPos>]
+
+  #<bAngle> = 0
+  #<bAngleMeas> = 0
+  #<bErrAbs> = 0
+  o100 do
+    g0 b5
+    g0 b[#<bAngle>]
+    M66 E0 L0
+    o<v2_calib_find_pos_b_near_home> call [#<yPos>] [#<bAngle>]
+    #<bAngleMeas> = [#<_value>]
+    #<bErrAbs> = [ ABS[ #<bAngleMeas>] ] 
+
+    #<bAngle> = [#<bAngle> - #<bAngleMeas>]
+    
+  o100 while [#<bErrAbs> GT 0.003]
+
+o<v2-calib-zero-b-reverse> endsub [#<bAngle>]
+M2

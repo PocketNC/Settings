@@ -266,21 +266,69 @@ async def v2_calib_init_characterize_z_reverse(self):
   }
   state.saveStage(Stages.CHARACTERIZE_Z_REVERSE, stage)
 
-async def v2_calib_init_characterize_a(self):
+async def v2_calib_init_characterize_a_line(self):
   state = CalibState.getInstance()
   stage = {
     "features": [],
     "positions": []
   }
-  state.saveStage(Stages.CHARACTERIZE_A, stage)
+  state.saveStage(Stages.CHARACTERIZE_A_LINE, stage)
 
-async def v2_calib_init_characterize_b(self):
+async def v2_calib_init_characterize_a_line_reverse(self):
   state = CalibState.getInstance()
   stage = {
     "features": [],
     "positions": []
   }
-  state.saveStage(Stages.CHARACTERIZE_B, stage)
+  state.saveStage(Stages.CHARACTERIZE_A_LINE_REVERSE, stage)
+
+async def v2_calib_init_characterize_a_sphere(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE, stage)
+
+async def v2_calib_init_characterize_a_sphere_reverse(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE_REVERSE, stage)
+
+async def v2_calib_init_characterize_b_line(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_B_LINE, stage)
+
+async def v2_calib_init_characterize_b_line_reverse(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_B_LINE_REVERSE, stage)
+
+async def v2_calib_init_characterize_b_sphere(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE, stage)
+
+async def v2_calib_init_characterize_b_sphere_reverse(self):
+  state = CalibState.getInstance()
+  stage = {
+    "features": [],
+    "positions": []
+  }
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE_REVERSE, stage)
 
 async def v2_calib_probe_x(self, x, z):
   cmm = Cmm.getInstance()
@@ -579,9 +627,7 @@ def v2_calib_calc_tool_probe_offset(self):
   
   stage = state.getStage(Stages.TOOL_PROBE_OFFSET)
 
-  
-
-async def v2_calib_probe_a0(self, y, a, v2_a):
+async def v2_calib_probe_a0_sphere(self, y, a, v2_a):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -589,12 +635,12 @@ async def v2_calib_probe_a0(self, y, a, v2_a):
 
   a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
 
-  stage = state.getStage(Stages.CHARACTERIZE_A)
+  stage = state.getStage(Stages.CHARACTERIZE_A_SPHERE)
   stage["zero"] = a_pos
   stage["zero_a_pos"] = v2_a
-  state.saveStage(Stages.CHARACTERIZE_A, stage)
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE, stage)
 
-async def v2_calib_probe_a(self, y, a):
+async def v2_calib_probe_a0_sphere_reverse(self, y, a, v2_a):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -602,12 +648,132 @@ async def v2_calib_probe_a(self, y, a):
 
   a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
 
-  stage = state.getStage(Stages.CHARACTERIZE_A)
+  stage = state.getStage(Stages.CHARACTERIZE_A_SPHERE_REVERSE)
+  stage["zero"] = a_pos
+  stage["zero_a_pos"] = v2_a
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE_REVERSE, stage)
+
+async def v2_calib_probe_a0_line(self, y, a, v2_a):
+  cmm = Cmm.getInstance()
+  a_line = await cmm.v2routines.probe_a_line(y, a)
+  logger.debug('a0_line points %s', a_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_A_LINE)
+  stage["zero"] = a_line
+  stage["zero_a_pos"] = v2_a
+  state.saveStage(Stages.CHARACTERIZE_A_LINE, stage)
+
+async def v2_calib_probe_a0_line_reverse(self, y, a, v2_a):
+  cmm = Cmm.getInstance()
+  a_line = await cmm.v2routines.probe_a_line(y, a)
+  logger.debug('a0_line points %s', a_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_A_LINE_REVERSE)
+  stage["zero"] = a_line
+  stage["zero_a_pos"] = v2_a
+  state.saveStage(Stages.CHARACTERIZE_A_LINE_REVERSE, stage)
+
+async def v2_calib_probe_b0_sphere(self, y, b, v2_b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  b_pos = await cmm.v2routines.probe_b_pos(fixture_ball_pos.sphere()[1], y, b)
+
+  stage = state.getStage(Stages.CHARACTERIZE_B_SPHERE)
+  stage["zero"] = b_pos
+  stage["zero_b_pos"] = v2_b
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE, stage)
+
+async def v2_calib_probe_b0_sphere_reverse(self, y, b, v2_b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  b_pos = await cmm.v2routines.probe_b_pos(fixture_ball_pos.sphere()[1], y, b)
+
+  stage = state.getStage(Stages.CHARACTERIZE_B_SPHERE_REVERSE)
+  stage["zero"] = b_pos
+  stage["zero_b_pos"] = v2_b
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE_REVERSE, stage)
+
+async def v2_calib_probe_b0_line(self, y, b, v2_b):
+  cmm = Cmm.getInstance()
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  logger.debug('b0_line points %s', b_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_B_LINE)
+  stage["zero"] = b_line
+  stage["zero_b_pos"] = v2_b
+  state.saveStage(Stages.CHARACTERIZE_B_LINE, stage)
+
+async def v2_calib_probe_b0_line_reverse(self, y, b, v2_b):
+  cmm = Cmm.getInstance()
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  logger.debug('b0_line points %s', b_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_B_LINE_REVERSE)
+  stage["zero"] = b_line
+  stage["zero_b_pos"] = v2_b
+  state.saveStage(Stages.CHARACTERIZE_B_LINE_REVERSE, stage)
+
+async def v2_calib_probe_a_sphere(self, y, a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
+
+  stage = state.getStage(Stages.CHARACTERIZE_A_SPHERE)
   stage["features"].append(a_pos)
   stage["positions"].append({ "y": y, "a": a })
-  state.saveStage(Stages.CHARACTERIZE_A, stage)
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE, stage)
 
-async def v2_calib_probe_b(self, y, b):
+async def v2_calib_probe_a_sphere_reverse(self, y, a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
+
+  stage = state.getStage(Stages.CHARACTERIZE_A_SPHERE_REVERSE)
+  stage["features"].append(a_pos)
+  stage["positions"].append({ "y": y, "a": a })
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE_REVERSE, stage)
+
+async def v2_calib_probe_a_line(self, y, a):
+  cmm = Cmm.getInstance()
+
+  a_line = await cmm.v2routines.probe_a_line(y, a)
+  logger.debug('a_line points %s', a_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_A_LINE)
+  stage["features"].append(a_line)
+  stage["positions"].append({ "y": y, "a": a })
+  state.saveStage(Stages.CHARACTERIZE_A_LINE, stage)
+
+async def v2_calib_probe_a_line_reverse(self, y, a):
+  cmm = Cmm.getInstance()
+
+  a_line = await cmm.v2routines.probe_a_line(y, a)
+  logger.debug('a_line points %s', a_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_A_LINE_REVERSE)
+  stage["features"].append(a_line)
+  stage["positions"].append({ "y": y, "a": a })
+  state.saveStage(Stages.CHARACTERIZE_A_LINE_REVERSE, stage)
+
+async def v2_calib_probe_b_sphere(self, y, b):
   cmm = Cmm.getInstance()
 
   state = CalibState.getInstance()
@@ -615,10 +781,47 @@ async def v2_calib_probe_b(self, y, b):
 
   b_pos = await cmm.v2routines.probe_b_pos(fixture_ball_pos.sphere()[1], y, b)
   
-  stage = state.getStage(Stages.CHARACTERIZE_B)
+  stage = state.getStage(Stages.CHARACTERIZE_B_SPHERE)
   stage["features"].append(b_pos)
   stage["positions"].append({ "y": y, "b": b })
-  state.saveStage(Stages.CHARACTERIZE_B, stage)
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE, stage)
+
+async def v2_calib_probe_b_sphere_reverse(self, y, b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  b_pos = await cmm.v2routines.probe_b_pos(fixture_ball_pos.sphere()[1], y, b)
+  
+  stage = state.getStage(Stages.CHARACTERIZE_B_SPHERE_REVERSE)
+  stage["features"].append(b_pos)
+  stage["positions"].append({ "y": y, "b": b })
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE_REVERSE, stage)
+
+async def v2_calib_probe_b_line(self, y, b):
+  cmm = Cmm.getInstance()
+
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  logger.debug('b_line points %s', b_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_B_LINE)
+  stage["features"].append(b_line)
+  stage["positions"].append({ "y": y, "b": b })
+  state.saveStage(Stages.CHARACTERIZE_B_LINE, stage)
+
+async def v2_calib_probe_b_line_reverse(self, y, b):
+  cmm = Cmm.getInstance()
+
+  b_line = await cmm.v2routines.probe_b_line(y, b)
+  logger.debug('b_line points %s', b_line.points())
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.CHARACTERIZE_B_LINE_REVERSE)
+  stage["features"].append(b_line)
+  stage["positions"].append({ "y": y, "b": b })
+  state.saveStage(Stages.CHARACTERIZE_B_LINE_REVERSE, stage)
 
 async def v2_calib_find_pos_a(self, y, a):
   cmm = Cmm.getInstance()

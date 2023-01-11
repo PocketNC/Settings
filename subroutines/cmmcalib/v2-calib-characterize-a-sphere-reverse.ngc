@@ -1,0 +1,19 @@
+;v2-calib-characterize-a-sphere-reverse
+o<v2-calib-characterize-a-sphere-reverse> sub
+  g21
+  #2 = [134.5]
+
+  o101 while [#2 GT -25]
+    g0 a[#2]
+    M66  E0 L0
+    o<v2_calib_probe_a_sphere_reverse> call [0] [#2]
+    #2 = [#2 - 5]
+  o101 endwhile
+
+  (perform final probe at limit of travel)
+  g0 a-25
+  M66  E0 L0
+  o<v2_calib_probe_a_sphere_reverse> call [0] [-25]
+
+o<v2-calib-characterize-a-sphere-reverse> endsub
+M2
