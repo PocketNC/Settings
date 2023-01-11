@@ -6,13 +6,13 @@ o<v2-calib-characterize-b-line-reverse> sub
 
   g0 y0
 
-  o100 while [#2 LT 361]
+  o100 while [#2 GT -361]
     M66  E0 L0
     g0 b[#2]
     M66  E0 L0
     o<v2_calib_probe_b_line_reverse> call [0] [#2]
     M66  E0 L0
-    #2 = [#2 + 5]
+    #2 = [#2 - 5]
     M66  E0 L0
   o100 endwhile
 
