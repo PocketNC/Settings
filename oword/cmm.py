@@ -40,6 +40,11 @@ async def cmm_go_to_clearance_z(self, z=-250):
 
   await cmm.v2routines.go_to_clearance_z(z)
 
+async def cmm_align_tool(self, i, j, k):
+  cmm = Cmm.getInstance()
+
+  await cmm.v2routines.align_tool(i, j, k)
+
 def cmm_set_skip_cmm(self, val):
   cmm = Cmm.getInstance()
   tf = abs(val) > 1e-6
