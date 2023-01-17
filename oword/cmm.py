@@ -18,6 +18,38 @@ async def cmm_connect(self):
   await cmm.EndSession().complete()
   await cmm.StartSession().complete()
 
+async def cmm_set_headtouch_prop(self, val):
+  cmm = Cmm.getInstance()
+
+  await cmm.SetProp(f"Tool.PtMeasPar.HeadTouch({val})").complete()
+
+async def cmm_set_search_prop(self, val):
+  cmm = Cmm.getInstance()
+
+  await cmm.SetProp(f"Tool.PtMeasPar.Search({val})").complete()
+
+async def cmm_set_approach_prop(self, val):
+  cmm = Cmm.getInstance()
+
+  await cmm.SetProp(f"Tool.PtMeasPar.Approach({val})").complete()
+
+async def cmm_set_retract_prop(self, val):
+  cmm = Cmm.getInstance()
+
+  await cmm.SetProp(f"Tool.PtMeasPar.Approach({val})").complete()
+
+async def cmm_set_common_probe_props(self, headtouch, search, approach, retract):
+  """
+  Sets the Tool.PtMeasPar.HeadTouch, Tool.PtMeasPar.Search, Tool.PtMeasPar.Approach and
+  Tool.PtMeasPar.Retract properties.
+  """
+  cmm = Cmm.getInstance()
+
+  await cmm.SetProp(f"Tool.PtMeasPar.HeadTouch({headtouch})").send()
+  await cmm.SetProp(f"Tool.PtMeasPar.Search({search})").send()
+  await cmm.SetProp(f"Tool.PtMeasPar.Approach({approach})").send()
+  await cmm.SetProp(f"Tool.PtMeasPar.Retract({retract})").complete()
+
 async def cmm_disconnect(self):
   cmm = Cmm.getInstance()
 

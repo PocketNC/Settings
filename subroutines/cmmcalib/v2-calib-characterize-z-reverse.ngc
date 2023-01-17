@@ -18,14 +18,14 @@ o<v2-calib-characterize-z-reverse> sub
     #<z> = [[ #<zMax> * [ 1 - #<t> ]] + [ #<zMin> * #<t> ]]
     g0 z[#<z>]
     M66  E0 L0
-    o<v2_calib_probe_z_reverse> call [0][#<z>]
+    o<v2_calib_probe_spindle> call [0] [#<z>] [#<_CALIB_CHARACTERIZE_Z_REVERSE>]
     #<i> = [#<i> + 1]
   o100 endwhile
 
   G0 Z-50.8
   g0 Z-25.4
   M66  E0 L0
-  o<v2_calib_probe_z1_reverse> call [0] [-25.4]
+  o<v2_calib_probe_spindle> call [0] [-25.4] [#<_CALIB_CHARACTERIZE_Z_REVERSE>]
 
 o<v2-calib-characterize-z-reverse> endsub
 M2

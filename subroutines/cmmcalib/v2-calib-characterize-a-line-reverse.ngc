@@ -6,14 +6,14 @@ o<v2-calib-characterize-a-line-reverse> sub
   o101 while [#2 GT -25]
     g0 a[#2]
     M66  E0 L0
-    o<v2_calib_probe_a_line_reverse> call [0] [#2]
+    o<v2_calib_probe_fixture_fin> call [0] [#2] [#<_CALIB_CHARACTERIZE_A_LINE_REVERSE>]
     #2 = [#2 - 5]
   o101 endwhile
 
   (perform final probe at limit of travel)
   g0 a-25
   M66  E0 L0
-  o<v2_calib_probe_a_line_reverse> call [0] [-25]
+  o<v2_calib_probe_fixture_fin> call [0] [-25] [#<_CALIB_CHARACTERIZE_A_LINE_REVERSE>]
 
 o<v2-calib-characterize-a-line-reverse> endsub
 M2

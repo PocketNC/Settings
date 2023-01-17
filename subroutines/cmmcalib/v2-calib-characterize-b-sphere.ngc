@@ -7,13 +7,10 @@ o<v2-calib-characterize-b-sphere> sub
   g0 y0
 
   o100 while [#2 LT 361]
-    M66  E0 L0
     g0 b[#2]
     M66  E0 L0
-    o<v2_calib_probe_b_sphere> call [0] [#2]
-    M66  E0 L0
+    o<v2_calib_probe_fixture_ball_top> call [0] [#2] [#<_CALIB_CHARACTERIZE_B_SPHERE>]
     #2 = [#2 + 5]
-    M66  E0 L0
   o100 endwhile
 
 o<v2-calib-characterize-b-sphere> endsub

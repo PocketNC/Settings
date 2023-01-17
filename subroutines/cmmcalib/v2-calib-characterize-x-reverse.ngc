@@ -14,13 +14,13 @@ o100 while [#<i> LT #<numPoints>]
   #<x> = [[ #<xMax> * [ 1 - #<t> ] ] + [ #<xMin> * #<t> ]]
   g0 x[#<x>]
   M66  E0 L0
-  o<v2_calib_probe_x_reverse> call [#<x>][0]
+  o<v2_calib_probe_spindle> call [#<x>] [0] [#<_CALIB_CHARACTERIZE_X_REVERSE>]
   #<i> = [ #<i> + 1 ]
 o100 endwhile
 
 g0 X-25.4
 g0 x0
 M66  E0 L0
-o<v2_calib_probe_x0_reverse> call [0] [0]
+o<v2_calib_probe_spindle> call [0] [0] [#<_CALIB_CHARACTERIZE_X_REVERSE>]
 o<v2-calib-characterize-x-reverse> endsub
 M2

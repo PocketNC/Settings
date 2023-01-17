@@ -1,0 +1,38 @@
+;v2-calib-characterize-xz
+o<v2-calib-characterize-xz> sub
+g21
+g90
+g0 z0
+g0 x63.5 y63.5 a0b0
+#<zMax> = -12.7
+#<zMin> = -76
+#<xMax> = 50.8
+#<xMin> = -38.01
+#<i> = 0
+#<numXPoints> = #1
+#<numZPoints> = #2
+
+o100 while [#<i> LT #<numXPoints>]
+  #<tx> = [ #<i> / [ #<numXPoints> - 1 ] ]
+  #<x> = [[ #<xMax> * [ 1 - #<tx> ] ] + [ #<xMin> * #<tx> ]]
+  g0 x[#<x>]
+  #<j> = 0
+  o200 while [#<j> LT #<numZPoints>]
+    #<tz> = [ #<j> / [ #<numZPoints> - 1 ] ]
+    #<z> = [[ #<zMax> * [ 1 - #<tz> ] ] + [ #<zMin> * #<tz> ]]
+    g0 z[#<z>]
+    M66  E0 L0
+    o<v2_calib_probe_spindle> call [#<x>] [#<z>] [#<_CALIB_CHARACTERIZE_XZ>]
+    #<j> = [ #<j> + 1 ]
+  o200 endwhile
+  g0 z[0]
+  #<i> = [ #<i> + 1 ]
+o100 endwhile
+
+g0 X25.4
+g0 z-1
+g0 x0
+M66  E0 L0
+o<v2_calib_probe_spindle> call [0] [-1] [#<_CALIB_CHARACTERIZE_XZ>]
+o<v2-calib-characterize-xz> endsub
+M2

@@ -17,14 +17,14 @@ o<v2-calib-characterize-z> sub
     #<z> = [[ #<zMax> * [ 1 - #<t> ]] + [ #<zMin> * #<t> ]]
     g0 z[#<z>]
     M66  E0 L0
-    o<v2_calib_probe_z> call [0][#<z>]
+    o<v2_calib_probe_spindle> call [0] [#<z>] [#<_CALIB_CHARACTERIZE_Z>]
     #<i> = [#<i> + 1]
   o100 endwhile
 
 g0 Z0
 g0 z-25.4
 M66  E0 L0
-o<v2_calib_probe_z1> call [0] [-25.4]
+o<v2_calib_probe_spindle> call [0] [-25.4] [#<_CALIB_CHARACTERIZE_Z>]
 
 o<v2-calib-characterize-z> endsub
 

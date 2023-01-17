@@ -15,14 +15,14 @@ o<v2-calib-characterize-y> sub
     #<y> = [[ #<yMax> * [ 1 - #<t> ]] + [ #<yMin> * #<t> ]]
     g0 y[#<y>]
     M66  E0 L0
-    o<v2_calib_probe_y> call [#<y>]
+    o<v2_calib_probe_fixture_ball_top> call [#<y>] [0] [#<_CALIB_CHARACTERIZE_Y>]
     #<i> = [#<i> + 1]
   o100 endwhile
 
 g0 Y25.4
 g0 Y0
 M66  E0 L0
-o<v2_calib_probe_y0> call [0]
+o<v2_calib_probe_fixture_ball_top> call [0] [0] [#<_CALIB_CHARACTERIZE_Y>]
 
 o<v2-calib-characterize-y> endsub
 
