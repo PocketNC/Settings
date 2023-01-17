@@ -15,7 +15,7 @@ o<v2-calib-characterize-a-sphere> sub
   (perform final probe at limit of travel)
   g0 a135
   M66  E0 L0
-  o<v2_calib_probe_a_sphere> call [0] [135] [#<_CALIB_CHARACTERIZE_A_SPHERE>]
+  o<v2_calib_probe_fixture_ball_side> call [0] [135] [#<_CALIB_CHARACTERIZE_A_SPHERE>]
 
 o<v2-calib-characterize-a-sphere> endsub
 M2
