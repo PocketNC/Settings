@@ -104,9 +104,9 @@ def nearestPointOnLine(pt, line):
   dot = dx*line[1][0] + dy*line[1][1] + dz*line[1][2]
 
   return (pt[0]-dot*line[1][0], pt[1]-dot*line[1][1], pt[2]-dot*line[1][2])
-  
+
 # with help from https://nvlpubs.nist.gov/nistpubs/jres/103/6/j36sha.pdf
-def bestFitCylinder(pts):
+def bestFitCylinder(pts, pt=None, axis=[ 0,0, 1], radius=1):
   data = pts.T
 
   x = data[0]
@@ -173,7 +173,7 @@ def bestFitCylinder(pts):
 
     return np.column_stack((ddPtX, ddPtY, ddPtZ, ddDirX, ddDirY, ddDirZ, ddR))
     
-  (cylinder, ier) = scipy.optimize.leastsq(distFromCylinder, np.array([ x.mean(), y.mean(), z.mean(), 0, 0, 1, 1 ]))
+  (cylinder, ier) = scipy.optimize.leastsq(distFromCylinder, np.array([ pt[0] if pt is not None else x.mean(), pt[1] if pt is not None else y.mean(), pt[2] if pt is not None else z.mean(), axis[0], axis[1], axis[2], radius ]))
 
   (ptX, ptY, ptZ, dirX, dirY, dirZ, r) = cylinder
 
@@ -453,15 +453,17 @@ class Feature:
 
     return self._line
 
-  def cylinder(self):
+  def cylinder(self, pt=None, axis=[0,0,1], radius=1):
     """Requires at least 7 points. Returns (pointOnMainAxis, directionOfMainAxis, radius)."""
-    if self._cylinder is None:
-      self._cylinder = bestFitCylinder(self.points())
+
+    # Not caching as this best fit function takes float arguments. We either need to improve
+    # how we cache, or for now, don't cache (see SOFT-1023).
+    _cylinder = bestFitCylinder(self.points(), pt, axis, radius)
 
     if _DEBUG:
-      logger.debug("Cylinder: ", self._cylinder)
+      logger.debug("Cylinder: ", _cylinder)
 
-    return self._cylinder
+    return _cylinder
 
   def sphere(self):
     """Returns (radius, center)"""
