@@ -349,7 +349,7 @@ async def v2_calib_find_pos_a(self, y, a):
   state = CalibState.getInstance()
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
 
-  a_line = await cmm.v2routines.probe_a_line(y, a)
+  a_line = await cmm.v2routines.probe_fixture_fin(y, a)
   a_pos = v2calculations.calc_pos_a(a_line, x_dir, y_dir, z_dir, APPROX_COR)
   return a_pos
 
@@ -449,7 +449,7 @@ async def v2_calib_probe_fixture_line(self, y, b, stageFloat):
 
   state = CalibState.getInstance()
   stage = state.getStage(int(stageFloat))
-  stage["features"].append(b_line)
+  stage["features"].append(line)
   stage["positions"].append({ "y": y, "b": b })
   state.saveStage(int(stageFloat), stage)
 
