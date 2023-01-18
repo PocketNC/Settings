@@ -1,0 +1,26 @@
+;v2-calib-characterize-x-fixture-ball
+o<v2-calib-characterize-x-fixture-ball> sub
+g21
+g90
+g0 z0
+g0 x63.5 y63.5 a0b0
+#<xMax> = 50.8
+#<xMin> = -38.01
+#<i> = 0
+#<numPoints> = #1
+
+o100 while [#<i> LT #<numPoints>]
+  #<t> = [ #<i> / [ #<numPoints> - 1 ] ]
+  #<x> = [[ #<xMax> * [ 1 - #<t> ] ] + [ #<xMin> * #<t> ]]
+  g0 x[#<x>]
+  M66  E0 L0
+  o<v2_calib_probe_fixture_ball_top> call [63.5] [0] [#<_CALIB_CHARACTERIZE_X_FIXTURE_BALL>]
+  #<i> = [ #<i> + 1 ]
+o100 endwhile
+
+g0 X25.4
+g0 x0
+M66  E0 L0
+o<v2_calib_probe_fixture_ball_top> call [63.5] [0] [#<_CALIB_CHARACTERIZE_X_FIXTURE_BALL>]
+o<v2-calib-characterize-x-fixture-ball> endsub
+M2

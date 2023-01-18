@@ -1,5 +1,5 @@
-;v2-calib-characterize-y
-o<v2-calib-characterize-y> sub
+;v2-calib-characterize-y-spindle-ball
+o<v2-calib-characterize-y-spindle-ball> sub
   g21
   g90
   #<yMax> = 50.8
@@ -19,16 +19,15 @@ o<v2-calib-characterize-y> sub
     #<y> = [[ #<yMax> * [ 1 - #<t> ]] + [ #<yMin> * #<t> ]]
     g0 y[#<y>]
     M66  E0 L0
-    o<v2_calib_probe_fixture_ball_top> call [#<y>] [0] [#<_CALIB_CHARACTERIZE_Y>]
-    o<cmm_move_relative> call [0] [ #<dy> ] [ 0]
+    o<v2_calib_probe_spindle> call [0] [0] [#<_CALIB_CHARACTERIZE_Y_SPINDLE_BALL>]
     #<i> = [#<i> + 1]
   o100 endwhile
 
 g0 Y25.4
 g0 Y0
 M66  E0 L0
-o<v2_calib_probe_fixture_ball_top> call [0] [0] [#<_CALIB_CHARACTERIZE_Y>]
+o<v2_calib_probe_spindle> call [0] [0] [#<_CALIB_CHARACTERIZE_Y_SPINDLE_BALL>]
 
-o<v2-calib-characterize-y> endsub
+o<v2-calib-characterize-y-spindle-ball> endsub
 
 M2
