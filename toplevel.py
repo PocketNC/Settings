@@ -6,6 +6,11 @@ import logging
 import sys
 import importlib
 import logging_constants
+from calibstate import CalibState, Stages
+from cmmmanager import Cmm
+
+calibState = CalibState.getInstance()
+cmm = Cmm.getInstance()
 
 POCKETNC_VAR_DIR = os.environ.get('POCKETNC_VAR_DIRECTORY')
 logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
