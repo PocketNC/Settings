@@ -359,12 +359,12 @@ class Feature:
     self.makeDirty()
 
   def __copy__(self):
-    f = Feature(self._points)
+    f = Feature(self._points.tolist())
     f._featureTransform = self._featureTransform
     return f
 
   def __deepcopy__(self, memo):
-    return self.__copy__(self)
+    return self.__copy__()
 
   def setTransformWithAxisAngle(self, axis, angle):
     """Sets the transform on the feature to a rotation about axis, by angle radians. Can be useful when
