@@ -8,6 +8,7 @@ import importlib
 import logging_constants
 from calibstate import CalibState, Stages
 from cmmmanager import Cmm
+import v2state
 
 calibState = CalibState.getInstance()
 cmm = Cmm.getInstance()
@@ -21,7 +22,7 @@ logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
 )
 logger = logging.getLogger(__name__)
 
-logger.debug("in toplevel.py 48")
+logger.debug("in toplevel.py 4232")
 
 def __init__(self):
 # handle any per-module initialisation tasks here
