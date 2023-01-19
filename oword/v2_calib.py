@@ -343,6 +343,34 @@ async def v2_calib_probe_fixture_ball_top(self, y, b, stageFloat):
   stage["positions"].append({ "y": y, "b": b })
   state.saveStage(int(stageFloat), stage)
 
+async def v2_calib_probe_a0_sphere(self, y, a, v2_a):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  a_pos = await cmm.v2routines.probe_fixture_ball_side(fixture_ball_pos.sphere()[1], y, a)
+
+  stage = state.getStage(Stages.CHARACTERIZE_A_SPHERE)
+  stage["zero"] = a_pos
+  stage["zero_a_pos"] = v2_a
+  state.saveStage(Stages.CHARACTERIZE_A_SPHERE, stage)
+
+
+async def v2_calib_probe_b0_sphere(self, y, b, v2_b):
+  cmm = Cmm.getInstance()
+
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  b_pos = await cmm.v2routines.probe_b_pos(fixture_ball_pos.sphere()[1], y, b)
+
+  stage = state.getStage(Stages.CHARACTERIZE_B_SPHERE)
+  stage["zero"] = b_pos
+  stage["zero_b_pos"] = v2_b
+  state.saveStage(Stages.CHARACTERIZE_B_SPHERE, stage)
+
+
 async def v2_calib_find_pos_a(self, y, a):
   cmm = Cmm.getInstance()
 
@@ -359,7 +387,7 @@ async def v2_calib_find_pos_b(self, y, b):
   state = CalibState.getInstance()
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
 
-  b_line = await cmm.v2routines.probe_b_line(y, b)
+  b_line = await cmm.v2routines.probe_fixture_line(y, b)
   b_pos = v2calculations.calc_pos_b(b_line, x_dir, y_dir, z_dir, APPROX_COR)
   return b_pos
 
@@ -369,7 +397,7 @@ async def v2_calib_find_pos_b_near_home(self, y, b):
   state = CalibState.getInstance()
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
 
-  b_line = await cmm.v2routines.probe_b_line(y, b)
+  b_line = await cmm.v2routines.probe_fixture_line(y, b)
   b_pos = v2calculations.calc_pos_b(b_line, x_dir, y_dir, z_dir, APPROX_COR)
   if b_pos > 180:
     b_pos = b_pos - 360
