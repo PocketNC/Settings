@@ -215,11 +215,11 @@ def test_best_fit_sphere_random_radius():
     feature = metrology.Feature(pts)
     sphere = feature.sphere()
 
-    assert sphere[0] == approx(1, abs=tol)
-    assert sphere[1] == approx((0,0,0), abs=tol)
+    assert sphere[0] == approx(1.0, abs=tol)
+    assert sphere[1] == approx((0.0,0.0,0.0), abs=tol)
 
 def test_best_fit_line():
-  pts = [ (0,0,0), (1,1,1) ]
+  pts = [ (0.0,0.0,0.0), (1.0,1.0,1.0) ]
   feature = metrology.Feature(pts)
   line = feature.line()
 
@@ -242,3 +242,28 @@ def test_best_fit_line_direction_matches_order():
     line = feature.line()
 
     assert line[1] == approx(normalizedDir)
+
+def test_best_fit_line_direction_matches_order_edge_case():
+  """We found our best fit line function produces the same output whether
+  this specific pts array is provided in order or reversed when we would
+  expect reversing the order to reverse the line. Seems like we made incorrect
+  assumptions about the best fit line calculation and need to explicitly check 
+  the direction. See changes to bestFitLine made in the same commit this test 
+  was added, which makes this test pass when it previously failed."""
+
+  pts = [
+    [-133.51666032,   -8.65792664, -110.97359563],
+    [-133.51494674,  -25.59015299, -110.97515438],
+    [-133.51413513,  -42.52348536, -110.97943219],
+    [-133.51374911,  -59.45522886, -110.98192507],
+    [-133.51390869,  -76.38668506, -110.98622678],
+    [-133.51305754,  -93.32001301, -110.98944711],
+    [-133.51609944, -110.25519564, -110.98932217]
+  ]
+
+  feature = metrology.Feature(pts)
+  feature_rev = metrology.Feature(list(reversed(pts)))
+
+  line = feature.line()
+  line_rev = feature_rev.line()
+  assert line[1] == approx(-line_rev[1])

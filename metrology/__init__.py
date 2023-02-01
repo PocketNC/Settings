@@ -239,12 +239,25 @@ def bestFitLine(pts):
   pts_array = np.array(pts)
   mean = np.mean(pts_array, axis=0)
   svd = np.linalg.svd(pts_array-mean)
+  dir = svd[2][0]
 
   if _DEBUG:
     logger.debug("SVD %s", svd)
 
+  # The direction isn't guaranteed to be related to the direction the points
+  # were gathered in. Check that the direction from the first to last point
+  # is roughly in the same direction as the direction of the line. If the line
+  # direction is pointed roughly in the opposite direction, flip the direction.
+  # Either way, it defines the same line, but this makes the direction of the
+  # line more deterministic, so users can make assumptions about the direction
+  # of the line based on the order the points were gathered in.
+  approx_dir = pts_array[-1]-pts_array[0]
+  approx_dir *= 1.0/np.linalg.norm(approx_dir)
+  if np.dot(approx_dir, dir) < 0:
+    dir *= -1
+
   # return tuple with (pt on line, direction of line)
-  return (mean, svd[2][0])
+  return (mean, dir)
 
 def projectPointToPlane(point, plane):
   planePt = plane[0]
