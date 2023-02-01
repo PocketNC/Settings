@@ -1,18 +1,19 @@
 ;v2-calib-characterize-b-line
 o<v2-calib-characterize-b-line> sub
   g21
-
-  #2 = [#1]
-
   g0 y0
 
-  o100 while [#2 LT 361]
+  #<bAngleTrueZero> = #1
+  #<stage> = #2
+
+  #<bPos> = #1
+  o100 while [#<bPos> LT 361]
     M66  E0 L0
-    g0 b[#2]
+    g0 b[#<bPos>]
     M66  E0 L0
-    o<v2_calib_probe_fixture_line> call [0] [#2]
+    o<v2_calib_probe_fixture_line> call [0] [#<bPos>] [#<stage>]
     M66  E0 L0
-    #2 = [#2 + 5]
+    #<bPos> = [#<bPos> + 5]
     M66  E0 L0
   o100 endwhile
 

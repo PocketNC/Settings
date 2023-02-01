@@ -21,6 +21,6 @@ o100 endwhile
 g0 X25.4
 g0 x0
 M66  E0 L0
-o<v2_calib_probe_spindle> call [0] [0] [#<_CALIB_CHARACTERIZE_X>]
+o<v2_calib_probe_spindle_zero> call [0] [0] [#<_CALIB_CHARACTERIZE_X>]
 o<v2-calib-characterize-x> endsub
 M2

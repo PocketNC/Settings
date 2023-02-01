@@ -24,9 +24,6 @@ o<v2-calib-characterize-z> sub
 g0 Z0
 g0 z-25.4
 M66  E0 L0
-o<v2_calib_probe_spindle> call [0] [-25.4] [#<_CALIB_CHARACTERIZE_Z>]
-
+o<v2_calib_probe_spindle_zero> call [0] [-25.4] [#<_CALIB_CHARACTERIZE_Z>]
 o<v2-calib-characterize-z> endsub
-
-
 M2

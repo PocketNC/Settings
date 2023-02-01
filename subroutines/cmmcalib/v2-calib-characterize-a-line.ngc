@@ -1,21 +1,22 @@
 ;v2-calib-characterize-a-line
 o<v2-calib-characterize-a-line> sub
   g21
-  #2 = [-24.5]
+  #<stage> = #1
 
   g0 y0a-25
 
-  o101 while [#2 LT 135]
-    g0 a[#2]
+  #<aPos> = [-24.5]
+  o101 while [#<aPos> LT 135]
+    g0 a[#<aPos>]
     M66  E0 L0
-    o<v2_calib_probe_fixture_fin> call [0] [#2] [#<_CALIB_CHARACTERIZE_A_LINE>]
-    #2 = [#2 + 5]
+    o<v2_calib_probe_fixture_fin> call [0] [#2] [#<stage>]
+    #<aPos> = [#<aPos> + 5]
   o101 endwhile
 
   (perform final probe at limit of travel)
   g0 a135
   M66  E0 L0
-  o<v2_calib_probe_fixture_fin> call [0] [135] [#<_CALIB_CHARACTERIZE_A_LINE>]
+  o<v2_calib_probe_fixture_fin> call [0] [135] [#<stage>]
 
 o<v2-calib-characterize-a-line> endsub
 M2

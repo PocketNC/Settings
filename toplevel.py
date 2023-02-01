@@ -11,6 +11,7 @@ from cmmmanager import Cmm
 import v2state
 
 calibState = CalibState.getInstance()
+calibState.storeStartupState()
 cmm = Cmm.getInstance()
 
 POCKETNC_VAR_DIR = os.environ.get('POCKETNC_VAR_DIRECTORY')
@@ -22,7 +23,7 @@ logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
 )
 logger = logging.getLogger(__name__)
 
-logger.debug("in toplevel.py 4232")
+logger.debug("in toplevel.py 115")
 
 def __init__(self):
 # handle any per-module initialisation tasks here
