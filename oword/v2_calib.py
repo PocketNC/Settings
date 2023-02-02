@@ -159,6 +159,7 @@ async def v2_calib_init_probe_features_stage(self, stageFloat):
   Saves a stage with a `features` key, which is a list that will be populated with Feature objects representing information about the corresponding
   position of the machine stored in the `positions` key.
   """
+  logger.debug('v2_calib_init_probe_features_stage')
   state = CalibState.getInstance()
   stage = {
     "features": [],
@@ -188,7 +189,7 @@ async def v2_calib_probe_spindle(self, x, z, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["features"].append(spindle_pos)
   stage["positions"].append({ "x": x, "z": z })
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 async def v2_calib_probe_spindle_zero(self, x, z, stageFloat):
 
@@ -204,7 +205,7 @@ async def v2_calib_probe_spindle_zero(self, x, z, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["zero"] = spindle_pos
   stage["zero_pos"] = { "x": x, "z": z }
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 async def v2_calib_probe_y0(self, y, b, stageFloat):
   logger.debug("Probing fixture ball from top for y0 pos %s", stageFloat)
@@ -218,7 +219,7 @@ async def v2_calib_probe_y0(self, y, b, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["zero"] = pos
   stage["zero_pos"] = { "y": y, "b": b }
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 async def v2_calib_probe_top_plane(self, y):
   cmm = Cmm.getInstance()
@@ -308,7 +309,7 @@ async def v2_calib_probe_spindle_at_tool_probe(self, x, y, z):
   state = CalibState.getInstance()
   stage = {}
   stage["tool_probe_pos"] = spindle_pos
-  state.saveStage(Stages.TOOL_PROBE_OFFSET, stage)
+  state.updateStage(Stages.PROBE_OFFSETS, stage)
 
 async def v2_calib_probe_fixture_plane_a90(self, y, a):
   cmm = Cmm.getInstance()
@@ -319,7 +320,7 @@ async def v2_calib_probe_fixture_plane_a90(self, y, a):
   stage = state.getStage(Stages.PROBE_OFFSETS)
   stage["plane_a90"] = plane
   stage["plane_a90_pos"] = {"y": y, "a": a}
-  state.saveStage(Stages.PROBE_OFFSETS, stage)
+  state.updateStage(Stages.PROBE_OFFSETS, stage)
 
 def v2_calib_calc_tool_probe_offset(self):
   state = CalibState.getInstance()
@@ -342,7 +343,7 @@ async def v2_calib_probe_fixture_ball_side(self, y, a, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["features"].append(a_pos)
   stage["positions"].append({ "y": y, "a": a })
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 async def v2_calib_probe_fixture_fin(self, y, a, stageFloat):
   cmm = Cmm.getInstance()
@@ -354,7 +355,7 @@ async def v2_calib_probe_fixture_fin(self, y, a, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["features"].append(line)
   stage["positions"].append({ "y": y, "a": a })
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 async def v2_calib_probe_fixture_ball_top(self, y, b, stageFloat):
   """
@@ -372,7 +373,7 @@ async def v2_calib_probe_fixture_ball_top(self, y, b, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["features"].append(b_pos)
   stage["positions"].append({ "y": y, "b": b })
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 
 async def v2_calib_probe_a0_line(self, y, a, v2_a):
@@ -382,7 +383,7 @@ async def v2_calib_probe_a0_line(self, y, a, v2_a):
   stage = state.getStage(Stages.CHARACTERIZE_A_LINE)
   stage["zero"] = a_pos
   stage["zero_a_pos"] = v2_a
-  state.saveStage(Stages.CHARACTERIZE_A_LINE, stage)
+  state.updateStage(Stages.CHARACTERIZE_A_LINE, stage)
 
 async def v2_calib_probe_a0_sphere(self, y, a, v2_a):
   cmm = Cmm.getInstance()
@@ -395,7 +396,7 @@ async def v2_calib_probe_a0_sphere(self, y, a, v2_a):
   stage = state.getStage(Stages.CHARACTERIZE_A_SPHERE)
   stage["zero"] = a_pos
   stage["zero_a_pos"] = v2_a
-  state.saveStage(Stages.CHARACTERIZE_A_SPHERE, stage)
+  state.updateStage(Stages.CHARACTERIZE_A_SPHERE, stage)
 
 
 async def v2_calib_probe_b0_line(self, y, b, v2_b):
@@ -406,7 +407,7 @@ async def v2_calib_probe_b0_line(self, y, b, v2_b):
   stage = state.getStage(Stages.CHARACTERIZE_B_LINE)
   stage["zero"] = b_line
   stage["zero_b_pos"] = v2_b
-  state.saveStage(Stages.CHARACTERIZE_B_LINE, stage)
+  state.updateStage(Stages.CHARACTERIZE_B_LINE, stage)
 
 async def v2_calib_probe_b0_sphere(self, y, b, v2_b):
   cmm = Cmm.getInstance()
@@ -419,7 +420,7 @@ async def v2_calib_probe_b0_sphere(self, y, b, v2_b):
   stage = state.getStage(Stages.CHARACTERIZE_B_SPHERE)
   stage["zero"] = b_pos
   stage["zero_b_pos"] = v2_b
-  state.saveStage(Stages.CHARACTERIZE_B_SPHERE, stage)
+  state.updateStage(Stages.CHARACTERIZE_B_SPHERE, stage)
   
 
 async def v2_calib_find_pos_a(self, y, a):
@@ -495,25 +496,25 @@ async def v2_calib_init_home_offsets_state(self):
     "y_features": [],
     "y_positions": []
   }
-  state.saveStage(Stages.PROBE_HOME_OFFSETS, stage)
+  state.saveStage(Stages.PROBE_OFFSETS, stage)
 
 async def v2_calib_probe_home_offset_x(self, y, a, b):
   cmm = Cmm.getInstance()
   feat = await cmm.v2routines.probe_home_offset_x(y, a, b)
   state = CalibState.getInstance()
-  stage = state.getStage(Stages.PROBE_HOME_OFFSETS)
+  stage = state.getStage(Stages.PROBE_OFFSETS)
   stage["x_features"].append(feat)
   stage["x_positions"].append({ "y": y, "a": a, "b": b })
-  state.saveStage(Stages.PROBE_HOME_OFFSETS, stage)
+  state.updateStage(Stages.PROBE_OFFSETS, stage)
 
 async def v2_calib_probe_home_offset_y(self, y, a, b):
   cmm = Cmm.getInstance()
   feat = await cmm.v2routines.probe_home_offset_y(y, a, b)
   state = CalibState.getInstance()
-  stage = state.getStage(Stages.PROBE_HOME_OFFSETS)
+  stage = state.getStage(Stages.PROBE_OFFSETS)
   stage["y_features"].append(feat)
   stage["y_positions"].append({ "y": y, "a": a, "b": b })
-  state.saveStage(Stages.PROBE_HOME_OFFSETS, stage)
+  state.updateStage(Stages.PROBE_OFFSETS, stage)
 
 def v2_calib_calc_home_offsets(self):
   pass
@@ -543,7 +544,7 @@ async def v2_calib_probe_fixture_line(self, y, b, stageFloat):
   stage = state.getStage(int(stageFloat))
   stage["features"].append(line)
   stage["positions"].append({ "y": y, "b": b })
-  state.saveStage(int(stageFloat), stage)
+  state.updateStage(int(stageFloat), stage)
 
 def v2_calib_verify_b_home(self, stageFloat):
   state = CalibState.getInstance()
@@ -619,7 +620,7 @@ def v2_calib_calc_a_comp(self):
   stage = state.getStage(Stages.CALIBRATE)
   stage["a_err"] = errors
   stage["a_comp"] = a_comp
-  state.saveStage(Stages.CALIBRATE, stage)
+  state.updateStage(Stages.CALIBRATE, stage)
 
 
 def v2_calib_calc_b_comp(self):
@@ -646,4 +647,4 @@ def v2_calib_calc_b_comp(self):
   stage = state.getStage(Stages.CALIBRATE)
   stage["b_err"] = errors
   stage["b_comp"] = b_comp
-  state.saveStage(Stages.CALIBRATE, stage)
+  state.updateStage(Stages.CALIBRATE, stage)
