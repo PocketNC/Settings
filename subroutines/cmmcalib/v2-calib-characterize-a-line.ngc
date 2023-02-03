@@ -9,7 +9,7 @@ o<v2-calib-characterize-a-line> sub
   o101 while [#<aPos> LT 135]
     g0 a[#<aPos>]
     M66  E0 L0
-    o<v2_calib_probe_fixture_fin> call [0] [#2] [#<stage>]
+    o<v2_calib_probe_fixture_fin> call [0] [#<aPos>] [#<stage>]
     #<aPos> = [#<aPos> + 5]
   o101 endwhile
 

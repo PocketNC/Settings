@@ -10,6 +10,7 @@ import v2verifications
 from calibstate import CalibState, Stages
 from v2routines import V2_10, V2_50, PROBE_DIA, SPINDLE_BALL_DIA_10, SPINDLE_BALL_DIA_50, APPROX_FIXTURE_BALL_HOME, FIXTURE_BALL_DIA, APPROX_COR
 import numpy as np
+import compensation
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,7 @@ async def v2_calib_probe_machine_pos(self):
   state.saveStage(Stages.PROBE_MACHINE_POS, stage)
 
   csy = v2calculations.calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
+  logger.debug("new csy %s %s %s %s %s %s", csy.x, csy.y, csy.z, csy.theta, csy.phi, csy.psi)
 
   await cmm.routines.set_part_csy(csy)
   await cmm.v2routines.go_to_clearance_y()
@@ -227,10 +229,10 @@ async def v2_calib_probe_top_plane(self, y):
   top_plane = await cmm.v2routines.probe_top_plane(y)
 
   state = CalibState.getInstance()
-  stage = {}
+  stage = state.getStage(Stages.PROBE_OFFSETS)
   stage["top_plane"] = top_plane
   stage["y"] = y
-  state.saveStage(Stages.PROBE_TOP_PLANE, stage)
+  state.updateStage(Stages.PROBE_OFFSETS, stage)
 
 def v2_calib_verify_x_home(self):
   state = CalibState.getInstance()
@@ -307,7 +309,7 @@ async def v2_calib_probe_spindle_at_tool_probe(self, x, y, z):
   spindle_pos = await cmm.v2routines.probe_spindle_tip(zero_spindle_pos.sphere()[1], zero_spindle_pos.sphere()[0]*2, x, z)
 
   state = CalibState.getInstance()
-  stage = {}
+  stage = state.getStage(Stages.PROBE_OFFSETS)
   stage["tool_probe_pos"] = spindle_pos
   state.updateStage(Stages.PROBE_OFFSETS, stage)
 
@@ -349,10 +351,11 @@ async def v2_calib_probe_fixture_fin(self, y, a, stageFloat):
   cmm = Cmm.getInstance()
 
   line = await cmm.v2routines.probe_fixture_fin(y, a)
-  logger.debug('fixture fin line points %s', line.points())
+  logger.debug('fixture fin line points %s %s %s', line.points(), stageFloat, int(stageFloat))
 
   state = CalibState.getInstance()
   stage = state.getStage(int(stageFloat))
+  logger.debug("stage %s", stage)
   stage["features"].append(line)
   stage["positions"].append({ "y": y, "a": a })
   state.updateStage(int(stageFloat), stage)
@@ -378,12 +381,17 @@ async def v2_calib_probe_fixture_ball_top(self, y, b, stageFloat):
 
 async def v2_calib_probe_a0_line(self, y, a, v2_a):
   cmm = Cmm.getInstance()
-  a_line = await cmm.v2routines.probe_a_line(y, a)
+  a_line = await cmm.v2routines.probe_fixture_fin(y, a)
 
+  state = CalibState.getInstance()
   stage = state.getStage(Stages.CHARACTERIZE_A_LINE)
-  stage["zero"] = a_pos
+  stage["zero"] = a_line
   stage["zero_a_pos"] = v2_a
   state.updateStage(Stages.CHARACTERIZE_A_LINE, stage)
+  logger.debug("SHOULD HAVER zero and zero_a_pos %s" % (stage,))
+
+  stage = state.getStage(Stages.CHARACTERIZE_A_LINE)
+  logger.debug("updated Stage %s" % (stage,))
 
 async def v2_calib_probe_a0_sphere(self, y, a, v2_a):
   cmm = Cmm.getInstance()
@@ -401,7 +409,7 @@ async def v2_calib_probe_a0_sphere(self, y, a, v2_a):
 
 async def v2_calib_probe_b0_line(self, y, b, v2_b):
   cmm = Cmm.getInstance()
-  b_line = await cmm.v2routines.probe_b_line(y, b)
+  b_line = await cmm.v2routines.probe_fixture_line(y, b)
 
   state = CalibState.getInstance()
   stage = state.getStage(Stages.CHARACTERIZE_B_LINE)
@@ -553,19 +561,20 @@ def v2_calib_verify_b_home(self, stageFloat):
   (repeatability, expected) = v2verifications.verify_b_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
   logger.info('B Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
-async def v2_calib_calibrate(self):
+def v2_calib_calibrate(self):
   data = {}
 
   state = CalibState.getInstance()
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
 
-  a_positions = v2state.getAPositionsLine()
+  a_positions = v2state.getAPositionsLine(state)
   a_errors = []
   for (zeroed_nom_pos, pos) in a_positions:
     a_errors.append(zeroed_nom_pos, zeroed_nom_pos-pos)
   a_comp = compensation.calculateACompensation(a_errors)
   a_home_feats = v2state.getFeaturesHomingA(Stages.HOMING_A)
   a_home_offset = v2calculations.calc_home_offset_a(a_home_feats, x_dir,y_dir,z_dir, APPROX_COR, a_comp)
+  data["a_comp"] = a_comp.pts
   data["a_positions"] = a_positions
   data["a_errors"] = a_errors
   data["a_home_offset"] = a_home_offset
@@ -577,18 +586,28 @@ async def v2_calib_calibrate(self):
   b_comp = compensation.calculateBCompensation(b_errors)
   b_home_feats = v2state.getFeaturesHomingB(Stages.HOMING_B)
   b_home_offset = v2calculations.calc_home_offset_b(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
+  data["b_comp"] = b_comp.pts
   data["b_positions"] = b_positions
   data["b_errors"] = b_errors
   data["b_home_offset"] = b_home_offset
 
-  x_home_offset = v2calculations.calc_home_offset_x(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-  data["x_home_offset"] = x_home_offset
-  y_home_offset = v2calculations.calc_home_offset_y(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-  data["y_home_offset"] = y_home_offset
-  b_table_offset = v2calculations.calc_b_table_offset(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-  data["probe_b_table_offset"] = b_table_offset
-  probe_sensor_123_offset = v2calculations.calc_probe_sensor_123_offset(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-  data["probe_sensor_123_offset"] = probe_sensor_123_offset
+  x_homing_stage = state.getStage(Stages.HOMING_X)
+  probe_offsets_stage = state.getStage(Stages.PROBE_OFFSETS)
+
+  x_home_offset_error = v2calculations.calc_home_offset_x_error(x_dir, y_dir, x_homing_stage["features"], probe_offsets_stage["x_features"])
+  current_x_home_offset = self.params["_hal[ini.0.home_offset]"]
+  new_x_home_offset = current_x_home_offset - x_home_offset_error/25.4
+  data["x_home_offset"] = new_x_home_offset
+
+  y_home_offset_error = v2calculations.calc_home_offset_y_error(x_dir, y_dir, x_homing_stage["features"], probe_offsets_stage["y_features"])
+  current_y_home_offset = self.params["_hal[ini.1.home_offset]"]
+  new_y_home_offset = current_y_home_offset - y_home_offset_error/25.4
+  data["y_home_offset"] = new_y_home_offset
+
+#  b_table_offset = v2calculations.calc_b_table_offset(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
+#  data["probe_b_table_offset"] = b_table_offset
+#  probe_sensor_123_offset = v2calculations.calc_probe_sensor_123_offset(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
+#  data["probe_sensor_123_offset"] = probe_sensor_123_offset
 
   state.writeCalibration(data)
   state.saveStage(Stages.CALIBRATE, data)

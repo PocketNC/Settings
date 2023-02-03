@@ -26,8 +26,21 @@ import metrology.helpers
 import skg
 import math
 import logging
+import json
 
 logger = logging.getLogger(__name__)
+
+class FeatureEncoder(json.JSONEncoder):
+  """
+  A JSON encoder that turns Feature objects into a dictionary that is readily identifiable as a Feature object, so 
+  when the JSON is decoded in Python it can automatically turn those objects into Feature objects.
+  """
+
+  def default(self, o):
+    if isinstance(o, Feature):
+      return o.toJSON()
+
+    return super().default(o)
 
 _DEBUG = False
 
