@@ -244,6 +244,36 @@ def v2_calib_verify_x_home(self):
   (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "X")
   logger.info('X Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
+def v2_calib_verify_x_home_final(self):
+  state = CalibState.getInstance()
+  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+
+  stage = state.getStage(Stages.VERIFY_HOMING_X)
+  v2verifications.verify_sphere_diameters_within_tolerance(stage["features"], zero_spindle_pos.sphere()[0]*2)
+
+  (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "X")
+  logger.info('X Homing Repeatability: %s, expected <= %s', repeatability, expected)
+
+  probe_offsets_stage = state.getStage(Stages.PROBE_OFFSETS)
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  (error, max_error) = v2verifications.verify_x_homing_accuracy(stage["features"], probe_offsets_stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('X Homing Error: %s, expected <= %s', error, max_error)
+
+def v2_calib_verify_y_home_final(self):
+  state = CalibState.getInstance()
+  fixture_ball_pos = v2state.getFixtureBallPos(state)
+
+  stage = state.getStage(Stages.VERIFY_HOMING_Y)
+  v2verifications.verify_sphere_diameters_within_tolerance(stage["features"], fixture_ball_pos.sphere()[0]*2)
+
+  (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "Y")
+  logger.info('Y Homing Repeatability: %s, expected <= %s', repeatability, expected)
+
+  probe_offsets_stage = state.getStage(Stages.PROBE_OFFSETS)
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  (error, max_error) = v2verifications.verify_y_homing_accuracy(stage["features"], probe_offsets_stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('Y Homing Error: %s, expected <= %s', error, max_error)
+
 def v2_calib_verify_z_home(self):
   state = CalibState.getInstance()
   zero_spindle_pos = v2state.getZeroSpindlePos(state)
