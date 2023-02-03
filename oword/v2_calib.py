@@ -570,23 +570,25 @@ def v2_calib_calibrate(self):
   a_positions = v2state.getAPositionsLine(state)
   a_errors = []
   for (zeroed_nom_pos, pos) in a_positions:
-    a_errors.append(zeroed_nom_pos, zeroed_nom_pos-pos)
+    a_errors.append((zeroed_nom_pos, zeroed_nom_pos-pos))
   a_comp = compensation.calculateACompensation(a_errors)
-  a_home_feats = v2state.getFeaturesHomingA(Stages.HOMING_A)
-  a_home_offset = v2calculations.calc_home_offset_a(a_home_feats, x_dir,y_dir,z_dir, APPROX_COR, a_comp)
-  data["a_comp"] = a_comp.pts
+  a_home_feats = v2state.getFeaturesHomingA(state)
+  a_home_offset = v2calculations.calc_home_offset_a(a_home_feats, x_dir,y_dir,z_dir, APPROX_COR, a_comp[0])
+  data["a_comp"] = a_comp[0].pts
   data["a_positions"] = a_positions
   data["a_errors"] = a_errors
   data["a_home_offset"] = a_home_offset
 
-  b_positions = v2state.getBPositionsLine()
+  b_positions = v2state.getBPositionsLine(state)
   b_errors = []
   for (zeroed_nom_pos, pos) in b_positions:
-    b_errors.append(zeroed_nom_pos, zeroed_nom_pos-pos)
+    if zeroed_nom_pos < 360:
+      b_errors.append((zeroed_nom_pos, zeroed_nom_pos-pos))
+  logger.debug("b_errors: %s", b_errors)
   b_comp = compensation.calculateBCompensation(b_errors)
-  b_home_feats = v2state.getFeaturesHomingB(Stages.HOMING_B)
-  b_home_offset = v2calculations.calc_home_offset_b(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-  data["b_comp"] = b_comp.pts
+  b_home_feats = v2state.getFeaturesHomingB(state)
+  b_home_offset = v2calculations.calc_home_offset_b(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp[0])
+  data["b_comp"] = b_comp[0].pts
   data["b_positions"] = b_positions
   data["b_errors"] = b_errors
   data["b_home_offset"] = b_home_offset
@@ -600,14 +602,18 @@ def v2_calib_calibrate(self):
   data["x_home_offset"] = new_x_home_offset
 
   y_home_offset_error = v2calculations.calc_home_offset_y_error(x_dir, y_dir, x_homing_stage["features"], probe_offsets_stage["y_features"])
+  logger.debug("y_home_offset_error %s", y_home_offset_error)
   current_y_home_offset = self.params["_hal[ini.1.home_offset]"]
   new_y_home_offset = current_y_home_offset - y_home_offset_error/25.4
   data["y_home_offset"] = new_y_home_offset
 
-#  b_table_offset = v2calculations.calc_b_table_offset(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-#  data["probe_b_table_offset"] = b_table_offset
-#  probe_sensor_123_offset = v2calculations.calc_probe_sensor_123_offset(b_home_feats, x_dir,y_dir,z_dir, APPROX_COR, b_comp)
-#  data["probe_sensor_123_offset"] = probe_sensor_123_offset
+  origin_spindle_pos = v2state.getOriginSpindlePos(state)
+
+  b_table_offset = v2calculations.calc_b_table_offset(origin_spindle_pos, probe_offsets_stage["top_plane"], y_dir)
+  data["probe_b_table_offset"] = b_table_offset
+
+  probe_sensor_123_offset = v2calculations.calc_probe_sensor_123_offset(probe_offsets_stage["tool_probe_pos"], probe_offsets_stage["plane_a90"], z_dir)
+  data["probe_sensor_123_offset"] = probe_sensor_123_offset
 
   state.writeCalibration(data)
   state.saveStage(Stages.CALIBRATE, data)
