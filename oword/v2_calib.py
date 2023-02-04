@@ -568,6 +568,15 @@ def v2_calib_verify_a_home(self, stageFloat):
   (repeatability, expected) = v2verifications.verify_a_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
   logger.info('A Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
+def v2_calib_verify_a_home_final(self):
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  stage = state.getStage(Stages.VERIFY_HOMING_A)
+  (repeatability, expected) = v2verifications.verify_a_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('A Homing Repeatability: %s, expected <= %s', repeatability, expected)
+  (max_error, expected) = v2verifications.verify_a_homing_accuracy(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('A Homing Max Error: %s, expected <= %s', max_error, expected)
+
 async def v2_calib_prep_probe_b_line(self):
   cmm = Cmm.getInstance()
   await cmm.v2routines.prep_probe_b_line(0,0)
@@ -590,6 +599,15 @@ def v2_calib_verify_b_home(self, stageFloat):
   stage = state.getStage(int(stageFloat))
   (repeatability, expected) = v2verifications.verify_b_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
   logger.info('B Homing Repeatability: %s, expected <= %s', repeatability, expected)
+
+def v2_calib_verify_b_home_final(self):
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  stage = state.getStage(Stages.VERIFY_HOMING_B)
+  (repeatability, expected) = v2verifications.verify_b_homing_repeatability(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('B Homing Repeatability: %s, expected <= %s', repeatability, expected)
+  (max_error, expected) = v2verifications.verify_b_homing_accuracy(stage["features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('B Homing Max Error: %s, expected <= %s', max_error, expected)
 
 def v2_calib_calibrate(self):
   data = {}
