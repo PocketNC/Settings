@@ -249,20 +249,23 @@ def v2_calib_verify_x_home(self):
   (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "X")
   logger.info('X Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
-def v2_calib_verify_x_home_final(self):
+def v2_calib_verify_x0_final(self):
   state = CalibState.getInstance()
-  zero_spindle_pos = v2state.getZeroSpindlePos(state)
+  stage = state.getStage(Stages.VERIFY_OFFSETS)
+  zero_spindle_pos = stage['zero']
 
-  stage = state.getStage(Stages.VERIFY_HOMING_X)
-  v2verifications.verify_sphere_diameters_within_tolerance(stage["features"], zero_spindle_pos.sphere()[0]*2)
-
-  (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "X")
-  logger.info('X Homing Repeatability: %s, expected <= %s', repeatability, expected)
-
-  probe_offsets_stage = state.getStage(Stages.PROBE_OFFSETS)
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
-  (error, max_error) = v2verifications.verify_x_homing_accuracy(stage["features"], probe_offsets_stage["x_features"], x_dir, y_dir)
-  logger.info('X Homing Error: %s, expected <= %s', error, max_error)
+  (error, max_error) = v2verifications.verify_x_homing_accuracy([zero_spindle_pos], stage["x_features"], x_dir, y_dir)
+  logger.info('Final X Homing Error: %s, expected <= %s', error, max_error)
+
+def v2_calib_verify_y0_final(self):
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.VERIFY_OFFSETS)
+  zero_spindle_pos = stage['zero']
+
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  (error, max_error) = v2verifications.verify_y_homing_accuracy([zero_spindle_pos], stage["y_features"], x_dir, y_dir, z_dir, APPROX_COR)
+  logger.info('Final Y Homing Error: %s, expected <= %s', error, max_error)
 
 def v2_calib_verify_y_home_final(self):
   state = CalibState.getInstance()
@@ -525,7 +528,7 @@ async def v2_calib_find_pos_fixture_rel_y_perp(self, y, a, b):
   angle_rel_y = v2calculations.calc_ccw_angle_from_y(horiz_fixture_line, x_dir, y_dir, z_dir, APPROX_COR)
   return angle_rel_y + 90
 
-async def v2_calib_init_probe_offsets_state(self):
+async def v2_calib_init_probe_offsets_state(self, stageFloat):
   state = CalibState.getInstance()
   stage = {
     "x_features": [],
@@ -533,7 +536,7 @@ async def v2_calib_init_probe_offsets_state(self):
     "y_features": [],
     "y_positions": []
   }
-  state.saveStage(Stages.PROBE_OFFSETS, stage)
+  state.saveStage(int(stageFloat), stage)
 
 
 async def v2_calib_init_home_offsets_state(self):
@@ -546,23 +549,23 @@ async def v2_calib_init_home_offsets_state(self):
   }
   state.saveStage(Stages.PROBE_OFFSETS, stage)
 
-async def v2_calib_probe_home_offset_x(self, y, a, b):
+async def v2_calib_probe_home_offset_x(self, y, a, b, stageFloat):
   cmm = Cmm.getInstance()
   feat = await cmm.v2routines.probe_home_offset_x(y, a, b)
   state = CalibState.getInstance()
-  stage = state.getStage(Stages.PROBE_OFFSETS)
+  stage = state.getStage(int(stageFloat))
   stage["x_features"].append(feat)
   stage["x_positions"].append({ "y": y, "a": a, "b": b })
-  state.updateStage(Stages.PROBE_OFFSETS, stage)
+  state.updateStage(int(stageFloat), stage)
 
-async def v2_calib_probe_home_offset_y(self, y, a, b):
+async def v2_calib_probe_home_offset_y(self, y, a, b, stageFloat):
   cmm = Cmm.getInstance()
   feat = await cmm.v2routines.probe_home_offset_y(y, a, b)
   state = CalibState.getInstance()
-  stage = state.getStage(Stages.PROBE_OFFSETS)
+  stage = state.getStage(int(stageFloat))
   stage["y_features"].append(feat)
   stage["y_positions"].append({ "y": y, "a": a, "b": b })
-  state.updateStage(Stages.PROBE_OFFSETS, stage)
+  state.updateStage(int(stageFloat), stage)
 
 def v2_calib_calc_home_offsets(self):
   pass
