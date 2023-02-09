@@ -12,6 +12,8 @@ from v2routines import V2_10, V2_50, PROBE_DIA, SPINDLE_BALL_DIA_10, SPINDLE_BAL
 import numpy as np
 import compensation
 import ini
+import json
+import zmq
 
 logger = logging.getLogger(__name__)
 
@@ -336,7 +338,6 @@ def v2_calib_verify_y_home(self):
   (repeatability, expected) = v2verifications.verify_linear_homing_repeatability(stage["features"], "Y")
   logger.info('Y Homing Repeatability: %s, expected <= %s', repeatability, expected)
 
-
 async def v2_calib_probe_spindle_at_tool_probe(self, x, y, z):
   cmm = Cmm.getInstance()
 
@@ -574,6 +575,36 @@ async def v2_calib_prep_probe_fixture_fin(self):
   cmm = Cmm.getInstance()
   await cmm.v2routines.prep_probe_fixture_fin(0,0)
 
+async def v2_calib_report_a_position(self, y, a):
+  cmm = Cmm.getInstance()
+  line = await cmm.v2routines.probe_fixture_fin(0,0)
+  
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  pos = v2calculations.calc_pos_a(line, x_dir, y_dir, z_dir, APPROX_COR)
+  
+  context = zmq.Context()
+  socket = context.socket(zmq.PUSH)
+  socket.set(zmq.SNDTIMEO, 3000)
+  socket.bind('ipc:///tmp/cmm')
+  report_json = json.dumps({'a_pos': pos})
+  socket.send_string(report_json)
+
+async def v2_calib_report_b_position(self, y, b):
+  cmm = Cmm.getInstance()
+  line = await cmm.v2routines.probe_fixture_line(y, b)
+  
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  pos = v2calculations.calc_pos_b(line, x_dir, y_dir, z_dir, APPROX_COR)
+  
+  context = zmq.Context()
+  socket = context.socket(zmq.PUSH)
+  socket.set(zmq.SNDTIMEO, 3000)
+  socket.bind('ipc:///tmp/cmm')
+  report_json = json.dumps({'b_pos': pos})
+  socket.send_string(report_json)
+
 def v2_calib_verify_a_home(self, stageFloat):
   state = CalibState.getInstance()
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
@@ -734,3 +765,48 @@ def v2_calib_calc_b_comp(self):
   stage["b_err"] = errors
   stage["b_comp"] = b_comp
   state.updateStage(Stages.CALIBRATE, stage)
+
+def v2_calib_verify_a(self):
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  stage = state.getStage(Stages.VERIFY_A_LINE)
+  
+  zero_feat = stage['features'][0]
+  zero_pos = v2calculations.calc_pos_a(zero_feat, x_dir, y_dir, z_dir, APPROX_COR)
+  nom_zero_pos = stage['positions'][0]
+
+  angles = []
+  errors = []
+
+  for (feat, nom_pos) in zip(stage["features"],stage["positions"]):
+    zeroed_nom_pos = nom_pos - nom_zero_pos
+    a_pos = v2calculations.calc_pos_a(feat, x_dir, y_dir, z_dir, APPROX_COR)
+    angles.append((zeroed_nom_pos, a_pos))
+    err = zeroed_nom_pos - a_pos 
+    errors.append((zeroed_nom_pos, a_pos))
+
+  (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'A')
+  logger.info('A max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
+
+def v2_calib_verify_b(self):
+  state = CalibState.getInstance()
+  (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
+  stage = state.getStage(Stages.VERIFY_B_LINE)
+  
+  zero_feat = stage['features'][0]
+  zero_pos = v2calculations.calc_pos_b(zero_feat, x_dir, y_dir, z_dir, APPROX_COR)
+  nom_zero_pos = stage['positions'][0]
+
+  angles = []
+  errors = []
+
+  for (feat, nom_pos) in zip(stage["features"],stage["positions"]):
+    zeroed_nom_pos = nom_pos - nom_zero_pos
+    b_pos = v2calculations.calc_pos_b(feat, x_dir, y_dir, z_dir, APPROX_COR)
+    angles.append((zeroed_nom_pos, b_pos))
+    err = zeroed_nom_pos - b_pos 
+    errors.append((zeroed_nom_pos, b_pos))
+
+  (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'B')
+  logger.info('B max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
+
