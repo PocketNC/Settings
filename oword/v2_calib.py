@@ -241,6 +241,17 @@ async def v2_calib_probe_top_plane(self, y):
   stage["y"] = y
   state.updateStage(Stages.PROBE_OFFSETS, stage)
 
+async def v2_calib_probe_top_plane_180(self, y):
+  cmm = Cmm.getInstance()
+
+  top_plane = await cmm.v2routines.probe_top_plane(y,is_180=True)
+
+  state = CalibState.getInstance()
+  stage = state.getStage(Stages.PROBE_OFFSETS)
+  stage["top_plane_180"] = top_plane
+  stage["y_180"] = y
+  state.updateStage(Stages.PROBE_OFFSETS, stage)
+
 def v2_calib_verify_x_home(self):
   state = CalibState.getInstance()
   zero_spindle_pos = v2state.getZeroSpindlePos(state)
@@ -701,7 +712,7 @@ def v2_calib_calibrate(self):
 
   origin_spindle_pos = v2state.getOriginSpindlePos(state)
 
-  b_table_offset = v2calculations.calc_b_table_offset(origin_spindle_pos, probe_offsets_stage["top_plane"], y_dir)
+  b_table_offset = v2calculations.calc_b_table_offset(origin_spindle_pos, probe_offsets_stage["top_plane"], probe_offsets_stage["top_plane_180"], y_dir)
   data["probe_b_table_offset"] = b_table_offset
 
   probe_sensor_123_offset = v2calculations.calc_probe_sensor_123_offset(probe_offsets_stage["tool_probe_pos"], probe_offsets_stage["plane_a90"], z_dir)
