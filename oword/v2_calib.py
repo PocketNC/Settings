@@ -121,7 +121,7 @@ async def v2_calib_verify_spindle_pos_v2_10(self):
   logger.info("Spindle ball diameter: %s", zero_spindle_pos.sphere()[0]*2)
   logger.info("Spindle ball position: %s", zero_spindle_pos.sphere()[1])
 
-async def v2_calib_verify_spindle_pos_v2_50(self, x, z):
+async def v2_calib_verify_spindle_pos_v2_50(self):
   state = CalibState.getInstance()
   zero_spindle_pos = v2state.getZeroSpindlePos(state)
 
