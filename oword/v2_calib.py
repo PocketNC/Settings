@@ -685,7 +685,7 @@ def v2_calib_calibrate(self):
   b_positions = v2state.getBPositionsLine(state)
   b_errors = []
   for (zeroed_nom_pos, pos) in b_positions:
-    if zeroed_nom_pos < 360:
+    if zeroed_nom_pos < 360-.000001:
       b_errors.append((zeroed_nom_pos, zeroed_nom_pos-pos))
   logger.debug("b_errors: %s", b_errors)
   b_comp = compensation.calculateBCompensation(b_errors)
@@ -782,19 +782,14 @@ def v2_calib_verify_a(self):
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
   stage = state.getStage(Stages.VERIFY_A_LINE)
   
-  zero_feat = stage['features'][0]
-  zero_pos = v2calculations.calc_pos_a(zero_feat, x_dir, y_dir, z_dir, APPROX_COR)
-  nom_zero_pos = stage['positions'][0]
-
   angles = []
   errors = []
 
   for (feat, nom_pos) in zip(stage["features"],stage["positions"]):
-    zeroed_nom_pos = nom_pos - nom_zero_pos
     a_pos = v2calculations.calc_pos_a(feat, x_dir, y_dir, z_dir, APPROX_COR)
-    angles.append((zeroed_nom_pos, a_pos))
-    err = zeroed_nom_pos - a_pos 
-    errors.append((zeroed_nom_pos, a_pos))
+    angles.append((nom_pos['a'], a_pos))
+    err = nom_pos['a'] - a_pos 
+    errors.append((nom_pos['a'], err))
 
   (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'A')
   logger.info('A max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
@@ -804,19 +799,14 @@ def v2_calib_verify_b(self):
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
   stage = state.getStage(Stages.VERIFY_B_LINE)
   
-  zero_feat = stage['features'][0]
-  zero_pos = v2calculations.calc_pos_b(zero_feat, x_dir, y_dir, z_dir, APPROX_COR)
-  nom_zero_pos = stage['positions'][0]
-
   angles = []
   errors = []
 
   for (feat, nom_pos) in zip(stage["features"],stage["positions"]):
-    zeroed_nom_pos = nom_pos - nom_zero_pos
     b_pos = v2calculations.calc_pos_b(feat, x_dir, y_dir, z_dir, APPROX_COR)
-    angles.append((zeroed_nom_pos, b_pos))
-    err = zeroed_nom_pos - b_pos 
-    errors.append((zeroed_nom_pos, b_pos))
+    angles.append((nom_pos['b'], b_pos))
+    err = nom_pos['b'] - b_pos 
+    errors.append((nom_pos['b'], b_pos))
 
   (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'B')
   logger.info('B max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
