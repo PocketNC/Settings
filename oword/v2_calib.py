@@ -804,9 +804,13 @@ def v2_calib_verify_b(self):
 
   for (feat, nom_pos) in zip(stage["features"],stage["positions"]):
     b_pos = v2calculations.calc_pos_b(feat, x_dir, y_dir, z_dir, APPROX_COR)
+
+    if abs(b_pos-nom_pos['b']) > 180:
+      b_pos -= 360
+
     angles.append((nom_pos['b'], b_pos))
     err = nom_pos['b'] - b_pos 
-    errors.append((nom_pos['b'], b_pos))
+    errors.append((nom_pos['b'], err))
 
   (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'B')
   logger.info('B max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
