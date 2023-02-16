@@ -1,6 +1,15 @@
-from calibstate import Stages
+from calibstate import Stages, CalibState
 
-__all__ = []
+def _v2_calib_x_offset(self):
+  state = CalibState.getInstance()
+  return state.getHomeOffsetDx(state,self)
+
+def _v2_calib_y_offset(self):
+  state = CalibState.getInstance()
+  return state.getHomeOffsetDy(state,self)
+
+__all__ = [ k for k in globals().keys() if k.startswith("_v2_calib") ]
+
 for n in Stages:
   var_name = ('_CALIB_%s' % n.name).lower()
   __all__.append(var_name)
