@@ -33,7 +33,11 @@ G90 G20
 #<_newY> = [ [ [ #<_x1>*#<_SC1>+#<_y1>*#<_CC1> ] - #[5222+20*[#5220-1]]] * #<J> + [ #<_y> * [ 1 - #<J> ] ] ]
 #<_newZ> = [ [ [ -#<_x1>*#<_CC1>*#<_SB1>+#<_y1>*#<_SC1>*#<_SB1> + #<_z1>*#<_CB1> ] - #[5223+20*[#5220-1]]] * #<K> + [ #<_z> *[ 1 - #<K> ] ] ]
 
-G#<P> X#<_newX> Y#<_newY> Z#<_newZ>
+o100 if [ EXISTS [ #<F> ] ]
+  G#<P> X#<_newX> Y#<_newY> Z#<_newZ> F#<F>
+o100 else
+  G#<P> X#<_newX> Y#<_newY> Z#<_newZ>
+o100 endif
 
 M72
 O<move-local-solo> ENDSUB
