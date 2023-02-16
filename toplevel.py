@@ -13,7 +13,7 @@ import v2state
 POCKETNC_VAR_DIR = os.environ.get('POCKETNC_VAR_DIRECTORY')
 logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
   filemode='a',
-  level=logging.DEBUG if os.environ.get('DEV') == "true" else logging.INFO
+  level=logging.DEBUG if os.environ.get('DEV') == "true" else logging.INFO,
   format=logging_constants.FORMAT,
   datefmt=logging_constants.DATEFMT
 )
