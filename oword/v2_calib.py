@@ -792,7 +792,7 @@ def v2_calib_verify_a(self):
     errors.append((nom_pos['a'], err))
 
   (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'A')
-  logger.info('A max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
+  logger.info('A max err pass: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
 
 def v2_calib_verify_b(self):
   state = CalibState.getInstance()
@@ -813,5 +813,5 @@ def v2_calib_verify_b(self):
     errors.append((nom_pos['b'], err))
 
   (max_err_pair, expected) = v2verifications.verify_rotary_accuracy(errors, 'B')
-  logger.info('B max err: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
+  logger.info('B max err pass: %s, expected <= %s. Max err pos %s', max_err_pair[1], expected, max_err_pair[0])
 
