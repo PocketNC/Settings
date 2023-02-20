@@ -805,8 +805,10 @@ def v2_calib_verify_b(self):
   for (feat, nom_pos) in zip(stage["features"],stage["positions"]):
     b_pos = v2calculations.calc_pos_b(feat, x_dir, y_dir, z_dir, APPROX_COR)
 
-    if abs(b_pos-nom_pos['b']) > 180:
+    if b_pos-nom_pos['b'] > 180:
       b_pos -= 360
+    elif b_pos-nom_pos['b'] < -180:
+      b_pos += 360
 
     angles.append((nom_pos['b'], b_pos))
     err = nom_pos['b'] - b_pos 
