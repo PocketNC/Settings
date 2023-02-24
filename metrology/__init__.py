@@ -77,12 +77,12 @@ def angle_between_ccw_2d(v1,v2):
 
 def line_plane_intersect(dir_line, pt_line, dir_plane, pt_plane):
   dir_line = np.array(dir_line)
-  dir_line = np.array(pt_line)
-  dir_line = np.array(dir_plane)
-  dir_line = np.array(pt_plane)
+  pt_line = np.array(pt_line)
+  dir_plane = np.array(dir_plane)
+  pt_plane = np.array(pt_plane)
 
   norm_dot_vec = np.dot(dir_plane, dir_line)
-  if( abs(norm_dot_vec) < EPSILON):
+  if( abs(norm_dot_vec) < .00001):
     return None
 
   w = pt_line - pt_plane
