@@ -116,7 +116,7 @@ def nearestPointOnLine(pt, line):
 
   dot = dx*line[1][0] + dy*line[1][1] + dz*line[1][2]
 
-  return (pt[0]-dot*line[1][0], pt[1]-dot*line[1][1], pt[2]-dot*line[1][2])
+  return (line[0][0]+dot*line[1][0], line[0][1]+dot*line[1][1], line[0][2]+dot*line[1][2])
 
 # with help from https://nvlpubs.nist.gov/nistpubs/jres/103/6/j36sha.pdf
 def bestFitCylinder(pts, pt=None, axis=[ 0,0, 1], radius=1):
