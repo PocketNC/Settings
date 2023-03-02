@@ -3,3 +3,12 @@ newinst bb_gpio probe-signal-pin pin=[POCKETNC_PINS]PROBE_SIGNAL_PIN direction=i
 setp probe-signal-pin.invert 1
 net tool-setter probe-signal-pin.in
 net tool-setter motion.probe-input
+
+newinst constant tool-setter-b-table-offset
+newinst constant tool-setter-sensor-123-offset
+
+setp tool-setter-b-table-offset.value [TOOL_PROBE]PROBE_B_TABLE_OFFSET
+setp tool-setter-sensor-123-offset.value [TOOL_PROBE]PROBE_SENSOR_123_OFFSET
+
+addf tool-setter-b-table-offset.funct servo-thread
+addf tool-setter-sensor-123-offset.funct servo-thread

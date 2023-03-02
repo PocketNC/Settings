@@ -24,8 +24,11 @@ O<tool-probe> SUB
 #<_UseInches> =           1     ( set to 1 to use inches here, or 0 to use millimeters; should match units on tool.tbl dimensions )
 #<_TravelZ> =            0.0   ( machine Z coordinate for travelling, typically near max Z to avoid ever hitting the work )
 #<_TravelFeed> =         40.0   ( feedrate used for general Z moves when avoiding G0 )
-#<_ProbeSensor123Offset> =  #<_ini[TOOL_PROBE]PROBE_SENSOR_123_OFFSET>  ( distance from probe sensor trigger to 123 block, Zprobe - Z123)
-#<_OriginOffset> =        #<_ini[TOOL_PROBE]PROBE_B_TABLE_OFFSET>   ( distance from B plate to origin, aka the center of rotation )
+
+M66 E0 L0 ; force sync so HAL pin data is up to date
+#<_ProbeSensor123Offset> =  #<_hal[tool-setter-sensor-123-offset.out]>  ( distance from probe sensor trigger to 123 block, Zprobe - Z123)
+#<_OriginOffset> =        #<_hal[tool-setter-b-table-offset.out]>   ( distance from B plate to origin, aka the center of rotation )
+
 #<_ProbeX> =             #<_ini[TOOL_PROBE]PROBE_X>  ( machine X coordinate of switch/touch-off plate )
 #<_ProbeY> =             #<_ini[TOOL_PROBE]PROBE_Y>  ( machine Y coordinate of switch/touch-off plate )
 #<_ProbeA> =             #<_ini[TOOL_PROBE]PROBE_A>   ( machine A coordinate of switch/touch-off plate )
