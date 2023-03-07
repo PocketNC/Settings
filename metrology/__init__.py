@@ -272,6 +272,22 @@ def bestFitLine(pts):
   # return tuple with (pt on line, direction of line)
   return (mean, dir)
 
+def surfaceParallelism(surfaceFeature, datumPlane):
+  """
+  `surfaceFeature` is a `Feature` object.
+
+  `datumPlane` is a tuple (point on plane, normal of plane). See `Feature.plane()` for how to get a best fit plane defined by a set of points.
+
+  Projects each point in `surfaceFeature` to the plane defined by `datumPlane`. A distance is calculated
+  for each projected point to the original point. Returns the max distance minus the min distance.
+  """
+  distances = []
+  for pt in surfaceFeature.points():
+    dist = np.linalg.norm(pt-projectPointToPlane(pt, datumPlane))
+    distances.append(dist)
+
+  return np.max(distances)-np.min(distances)
+
 def projectPointToPlane(point, plane):
   planePt = plane[0]
   planeN = plane[1]
