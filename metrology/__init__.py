@@ -272,6 +272,35 @@ def bestFitLine(pts):
   # return tuple with (pt on line, direction of line)
   return (mean, dir)
 
+def translatePlaneAlongNormal(plane, dist):
+  return (plane[0]+plane[1]*dist, plane[1])
+
+def ensureDirectionAlignsWith(dir1, dir2):
+  """Performs the dot product with dir1 and dir2. If the dot product is positve, dir1 is returned. Otherwise, -dir1 is returned."""
+
+  dot = np.dot(dir1, dir2)
+
+  if dot > 0:
+    return dir1
+  return -dir1
+
+def flatness(feature):
+  """
+  `feature` is a `Feature` object.
+
+  Calculates a best fit plane with the points in `feature`, then calculates a distance from each
+  point to the plane. Returns the max distance minus the min distance.
+  """
+
+  plane = feature.plane()
+  distances = []
+  for pt in feature.points():
+    dist = np.linalg.norm(pt-projectPointToPlane(pt, plane))
+    distances.append(dist)
+
+  return np.max(distances)-np.min(distances)
+
+  
 def surfaceParallelism(surfaceFeature, datumPlane):
   """
   `surfaceFeature` is a `Feature` object.
