@@ -317,6 +317,17 @@ def surfaceParallelism(surfaceFeature, datumPlane):
 
   return np.max(distances)-np.min(distances)
 
+def planeToFeatureDistanceError(plane, feature, nomDistance):
+  maxErr = maxErrAbs = 0
+  for pt in feature.points():
+    proj_pt = projectPointToPlane(pt, plane)
+    dist = np.linalg.norm(pt - proj_pt)
+    err = dist - nomDistance
+    if abs(err) > maxErrAbs:
+      maxErr = err
+      maxErrAbs = abs(err)
+  return maxErr
+
 def projectPointToPlane(point, plane):
   planePt = plane[0]
   planeN = plane[1]
