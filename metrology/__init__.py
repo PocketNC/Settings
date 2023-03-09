@@ -317,6 +317,48 @@ def surfaceParallelism(surfaceFeature, datumPlane):
 
   return np.max(distances)-np.min(distances)
 
+def linePerpendicularity(feature, datumLine):
+  """
+  `feature` is a Feature object.
+  `datumLine` is a tuple (point on line, direction of line). See `Feature.line()` for how to get a best fit line defined by a set of points.
+
+  Calculates how perpendicular two lines are to each other by defining a plane by the point and direction of the `datumLine` as a point and normal on the plane, then
+  calculating the distance of each point in `feature` to that plane. Returns max distance - min distance.
+  """
+
+  return surfaceParallelism(feature, datumLine)
+
+def straightness(feature):
+  """Calculates the max distance from each point in `feature` to the best fit line of the `feature`."""
+
+  line = feature.line()
+
+  maxDist = 0
+  for pt in feature.points():
+    projectPt = nearestPointOnLine(pt, line)
+    dist = np.linalg.norm(pt-projectPt)
+    if dist > maxDist:
+      maxDist = dist
+
+  return maxDist
+
+def maxDistanceToPlane(feature, datumPlane):
+  """
+  `feature` is a `Feature` object.
+  `datumPlane` is a tuple (point on plane, normal of plane). See `Feature.plane` for how to get a best fit plane from a list of points.
+
+  Calculates the max distance of every point in `feature` to the `datumPlane`.
+  """
+
+  maxDist = 0
+  for pt in feature.points():
+    projectedPt = projectPointToPlane(pt, datumPlane)
+    dist = np.linalg.norm(pt - projectedPt)
+    if dist > maxDist:
+      maxDist = dist
+
+  return maxDist
+
 def planeToFeatureDistanceError(plane, feature, nomDistance):
   maxErr = maxErrAbs = 0
   for pt in feature.points():
