@@ -278,7 +278,7 @@ def v2_calib_verify_x0_final(self):
   zero_spindle_pos = stage['zero']
 
   (x_dir,y_dir,z_dir) = v2state.getAxisDirections(state)
-  (error, max_error) = v2verifications.verify_x_homing_accuracy([zero_spindle_pos], stage["x_features"], x_dir, y_dir)
+  (error, max_error) = v2verifications.verify_x_homing_accuracy([zero_spindle_pos], stage["x_features"], x_dir, y_dir, z_dir)
   logger.info('Final X Homing Error: %s, expected <= %s', error, max_error)
 
 def v2_calib_verify_y0_final(self):
@@ -709,12 +709,12 @@ def v2_calib_calibrate(self):
   x_homing_stage = state.getStage(Stages.HOMING_X)
   probe_offsets_stage = state.getStage(Stages.PROBE_OFFSETS)
 
-  x_home_offset_error = v2calculations.calc_home_offset_x_error(x_dir, y_dir, x_homing_stage["features"], probe_offsets_stage["x_features"])
+  x_home_offset_error = v2calculations.calc_home_offset_x_error(x_dir, y_dir, z_dir, x_homing_stage["features"], probe_offsets_stage["x_features"])
   current_x_home_offset = self.params["_hal[ini.0.home_offset]"]
   new_x_home_offset = current_x_home_offset - x_home_offset_error/25.4
   data["x_home_offset"] = new_x_home_offset
 
-  y_home_offset_error = v2calculations.calc_home_offset_y_error(x_dir, y_dir, x_homing_stage["features"], probe_offsets_stage["y_features"])
+  y_home_offset_error = v2calculations.calc_home_offset_y_error(x_dir, y_dir, z_dir, x_homing_stage["features"], probe_offsets_stage["y_features"])
   logger.debug("y_home_offset_error %s", y_home_offset_error)
   current_y_home_offset = self.params["_hal[ini.1.home_offset]"]
   new_y_home_offset = current_y_home_offset - y_home_offset_error/25.4
