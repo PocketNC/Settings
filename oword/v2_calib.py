@@ -14,8 +14,18 @@ import compensation
 import ini
 import json
 import zmq
+from metrology import linePerpendicularity, angle_between, Feature, straightness
 
 logger = logging.getLogger(__name__)
+
+def v2_calib_verify_axes(self):
+  state = CalibState.getInstance()
+
+  xStage = state.getStage(Stages.CHARACTERIZE_X)
+  yStage = state.getStage(Stages.CHARACTERIZE_Y)
+  zStage = state.getStage(Stages.CHARACTERIZE_Z)
+
+  v2verifications.verify_axes(xStage["features"], yStage["features"], zStage["features"])
 
 async def v2_calib_setup_cmm(self):
   """
