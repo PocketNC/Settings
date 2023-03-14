@@ -85,6 +85,8 @@ async def v2_calib_probe_machine_pos(self):
   await cmm.routines.set_part_csy(csy)
   await cmm.v2routines.go_to_clearance_y()
 
+  v2verifications.verify_top_face_flatness(L_bracket_top_face)
+
 
 async def v2_calib_load_part_csy(self):
   state = CalibState.getInstance()
