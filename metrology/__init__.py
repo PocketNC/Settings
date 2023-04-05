@@ -439,19 +439,6 @@ def convertJSONDataToFeatures(data):
 
   return data
 
-def projectDirectionOntoPlane(direction, plane):
-  planePt = plane[0]
-  planeN = plane[1]
-
-  return numpy.subtract(direction, numpy.multiply(planeN, numpy.dot(direction, planeN))) 
-
-def projectLineOntoPlane(line, plane):
-  pt = projectPointOntoPlane(line[0], plane)
-  dir = projectDirectionOntoPlane(line[1], plane)
-
-  mag = math.sqrt(dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2])
-  return (pt, (dir[0]/mag, dir[1]/mag, dir[2]/mag))
-
 def intersectLines(line1, line2):
   p1 = line1[0]
   d1 = line1[1]
