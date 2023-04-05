@@ -26,7 +26,9 @@ o500 if [ [ #5400 LT 1 OR #5400 GT 13 ] AND #5399 EQ 1 ]
   (abort,Can't put away tool #5400. Manually remove tool and try again.)
 o500 endif
 
-
+; See SOFT-967 for why this is necessary
+#<backupFeed> = #<_feed>
+#<backupMotionMode> = #<_motion_mode>
 M70                                            ( save current modal state )
 
 G61
@@ -58,6 +60,8 @@ M6 T[#<T>]
 M271
 
 M72                                          ( restore modal state )
+G[ #<backupMotionMode> / 10 ]
+F#<backupFeed>
 
 O<solo-tool-change> ENDSUB
 

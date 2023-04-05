@@ -28,15 +28,15 @@ G94
 
 o<probe-relative> call [0] [0] [-#<plungeDepth>] [#<feedFast>] [ #<feedBack> ] [ #<feedSlow> ]
 
-o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> + [ #<probeDiameter> / 2 ] ]
+o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> ]
 
 #<approxSphereCenterX> = [ #<_probedG5X_X> ]
 #<approxSphereCenterY> = [ #<_probedG5X_Y> ]
-#<approxSphereCenterZ> = [ #<_probedG5X_Z> - [ #<ballDiameter> / 2 ] ]
+#<approxSphereCenterZ> = [ #<_probedG5X_Z> - [ #<ballDiameter> / 2 ] - [ #<probeDiameter> / 2 ]]
 
 ; startZ is the end of the tool, so the bottom of the probe sphere.
 ; We'll use probingRadius to calculate starting points around sphere.
-#<probingRadius> = [ #<startZ> + [ #<probeDiameter> / 2 ] - #<approxSphereCenterZ> ]
+#<probingRadius> = [ #<startZ> - #<approxSphereCenterZ> ]
 
 #<ringIndex> = 1
 o200 while [ #<ringIndex> LE #<rings> ]
@@ -48,13 +48,13 @@ o200 while [ #<ringIndex> LE #<rings> ]
 
   #<beginProbeFirstX> = [ #<probingRadius> * #<unitSphereFirstX> + #<approxSphereCenterX> ]
   #<beginProbeFirstY> = [ #<probingRadius> * #<unitSphereFirstY> + #<approxSphereCenterY> ]
-  #<beginProbeFirstZ> = [ #<probingRadius> * #<unitSphereFirstZ> + #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+  #<beginProbeFirstZ> = [ #<probingRadius> * #<unitSphereFirstZ> + #<approxSphereCenterZ> ]
 
   ; rotate in XZ plane down to next ring
   G18
   G90.1
   F#<positioningFeed>
-  G90 G3 X[ #<beginProbeFirstX> ] Z[ #<beginProbeFirstZ> ] I[ #<approxSphereCenterX> ] K[ #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+  G90 G3 X[ #<beginProbeFirstX> ] Z[ #<beginProbeFirstZ> ] I[ #<approxSphereCenterX> ] K[ #<approxSphereCenterZ> ]
 
   #<pointIndex> = 0
   o300 while [ #<pointIndex> LT #<samplesPerRing> ]
@@ -67,7 +67,7 @@ o200 while [ #<ringIndex> LE #<rings> ]
 
     o<probe-relative> call [ -#<unitSphereX> * #<plungeDepth> ] [ -#<unitSphereY> * #<plungeDepth> ] [ -#<unitSphereZ> * #<plungeDepth> ] [ #<feedFast> ] [ #<feedBack> ] [ #<feedSlow> ]
 
-    o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> + [ #<probeDiameter> / 2 ] ]
+    o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> ]
 
     #<nextUnitSphereX> = [ SIN[ #<latAngle> ] * COS[ #<nextLongAngle> ] ]
     #<nextUnitSphereY> = [ SIN[ #<latAngle> ] * SIN[ #<nextLongAngle> ] ]
@@ -75,7 +75,7 @@ o200 while [ #<ringIndex> LE #<rings> ]
 
     #<nextProbeX> = [ #<probingRadius> * #<nextUnitSphereX> + #<approxSphereCenterX> ]
     #<nextProbeY> = [ #<probingRadius> * #<nextUnitSphereY> + #<approxSphereCenterY> ]
-    #<nextProbeZ> = [ #<probingRadius> * #<nextUnitSphereZ> + #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+    #<nextProbeZ> = [ #<probingRadius> * #<nextUnitSphereZ> + #<approxSphereCenterZ> ]
 
     ; rotate in XY plane around to next point
     G17
@@ -92,7 +92,7 @@ o200 endwhile
 G18
 G90.1
 F#<positioningFeed>
-G90 G2 X[ #<startX> ] Z[ #<startZ> ] I[ #<approxSphereCenterX> ] K[ #<approxSphereCenterZ> - [ #<probeDiameter> / 2 ] ]
+G90 G2 X[ #<startX> ] Z[ #<startZ> ] I[ #<approxSphereCenterX> ] K[ #<approxSphereCenterZ> ]
 
 M72
 

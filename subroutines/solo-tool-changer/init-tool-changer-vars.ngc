@@ -1,7 +1,7 @@
 o<init-tool-changer-vars> sub
 
 #<_RapidFeed> = 300
-#<_RapidFeedRotary> = 600
+#<_RapidFeedRotary> = 5000
 
 #<_safeZ> = 0
 
@@ -22,21 +22,23 @@ o100 endif
 #<_okToOpenToolChangerInput> = 57
 #<_okToCloseToolChangerInput> = 56
   
-; TODO - This will need to be a calibrated value
 ; I measured this using the 4" granite cube + a .400 gage block
 ; I jogged the spindle down without a tool and touched it off
 ; the gage block and set the tool length offset by setting the
 ; DRO to 1.95906 (39.6mm nominally to top face of granite cube +
 ; .400 inch gage block)
-#<_spindleFaceToolLengthOffset> = -7.9969
+; We also probe the top face of the granite cube and then measure
+; the center of rotation of the B axis using that probe. We can 
+; then shift this number by that amount (seems right!).
+#<_spindleFaceToolLengthOffset> = #<_ini[TOOL_CHANGER]SPINDLE_TOOL_OFFSET>
 
 ; #_drawerTopFace is used by calibrate-tool-changer to initially position
 ; the probe above the open drawer so it can probe the actual position.
 ; This number shouldn't need to be adjusted from machine to machine, but
 ; we may need to adjust the how much allowance there is in the plunge distance
 ; of the probe to ensure we always hit the drawer.
-#<_drawerTopFace> = 1.836981
-#<_pickUpDist> = 0.02
+#<_drawerTopFace> = [ 1.8 ]
+#<_pickUpDist> = [ 0.02 ]
 
 #<_toolSetterDist> = [ 24.375 / 25.4 ] ; distance between probe slot center and tool setter center in the Y axis
 #<_toolSetterHeight> = [ 2 / 25.4 ]

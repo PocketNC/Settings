@@ -9,19 +9,6 @@ loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I /opt/pocketnc/Settings/versio
 loadusr -Wn d5next /opt/pocketnc/Settings/d5next.py
 net spindle-temperature d5next.temperature_c
 
-newsig spindle-pressure float
-sets spindle-pressure -999
-
-# ###################################
-# Core EMC/HAL Loads
-# ###################################
-
-# kinematics
-loadrt [KINS]KINEMATICS
-
-# motion controller, get name and thread periods from ini file
-loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=64
-
 newinst bb_gpio init
 
 loadrt torque axes=xyzbct
@@ -38,18 +25,16 @@ loadrt mult2 count=1
 # ################################################
 # THREADS
 # ################################################
+addf bb_gpio.read                  servo-thread
+addf bb_gpio.write                 servo-thread
 addf hpg0.capture-position         servo-thread
 addf hpg1.capture-position         servo-thread
 addf hpg2.capture-position         servo-thread
 addf hpg3.capture-position         servo-thread
-addf bb_gpio.read                  servo-thread
-addf motion-command-handler        servo-thread
-addf motion-controller             servo-thread
 addf hpg0.update                   servo-thread
 addf hpg1.update                   servo-thread
 addf hpg2.update                   servo-thread
 addf hpg3.update                   servo-thread
-addf bb_gpio.write                 servo-thread
 addf torque.funct                  servo-thread
 addf feedrate.funct                servo-thread
 addf solo-estop.funct              servo-thread
@@ -324,31 +309,14 @@ setp spindle-neutral-pin.invert 1
 # Cycle/Start button
 newinst bb_gpio cycle-start-pin pin=[SOLO_PINS]CYCLE_START_PIN direction=input
 setp cycle-start-pin.invert 1
-net cycle-start-pushed cycle-start-pin.in
 
-newinst and2 resume-program-and
-addf resume-program-and.funct servo-thread
-
-newinst and2 run-program-and
-addf run-program-and.funct servo-thread
-
-# If the cycle/start button is pressed and the interpreter is idle, run the program
-net program-is-idle run-program-and.in0
-net cycle-start-pushed run-program-and.in1
-
-net program-run run-program-and.out
-
-# If the cycle/start button is pressed and the interpreter is paused, resume the program
-net program-is-paused resume-program-and.in0
-net cycle-start-pushed resume-program-and.in1
-
-net program-resume resume-program-and.out
+net cycle-start-1 cycle-start-pin.in
 
 # Feed Hold
 newinst bb_gpio feed-hold-pin pin=[SOLO_PINS]FEED_HOLD_PIN direction=input
 setp feed-hold-pin.invert 1
 
-net program-pause feed-hold-pin.in
+net feed-hold-1 feed-hold-pin.in
 
 # eStop
 net estop-loop solo-estop.emc-enable
@@ -367,8 +335,7 @@ net unhome halui.joint.2.unhome
 net unhome halui.joint.3.unhome
 net unhome halui.joint.4.unhome
 
-net reset-estop solo-estop.user-requested-enable
-net reset-estop halui.estop.reset
+net reset-estop-1 solo-estop.user-requested-enable
 
 net machine-on solo-estop.machine-on
 net machine-on halui.machine.on
@@ -412,14 +379,6 @@ newinst bb_gpio c-enable-pin pin=[SOLO_PINS]C_ENABLE_PIN direction=output
 net c-motor-enable solo-estop.c-motor-enable
 net c-motor-enable c-enable-pin.out
 
-# Program status and commands
-net program-is-running halui.program.is-running
-net program-is-paused halui.program.is-paused
-net program-is-idle halui.program.is-idle
-net program-run halui.program.run
-net program-resume halui.program.resume
-net program-pause halui.program.pause
-
 # Tool Probe
 newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
 newinst bb_gpio tool-probe-error-pin pin=[SOLO_PINS]TOOL_PROBE_ERROR_PIN direction=input
@@ -447,6 +406,7 @@ net tool-probe motion.probe-input
 
 # Schunk Mini90 open
 net vice-released [SOLO_PINS]MINI90_OPEN_PIN
+net vice-released [SOLO_PINS]VICE_AIR_BLAST_PIN
 
 ### Spindle ###
 
@@ -507,16 +467,38 @@ net c-pos joint.4.pos-cmd
 net calculated-feedrate feedrate.feedrate
 
 ####################################################
+# LEDs
+####################################################
+loadusr -Wn solo-leds /opt/pocketnc/Settings/solo/solo_leds.py
+
+net program-is-paused solo-leds.is-paused
+net program-is-idle solo-leds.is-idle
+net is-estopped solo-leds.is-estopped
+
+####################################################
 # Cutting Fluid
 ####################################################
 
 # Cutting fluid pump pressure settings
-loadusr -Wn solo_cutting_fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
-net cutting-fluid-pressure solo_cutting_fluid.pressure
+loadusr -Wn solo-cutting-fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
+net cutting-fluid-pressure solo-cutting-fluid.pressure
 sets cutting-fluid-pressure 1
+
+newinst oneshot flood-coolant-air-blast-oneshot 
+addf flood-coolant-air-blast-oneshot.funct servo-thread
+setp flood-coolant-air-blast-oneshot.width 0
+setp flood-coolant-air-blast-oneshot.rising 0
+setp flood-coolant-air-blast-oneshot.falling 1
 
 net flood-coolant iocontrol.0.coolant-flood
 net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
+net flood-coolant flood-coolant-air-blast-oneshot.in
+
+net air-blast flood-coolant-air-blast-oneshot.out
+net air-blast [SOLO_PINS]AIR_BLAST_PIN
+
+net cutting-fluid-on halui.flood.on
+net cutting-fluid-off halui.flood.off
 
 ####################################################
 # Tool Changer
@@ -617,8 +599,7 @@ net open-tool-changer solo-tool-changer.open-out
 net close-tool-changer [SOLO_PINS]CLOSE_TOOL_CHANGER_PIN
 net close-tool-changer solo-tool-changer.close-out
 
-net inhibit-feed motion.feed-inhibit
-net inhibit-feed solo-tool-changer.inhibit-feed
+net inhibit-feed-1 solo-tool-changer.inhibit-feed
 
 net inhibit-homing motion.homing-inhibit
 net inhibit-homing solo-tool-changer.inhibit-homing
@@ -647,8 +628,7 @@ net clamp-cmd motion.digital-out-60
 
 # See more solo-tool-changer connections in PocketNC_PostMillTask.hal
 
-net tool-changer-fault solo-tool-changer.fault
-net tool-changer-fault halui.abort
+net abort-1 solo-tool-changer.fault
 
 ####################################################
 # Door

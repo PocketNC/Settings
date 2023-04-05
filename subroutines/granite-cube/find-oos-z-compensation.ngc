@@ -21,25 +21,25 @@ M429
 
 G53 G0 Z0
 
-o200 if [ #<_z> GT 2 ]
-  (abort,Tool probe too short)
-o200 endif
+;o200 if [ #<_z> GT 2 ]
+;  (abort,Tool probe too short)
+;o200 endif
 
 F#<_ini[TOOL_PROBE]FEED_TRAVEL>
 G90 G1 X2.25 Y1.75
-G90 G1 Z1.25
+G90 G1 Z1.3
 
 o<set_active_feature> call [0]
-o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [1.75] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [.6] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 (debug,ZX #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 
 G53 G0 Z0
 
 G90 G1 X1.75 Y2.25
-G90 G1 Z1.25
+G90 G1 Z1.3
 
 o<set_active_feature> call [1]
-o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [1.75] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [.6] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 (debug,ZY #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 
 G53 G0 Z0

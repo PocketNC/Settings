@@ -1,4 +1,6 @@
 o<solo-open-tool-changer> SUB
+M66  E0 L0
+G4 P0.2
 
 o<init-tool-changer-vars> call
 

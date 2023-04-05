@@ -28,14 +28,46 @@ def _penta_average_magnitude(self):
 
 def _penta_points(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
-  print("in _penta_points: %s" % (len(feature.points()),))
+
+  if _DEBUG:
+    print("in _penta_points: %s" % (len(feature.points()),))
+
   return len(feature.points());
+
+def _penta_first_x(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  first = feature.first()
+
+  if _DEBUG:
+    print("in _penta_first_x: %s" % (first[0],))
+
+  return first[0]
+
+def _penta_first_y(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  first = feature.first()
+
+  if _DEBUG:
+    print("in _penta_first_y: %s" % (first[1],))
+
+  return first[1]
+
+def _penta_first_z(self):
+  feature = manager.getActiveFeatureSet().getActiveFeature()
+  first = feature.first()
+
+  if _DEBUG:
+    print("in _penta_first_z: %s" % (first[2],))
+
+  return first[2]
+
 
 def _penta_average_x(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _penta_average_x: %s" % (avg[0],))
+  if _DEBUG:
+    print("in _penta_average_x: %s" % (avg[0],))
 
   return avg[0]
 
@@ -43,7 +75,8 @@ def _penta_average_y(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _penta_average_y: %s" % (avg[1],))
+  if _DEBUG:
+    print("in _penta_average_y: %s" % (avg[1],))
 
   return avg[1]
 
@@ -51,7 +84,8 @@ def _penta_average_z(self):
   feature = manager.getActiveFeatureSet().getActiveFeature()
   avg = feature.average()
 
-  print("in _penta_average_z: %s" % (avg[2],))
+  if _DEBUG:
+    print("in _penta_average_z: %s" % (avg[2],))
 
   return avg[2]
 

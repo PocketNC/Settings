@@ -39,9 +39,8 @@ G91 G1 F#<feedBack> X[ -#<dirX>*.001 ] Y[ -#<dirY>*.001 ] Z[ -#<dirZ>*.001 ]
 G90
 G38.2 F#<feedSlow> X[ #<fastTrippedX> ] Y[ #<fastTrippedY> ] Z[ #<fastTrippedZ> ]
 
+G30.1 ; Save the current position into #5181-5189
 o<set_probe_direction> call [#<dirX>] [#<dirY>] [#<dirZ>]
-
-; TODO - account for TCPC
 
 #<_probedG5X_X> = [ #5061 + #<_probe_compensation_x> ]
 #<_probedG5X_Y> = [ #5062 + #<_probe_compensation_y> ]
@@ -49,7 +48,7 @@ o<set_probe_direction> call [#<dirX>] [#<dirY>] [#<dirZ>]
 
 #<_probedRelativeX> = [ #5061 + #<_probe_compensation_x> - #<startX> ]
 #<_probedRelativeY> = [ #5062 + #<_probe_compensation_y> - #<startY> ]
-#<_probedRelativeZ> = [ #5063 + #<_probe_compensation_y> - #<startZ> ]
+#<_probedRelativeZ> = [ #5063 + #<_probe_compensation_z> - #<startZ> ]
 
 G1 F#<feedFast> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
 
