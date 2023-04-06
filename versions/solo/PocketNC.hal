@@ -275,31 +275,31 @@ setp hpg0.stepgen.00.dirpin          [SOLO_PINS]C_DIR_PIN
 # X axis
 #
 newinst bb_gpio x-limit-pin pin=[SOLO_PINS]X_LIMIT_PIN direction=input
-setp x-limit-pin.invert 1
+setp x-limit-pin.invert 0
 net x-max-and-home x-limit-pin.in
 net x-max-and-home joint.0.home-sw-in
 
 # Y axis
 newinst bb_gpio y-limit-pin pin=[SOLO_PINS]Y_LIMIT_PIN direction=input
-setp y-limit-pin.invert 1
+setp y-limit-pin.invert 0
 net y-max-and-home y-limit-pin.in
 net y-max-and-home joint.1.home-sw-in
 
 # Z axis
 newinst bb_gpio z-limit-pin pin=[SOLO_PINS]Z_LIMIT_PIN direction=input
-setp z-limit-pin.invert 1
+setp z-limit-pin.invert 0
 net z-max-and-home z-limit-pin.in
 net z-max-and-home joint.2.home-sw-in
 
 # B Axis Limit
 newinst bb_gpio b-limit-pin pin=[SOLO_PINS]B_LIMIT_PIN direction=input
-setp b-limit-pin.invert 1
+setp b-limit-pin.invert 0
 net b-min-and-home b-limit-pin.in
 net b-min-and-home joint.3.home-sw-in
 
 # C axis
 newinst bb_gpio c-limit-pin pin=[SOLO_PINS]C_LIMIT_PIN direction=input
-setp c-limit-pin.invert 1
+setp c-limit-pin.invert 0
 net c-home-and-index c-limit-pin.in
 net c-home-and-index => joint.4.home-sw-in
 
@@ -476,31 +476,6 @@ net program-is-idle solo-leds.is-idle
 net is-estopped solo-leds.is-estopped
 
 ####################################################
-# Cutting Fluid
-####################################################
-
-# Cutting fluid pump pressure settings
-loadusr -Wn solo-cutting-fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
-net cutting-fluid-pressure solo-cutting-fluid.pressure
-sets cutting-fluid-pressure 1
-
-newinst oneshot flood-coolant-air-blast-oneshot 
-addf flood-coolant-air-blast-oneshot.funct servo-thread
-setp flood-coolant-air-blast-oneshot.width 0
-setp flood-coolant-air-blast-oneshot.rising 0
-setp flood-coolant-air-blast-oneshot.falling 1
-
-net flood-coolant iocontrol.0.coolant-flood
-net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
-net flood-coolant flood-coolant-air-blast-oneshot.in
-
-net air-blast flood-coolant-air-blast-oneshot.out
-net air-blast [SOLO_PINS]AIR_BLAST_PIN
-
-net cutting-fluid-on halui.flood.on
-net cutting-fluid-off halui.flood.off
-
-####################################################
 # Tool Changer
 ####################################################
 loadusr -Wn solo-tool-changer /opt/pocketnc/Settings/solo_tool_changer/hal-component.py
@@ -629,10 +604,3 @@ net clamp-cmd motion.digital-out-60
 # See more solo-tool-changer connections in PocketNC_PostMillTask.hal
 
 net abort-1 solo-tool-changer.fault
-
-####################################################
-# Door
-####################################################
-
-net unsafe_set_door_open_signal [SOLO_PINS]DOOR_OPEN_PIN
-net unsafe_set_door_close_signal [SOLO_PINS]DOOR_CLOSE_PIN

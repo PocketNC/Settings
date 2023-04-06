@@ -1,0 +1,6 @@
+####################################################
+# Door
+####################################################
+
+net unsafe_set_door_open_signal [SOLO_PINS]DOOR_OPEN_PIN
+net unsafe_set_door_close_signal [SOLO_PINS]DOOR_CLOSE_PIN

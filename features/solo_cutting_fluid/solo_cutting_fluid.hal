@@ -1,0 +1,24 @@
+####################################################
+# Cutting Fluid
+####################################################
+
+# Cutting fluid pump pressure settings
+loadusr -Wn solo-cutting-fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
+net cutting-fluid-pressure solo-cutting-fluid.pressure
+sets cutting-fluid-pressure 1
+
+newinst oneshot flood-coolant-air-blast-oneshot 
+addf flood-coolant-air-blast-oneshot.funct servo-thread
+setp flood-coolant-air-blast-oneshot.width 0
+setp flood-coolant-air-blast-oneshot.rising 0
+setp flood-coolant-air-blast-oneshot.falling 1
+
+net flood-coolant iocontrol.0.coolant-flood
+net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
+net flood-coolant flood-coolant-air-blast-oneshot.in
+
+net air-blast flood-coolant-air-blast-oneshot.out
+net air-blast [SOLO_PINS]AIR_BLAST_PIN
+
+net cutting-fluid-on halui.flood.on
+net cutting-fluid-off halui.flood.off
