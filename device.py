@@ -9,8 +9,12 @@ class DeviceModel(Enum):
   BBAI = "BBAI"
 
 def getProcDeviceModel():
-  with open("/proc/device-tree/model") as deviceModel:
-    return deviceModel.read().strip()
+  try:
+    with open("/proc/device-tree/model") as deviceModel:
+      return deviceModel.read().strip()
+  except:
+    pass
+  return "UNKNOWN"
 
 def getDeviceModel():
   device = getProcDeviceModel()
