@@ -20,7 +20,7 @@ import os
 POCKETNC_VAR_DIRECTORY = os.environ.get('POCKETNC_VAR_DIRECTORY')
 VERSION_FILE_PATH = os.path.join(POCKETNC_VAR_DIRECTORY, "version")
 
-from device import getProcDeviceModel
+from device import getDeviceModel, DeviceModel
 from enum import Enum
 from i2c import bus
 
@@ -28,15 +28,21 @@ class Versions(Enum):
   V1REVH = "v1revH"
   V2REVP = "v2revP"
   V2REVR = "v2revR"
+  SOLO = "solo"
 
 
 def getVersion():
-  version = "v2revP" # default version if we don't find another using the version file or i2c
+  version = Versions.V2REVP.value # default version if we don't find another using the version file or i2c
 
   try:
     with open(VERSION_FILE_PATH, 'r') as versionFile:
       version = versionFile.read().strip();
   except:
+    # This will need to be updated if we ever start using the BBAI
+    # for machines other than the solo.
+    if getDeviceModel() == DeviceModel.BBAI:
+      return Versions.SOLO.value
+
     try:
       bus.read_byte(0x50)
       version = Versions.V2REVR.value
