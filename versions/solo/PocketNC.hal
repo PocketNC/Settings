@@ -467,15 +467,6 @@ net c-pos joint.4.pos-cmd
 net calculated-feedrate feedrate.feedrate
 
 ####################################################
-# LEDs
-####################################################
-loadusr -Wn solo-leds /opt/pocketnc/Settings/solo/solo_leds.py
-
-net program-is-paused solo-leds.is-paused
-net program-is-idle solo-leds.is-idle
-net is-estopped solo-leds.is-estopped
-
-####################################################
 # Tool Changer
 ####################################################
 loadusr -Wn solo-tool-changer /opt/pocketnc/Settings/solo_tool_changer/hal-component.py

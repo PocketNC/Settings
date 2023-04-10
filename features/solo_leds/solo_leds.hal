@@ -1,0 +1,9 @@
+####################################################
+# LEDs
+####################################################
+loadusr -Wn solo-leds /opt/pocketnc/Settings/features/solo_leds/solo_leds.py
+
+net program-is-paused solo-leds.is-paused
+net program-is-idle solo-leds.is-idle
+net is-estopped solo-leds.is-estopped
+
