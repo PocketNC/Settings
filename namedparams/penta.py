@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 manager = metrology.FeatureManager.getInstance()
 
 def _penta_average_magnitude(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
 
   points = feature.points()
 
@@ -27,178 +27,157 @@ def _penta_average_magnitude(self):
   return totalMag/numPoints
 
 def _penta_points(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
-
-  if _DEBUG:
-    print("in _penta_points: %s" % (len(feature.points()),))
+  feature = manager.getActiveFeatureMap().getActiveFeature()
 
   return len(feature.points());
 
 def _penta_first_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   first = feature.first()
-
-  if _DEBUG:
-    print("in _penta_first_x: %s" % (first[0],))
 
   return first[0]
 
 def _penta_first_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   first = feature.first()
-
-  if _DEBUG:
-    print("in _penta_first_y: %s" % (first[1],))
 
   return first[1]
 
 def _penta_first_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   first = feature.first()
-
-  if _DEBUG:
-    print("in _penta_first_z: %s" % (first[2],))
 
   return first[2]
 
 
 def _penta_average_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   avg = feature.average()
-
-  if _DEBUG:
-    print("in _penta_average_x: %s" % (avg[0],))
 
   return avg[0]
 
 def _penta_average_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   avg = feature.average()
-
-  if _DEBUG:
-    print("in _penta_average_y: %s" % (avg[1],))
 
   return avg[1]
 
 def _penta_average_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   avg = feature.average()
-
-  if _DEBUG:
-    print("in _penta_average_z: %s" % (avg[2],))
 
   return avg[2]
 
 def _penta_circle2d_center_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
   return circle2D[0][0]
 
 def _penta_circle2d_center_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
   return circle2D[0][1]
 
 def _penta_circle2d_radius(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
   return circle2D[1]
 
 def _penta_circle2d_diameter(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
   return 2*circle2D[1]
 
 def _penta_circle_center_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[0][0]
 
 def _penta_circle_center_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[0][1]
 
 def _penta_circle_center_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[0][2]
 
 def _penta_circle_radius(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[1]
 
 def _penta_circle_diameter(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return 2*circle[1]
 
 def _penta_circle_normal_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[2][0]
 
 def _penta_circle_normal_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[2][1]
 
 def _penta_circle_normal_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
   return circle[2][2]
 
 def _penta_cylinder_point_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[0][0]
 
 def _penta_cylinder_point_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[0][1]
 
 def _penta_cylinder_point_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[0][2]
 
 def _penta_cylinder_axis_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[1][0]
 
 def _penta_cylinder_axis_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[1][1]
 
 def _penta_cylinder_axis_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[1][2]
 
 def _penta_cylinder_radius(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   cylinder = feature.cylinder()
 
   return cylinder[2]
@@ -207,25 +186,25 @@ def _penta_cylinder_diameter(self):
   return _penta_cylinder_radius(self)*2
 
 def _penta_sphere_radius(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   sphere = feature.sphere()
 
   return sphere[0]
 
 def _penta_sphere_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   sphere = feature.sphere()
 
   return sphere[1][0]
 
 def _penta_sphere_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   sphere = feature.sphere()
 
   return sphere[1][1]
 
 def _penta_sphere_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   sphere = feature.sphere()
 
   return sphere[1][2]
@@ -235,74 +214,74 @@ def _penta_sphere_diameter(self):
   
 
 def _penta_line_direction_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   line = feature.line()
 
   return line[1][0]
 
 def _penta_line_direction_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   line = feature.line()
 
   return line[1][1]
 
 def _penta_line_direction_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   line = feature.line()
 
   return line[1][2]
 
 def _penta_line_angle_about_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   line = feature.line()
 
   return math.degrees(math.atan(line[1][1]/-line[1][2]))
 
 def _penta_line_angle_about_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   line = feature.line()
 
   return math.degrees(math.atan(-line[1][2]/line[1][0]))
 
 
 def _penta_line_angle_about_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   line = feature.line()
 
   return math.degrees(math.atan(line[1][1]/line[1][0]))
 
 def _penta_plane_normal_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   plane = feature.plane()
 
   return plane[1][0]
 
 def _penta_plane_normal_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   plane = feature.plane()
 
   return plane[1][1]
 
 def _penta_plane_normal_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   plane = feature.plane()
 
   return plane[1][2]
 
 def _penta_plane_point_x(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   plane = feature.plane()
 
   return plane[0][0]
 
 def _penta_plane_point_y(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   plane = feature.plane()
 
   return plane[0][1]
 
 def _penta_plane_point_z(self):
-  feature = manager.getActiveFeatureSet().getActiveFeature()
+  feature = manager.getActiveFeatureMap().getActiveFeature()
   plane = feature.plane()
 
   return plane[0][2]

@@ -27,6 +27,14 @@ def do_nothing(self):
   logger.debug("in do_nothing again2")
   pass
 
+def do_error(self):
+  logger.debug("in do_error")
+  return "This is an error"
+
+def return_int(self):
+  logger.debug("in return_int")
+  return 1
+
 def return_exception_as_string(func):
   def wrapper(*args, **kwargs):
     try:

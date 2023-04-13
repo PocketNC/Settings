@@ -556,7 +556,7 @@ class Feature:
       self._average = self.points().mean(axis=0)
 
     if _DEBUG:
-      logger.debug("Average: ", self._average)
+      logger.debug("Average: %s", self._average)
 
     return self._average
 
@@ -573,7 +573,7 @@ class Feature:
       self._line = bestFitLine(self.points())
 
     if _DEBUG:
-      logger.debug("Line: ", self._line)
+      logger.debug("Line: %s", self._line)
 
     return self._line
 
@@ -585,7 +585,7 @@ class Feature:
     _cylinder = bestFitCylinder(self.points(), pt, axis, radius)
 
     if _DEBUG:
-      logger.debug("Cylinder: ", _cylinder)
+      logger.debug("Cylinder: %s", _cylinder)
 
     return _cylinder
 
@@ -595,7 +595,7 @@ class Feature:
       self._sphere = skg.nsphere.nsphere_fit(self.points())
 
     if _DEBUG:
-      logger.debug("Sphere: ", self._sphere)
+      logger.debug("Sphere: %s", self._sphere)
 
     return self._sphere
 
@@ -605,7 +605,7 @@ class Feature:
       self._circle = metrology.bestFitCircle(self.points())
 
     if _DEBUG:
-      logger.debug("Circle: ", self._circle)
+      logger.debug("Circle: %s", self._circle)
 
     return self._circle
 
@@ -622,7 +622,7 @@ class Feature:
       self._circle2D = (circle[0], circle[1])
 
     if _DEBUG:
-      logger.debug("Circle2D: ", self._circle2D)
+      logger.debug("Circle2D: %s", self._circle2D)
 
     return self._circle2D
 
