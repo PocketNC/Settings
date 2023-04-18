@@ -594,4 +594,4 @@ net clamp-cmd motion.digital-out-60
 
 # See more solo-tool-changer connections in PocketNC_PostMillTask.hal
 
-net abort-1 solo-tool-changer.fault
+net estop-1 solo-tool-changer.fault
