@@ -91,13 +91,16 @@ async def v2_calib_probe_machine_pos(self):
 async def v2_calib_load_part_csy(self):
   state = CalibState.getInstance()
 
+  cmm = Cmm.getInstance()
+
   stage = state.getStage(Stages.PROBE_MACHINE_POS)
 
   L_bracket_top_face = stage["L_bracket_top_face"]
   L_bracket_back_line = stage["L_bracket_back_line"]
   L_bracket_right_line = stage["L_bracket_right_line"]
 
-  csy = calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
+  APPROX_CSY_FRONT_RIGHT_SLOT = Csy(653.0, 134.0, 126.5, 0, -90, 0)
+  csy = v2calculations.calc_part_csy(APPROX_CSY_FRONT_RIGHT_SLOT, L_bracket_top_face, L_bracket_back_line, L_bracket_right_line)
   await cmm.routines.set_part_csy(csy)
 
 def _save_zero_spindle_pos(zero_spindle_pos):
