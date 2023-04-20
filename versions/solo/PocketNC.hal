@@ -350,7 +350,7 @@ net estop-user-requested-enable iocontrol.0.user-request-enable
 net estop-user-requested-enable solo-estop.user-request-enable
 
 newinst bb_gpio estop-button-pin pin=[SOLO_PINS]ESTOP_BUTTON_PIN direction=input
-setp estop-button-pin.invert 1
+setp estop-button-pin.invert 0
 net estop-button solo-estop.button
 net estop-button estop-button-pin.in
 
