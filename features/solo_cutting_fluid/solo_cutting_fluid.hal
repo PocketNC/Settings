@@ -2,23 +2,30 @@
 # Cutting Fluid
 ####################################################
 
-# Cutting fluid pump pressure settings
-loadusr -Wn solo-cutting-fluid /opt/pocketnc/Settings/solo_cutting_fluid.py
-net cutting-fluid-pressure solo-cutting-fluid.pressure
-sets cutting-fluid-pressure 1
-
-newinst oneshot flood-coolant-air-blast-oneshot 
-addf flood-coolant-air-blast-oneshot.funct servo-thread
-setp flood-coolant-air-blast-oneshot.width 0
-setp flood-coolant-air-blast-oneshot.rising 0
-setp flood-coolant-air-blast-oneshot.falling 1
+newinst bb_gpio cutting-fluid-enable-pin pin=[SOLO_PINS]CUTTING_FLUID_ENABLE_PIN direction=output
 
 net flood-coolant iocontrol.0.coolant-flood
 net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
-net flood-coolant flood-coolant-air-blast-oneshot.in
-
-net air-blast flood-coolant-air-blast-oneshot.out
-net air-blast [SOLO_PINS]AIR_BLAST_PIN
+net flood-coolant cutting-fluid-enable-pin.out
+net flood-coolant hpg3.stepgen.01.enable
 
 net cutting-fluid-on halui.flood.on
 net cutting-fluid-off halui.flood.off
+
+# motor feedback
+setp hpg2.pwmread.06.max_time 2074689
+setp hpg2.pwmread.06.pin [SOLO_PINS]CUTTING_FLUID_FEEDBACK_PIN
+
+# timing parameters
+setp hpg3.stepgen.01.dirsetup        [CUTTING_FLUID]DIRSETUP
+setp hpg3.stepgen.01.dirhold         [CUTTING_FLUID]DIRHOLD
+setp hpg3.stepgen.01.steplen         [CUTTING_FLUID]STEPLEN
+setp hpg3.stepgen.01.stepspace       [CUTTING_FLUID]STEPSPACE
+setp hpg3.stepgen.01.position-scale  [CUTTING_FLUID]SCALE
+setp hpg3.stepgen.01.maxvel          [CUTTING_FLUID]STEPGEN_MAX_VEL
+setp hpg3.stepgen.01.maxaccel        [CUTTING_FLUID]STEPGEN_MAX_ACC
+
+setp hpg3.stepgen.01.steppin         [SOLO_PINS]CUTTING_FLUID_STEP_PIN
+setp hpg3.stepgen.01.dirpin          [SOLO_PINS]CUTTING_FLUID_DIR_PIN
+setp hpg3.stepgen.01.control-type 1
+setp hpg3.stepgen.01.velocity-cmd -1000
