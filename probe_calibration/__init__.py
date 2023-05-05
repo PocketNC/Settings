@@ -115,66 +115,68 @@ class ProbeCalibration():
     return (0,0,0)
 
   def computeCompensation(self, x, y, z):
-    # x, y, z is a normalized direction that represents the normal of the surface
-    # that we're approaching
-    print("computing compensation for direction (%s, %s, %s)" % (x,y,z))
+    if self._calibration:
+      # x, y, z is a normalized direction that represents the normal of the surface
+      # that we're approaching
+      print("computing compensation for direction (%s, %s, %s)" % (x,y,z))
 
-    latAngle = math.degrees(math.acos(z))
-    longAngle = math.degrees(math.atan2(y,x))
-    if longAngle < 0:
-      longAngle += 360
+      latAngle = math.degrees(math.acos(z))
+      longAngle = math.degrees(math.atan2(y,x))
+      if longAngle < 0:
+        longAngle += 360
 
-    latIndex = bisect.bisect_left([ elem[0] for elem in self._calibration ], latAngle)
+      latIndex = bisect.bisect_left([ elem[0] for elem in self._calibration ], latAngle)
 
-    if latIndex == 0:
-      latIndex = 1
+      if latIndex == 0:
+        latIndex = 1
 
-    print("latIndex: %s" % (latIndex,))
+      print("latIndex: %s" % (latIndex,))
 
-    latArray0 = self._calibration[latIndex-1]
-    latArray1 = self._calibration[latIndex]
+      latArray0 = self._calibration[latIndex-1]
+      latArray1 = self._calibration[latIndex]
 
-    latAngle0 = latArray0[0]
-    latAngle1 = latArray1[0]
+      latAngle0 = latArray0[0]
+      latAngle1 = latArray1[0]
 
-    longIndex0 = bisect.bisect_left([ elem[0] for elem in latArray0[1] ], longAngle)
-    longIndex1 = bisect.bisect_left([ elem[0] for elem in latArray1[1] ], longAngle)
+      longIndex0 = bisect.bisect_left([ elem[0] for elem in latArray0[1] ], longAngle)
+      longIndex1 = bisect.bisect_left([ elem[0] for elem in latArray1[1] ], longAngle)
 
-    compMag0_0 = latArray0[1][longIndex0-1][1]
-    compMag0_1 = latArray0[1][longIndex0][1]
+      compMag0_0 = latArray0[1][longIndex0-1][1]
+      compMag0_1 = latArray0[1][longIndex0][1]
 
-    longAngle0_0 = latArray0[1][longIndex0-1][0]
-    longAngle0_1 = latArray0[1][longIndex0][0]
+      longAngle0_0 = latArray0[1][longIndex0-1][0]
+      longAngle0_1 = latArray0[1][longIndex0][0]
 
-    compMag1_0 = latArray1[1][longIndex1-1][1]
-    compMag1_1 = latArray1[1][longIndex1][1]
+      compMag1_0 = latArray1[1][longIndex1-1][1]
+      compMag1_1 = latArray1[1][longIndex1][1]
 
-    longAngle1_0 = latArray1[1][longIndex1-1][0]
-    longAngle1_1 = latArray1[1][longIndex1][0]
+      longAngle1_0 = latArray1[1][longIndex1-1][0]
+      longAngle1_1 = latArray1[1][longIndex1][0]
 
-    t0 = (longAngle-longAngle0_0)/(longAngle0_1-longAngle0_0)
-    t1 = (longAngle-longAngle1_0)/(longAngle1_1-longAngle1_0)
+      t0 = (longAngle-longAngle0_0)/(longAngle0_1-longAngle0_0)
+      t1 = (longAngle-longAngle1_0)/(longAngle1_1-longAngle1_0)
 
-    latT = (latAngle-latAngle0)/(latAngle1-latAngle0)
+      latT = (latAngle-latAngle0)/(latAngle1-latAngle0)
 
-    print("t0: %s" % (t0, ))
-    print("t1: %s" % (t1, ))
-    print("latT: %s" % (latT, ))
+      print("t0: %s" % (t0, ))
+      print("t1: %s" % (t1, ))
+      print("latT: %s" % (latT, ))
 
-    compMag0 = compMag0_0*(1-t0) + compMag0_1*t0
-    compMag1 = compMag1_0*(1-t1) + compMag1_1*t1
+      compMag0 = compMag0_0*(1-t0) + compMag0_1*t0
+      compMag1 = compMag1_0*(1-t1) + compMag1_1*t1
 
-    compMag = compMag0*(1-latT)+compMag1*latT
+      compMag = compMag0*(1-latT)+compMag1*latT
 
-    comp = ( 
-      compMag*x,
-      compMag*y,
-      compMag*z
-    )
+      comp = ( 
+        compMag*x,
+        compMag*y,
+        compMag*z
+      )
 
-    print("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
+      print("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
 
-    return comp
+      return comp
+    return (0,0,0)
 
   def enableApproximateTouchPoint(self, probeDiameter):
     self._approximateTouchPoint = True
