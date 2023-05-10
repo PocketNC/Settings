@@ -3,6 +3,7 @@
 """
 import logging
 import probe_calibration
+import metrology
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +21,11 @@ def enable_probe_calibration(self):
 
 def set_probe_calibration(self, actualDiameter, probeTipDiameter, rings, samplesPerRing, theta):
   manager = metrology.FeatureManager.getInstance()
-  featureSet = manager.getActiveFeatureSet()
-  feature = featureSet.getActiveFeature()
+  featureMap = manager.getActiveFeatureMap()
+  feature = featureMap.getActiveFeature()
   cal = probe_calibration.getInstance()
 
-  cal.setProbeCalibration(actualDiameter, probeTipDiameter, feature, rings, samplesPerRing, theta)
+  cal.setProbeCalibration(actualDiameter, probeTipDiameter, feature, int(rings), int(samplesPerRing), theta)
 
 def save_probe_calibration(self):
   cal = probe_calibration.getInstance()
