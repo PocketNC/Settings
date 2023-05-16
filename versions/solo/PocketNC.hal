@@ -3,7 +3,7 @@ loadusr -Wn mcp21 hal_gpio_mcp23017 -n mcp21 -b 3 -a 33 -op A00,A01,A02,A03,A04,
 loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A04,A05,A06,A07,B00,B01,B02,B03,B04,B05,B06,B07 -ip A01,A02,A03
 
 # Spindle VFD control over serial
-loadusr -Wn spindle-vfd vfdb_vfd -n spindle-vfd -I /opt/pocketnc/Settings/versions/solo/vfd.ini -S SPINDLEVFD -r
+loadusr -Wn solo_vfd /opt/pocketnc/Settings/solo_vfd_hal.py
 
 # D5 Next water cooler data
 loadusr -Wn d5next /opt/pocketnc/Settings/d5next.py
@@ -380,8 +380,8 @@ net c-motor-enable c-enable-pin.out
 newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
 newinst bb_gpio tool-probe-error-pin pin=[SOLO_PINS]TOOL_PROBE_ERROR_PIN direction=input
 
-setp tool-probe-pin.invert 1
-setp tool-probe-error-pin.invert 1
+setp tool-probe-pin.invert 0
+setp tool-probe-error-pin.invert 0
 net tool-probe-error tool-probe-error-pin.in
 net tool-probe-error motion.digital-in-58
 
@@ -407,30 +407,23 @@ net vice-released [SOLO_PINS]VICE_AIR_BLAST_PIN
 
 ### Spindle ###
 
-net needs-correcting-spindle-current spindle-vfd.output-current
-net needs-correcting-spindle-current mult2.0.in0
-setp mult2.0.in1 .1
-
-net measured-spindle-current mult2.0.out
-net measured-spindle-voltage spindle-vfd.output-voltage
-net measured-spindle-speed spindle-vfd.motor-RPM
-net spindle-max-speed spindle-vfd.max-rpm
+sets spindle-max-speed 17970
 
 net spindle-enable spindle.0.on
-net spindle-enable spindle-vfd.spindle-on
+net spindle-enable solo_vfd.spindle-on
 # turn on air seal when spindle is enabled
 net spindle-enable [SOLO_PINS]AIR_SEAL_PIN
 
 net spindle-speed spindle.0.speed-out
-net spindle-speed spindle-vfd.speed-command
+net spindle-speed solo_vfd.speed-cmd
 
-net spindle-error spindle-vfd.error-code
+net spindle-error solo_vfd.error-code
 net spindle-error solo-estop.spindle-error-code
 
-net spindle-modbus-ok spindle-vfd.modbus-ok
+net spindle-modbus-ok solo_vfd.modbus-ok
 net spindle-modbus-ok solo-estop.spindle-modbus-ok
 
-setp spindle-vfd.enable 1
+setp solo_vfd.enabled 1
 
 # ##################################################
 # Features
@@ -531,28 +524,21 @@ addf clamped-notool-debounce.funct servo-thread
 setp clamped-tool-debounce.delay 300
 setp clamped-notool-debounce.delay 300
 
-net clamped-no-tool-raw [SOLO_PINS]CLAMPED_NO_TOOL_SENSOR_PIN
+net clamped-no-tool-raw solo_vfd.clamped-no-tool
 net clamped-no-tool-raw clamped-notool-debounce.0.in
 
-setp [SOLO_PINS]CLAMPED_NO_TOOL_SENSOR_INVERT 1
-setp [SOLO_PINS]CLAMPED_NO_TOOL_SENSOR_PULLUP 1
 net clamped-no-tool clamped-notool-debounce.0.out
 net clamped-no-tool motion.digital-in-61
 net clamped-no-tool solo-tool-changer.clamped-no-tool
 
-net tool-clamped-raw [SOLO_PINS]TOOL_CLAMPED_SENSOR_PIN
+net tool-clamped-raw solo_vfd.clamped-with-tool
 net tool-clamped-raw clamped-tool-debounce.0.in
 
-setp [SOLO_PINS]TOOL_CLAMPED_SENSOR_INVERT 1
-setp [SOLO_PINS]TOOL_CLAMPED_SENSOR_PULLUP 1
 net tool-clamped clamped-tool-debounce.0.out
 net tool-clamped motion.digital-in-60
 net tool-clamped solo-tool-changer.clamped-with-tool
 
-setp [SOLO_PINS]TOOL_UNCLAMPED_SENSOR_INVERT 1
-setp [SOLO_PINS]TOOL_UNCLAMPED_SENSOR_PULLUP 1
-
-net tool-unclamped [SOLO_PINS]TOOL_UNCLAMPED_SENSOR_PIN
+net tool-unclamped solo_vfd.unclamped
 net tool-unclamped motion.digital-in-59
 net tool-unclamped solo-tool-changer.unclamped
 
