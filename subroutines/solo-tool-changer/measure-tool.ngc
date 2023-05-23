@@ -1,15 +1,13 @@
 o<measure-tool> sub
 
-#<toolSetterTriggerZ> = #<_ini[TOOL_CHANGER]TOOL_SETTER_TRIGGER_Z>
-
-o<init-tool-changer-vars> call
-
 #<feedTravel> = #<_ini[TOOL_PROBE]FEED_TRAVEL>
 #<feedFast> = #<_ini[TOOL_PROBE]FEED_FAST>
 #<feedBack> = #<_ini[TOOL_PROBE]FEED_BACK>
 #<feedSlow> = #<_ini[TOOL_PROBE]FEED_SLOW>
 
 M70
+
+G30.1
 
 G20
 G90 G94 G40 G17 G91.1
@@ -18,12 +16,11 @@ G61.1
 M429
 
 G53 G0 Z0
+G0 B-90
 
-M270
+G1 F#<feedTravel> X#<_ini[TOOL_SETTER]X> Y#<_ini[TOOL_SETTER]Y>
 
-G1 F#<feedTravel> X#<_toolSetterX> Y#<_toolSetterY>
-
-G38.2 F20 Z[ #<_toolSetterZ> ]
+G38.2 F20 Z[ #<_ini[TOOL_SETTER]Z> ]
 
 #<fastTrippedZ> = #5063
 
@@ -33,13 +30,14 @@ G90
 G38.2 F#<feedSlow> Z[ #<fastTrippedZ> ]
 #<slowTrippedZ> = #5063
 
-#<toolLengthOffset> = [ #<slowTrippedZ> - #<toolSetterTriggerZ> ]
+#<toolLengthOffset> = [ #<slowTrippedZ> - #<_ini[TOOL_SETTER]TRIGGER_Z> ]
 
 G10 L1 P#5400 Z#<toolLengthOffset>
 
 G53 G0 Z0
-
-M271
+G53 G0 B[#5185]
+G53 G0 X[#5181] Y[#5182]
+G53 G1 F[#<_ini[TOOL_PROBE]FEED_TRAVEL>] Z[#5183]
 
 M72
 

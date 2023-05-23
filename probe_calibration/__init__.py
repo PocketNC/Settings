@@ -4,6 +4,9 @@ import os
 import numpy as np
 import json
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 _instance = None
 
@@ -101,7 +104,7 @@ class ProbeCalibration():
 
   def setProbeDirection(self, x, y, z):
     # x, y, z are a normalized direction that the probe is traveling in
-    print("in setProbeDirection (%s, %s, %s)" % (x, y, z))
+    logger.debug("in setProbeDirection (%s, %s, %s)" % (x, y, z))
     self._dirx = x
     self._diry = y
     self._dirz = z
@@ -118,7 +121,7 @@ class ProbeCalibration():
     if self._calibration:
       # x, y, z is a normalized direction that represents the normal of the surface
       # that we're approaching
-      print("computing compensation for direction (%s, %s, %s)" % (x,y,z))
+      logger.debug("computing compensation for direction (%s, %s, %s)" % (x,y,z))
 
       latAngle = math.degrees(math.acos(z))
       longAngle = math.degrees(math.atan2(y,x))
@@ -130,8 +133,9 @@ class ProbeCalibration():
       if latIndex == 0:
         latIndex = 1
 
-      print("latIndex: %s" % (latIndex,))
+      logger.debug("latIndex: %s" % (latIndex,))
 
+      latIndex = min(len(self._calibration)-1, latIndex)
       latArray0 = self._calibration[latIndex-1]
       latArray1 = self._calibration[latIndex]
 
@@ -158,9 +162,9 @@ class ProbeCalibration():
 
       latT = (latAngle-latAngle0)/(latAngle1-latAngle0)
 
-      print("t0: %s" % (t0, ))
-      print("t1: %s" % (t1, ))
-      print("latT: %s" % (latT, ))
+      logger.debug("t0: %s" % (t0, ))
+      logger.debug("t1: %s" % (t1, ))
+      logger.debug("latT: %s" % (latT, ))
 
       compMag0 = compMag0_0*(1-t0) + compMag0_1*t0
       compMag1 = compMag1_0*(1-t1) + compMag1_1*t1
@@ -173,7 +177,7 @@ class ProbeCalibration():
         compMag*z
       )
 
-      print("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
+      logger.debug("Computed compensation for direction (%s, %s, %s): (%s, %s, %s)" % (x,y,z,comp[0],comp[1],comp[2]))
 
       return comp
     return (0,0,0)

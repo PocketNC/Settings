@@ -73,55 +73,55 @@ def _penta_circle2d_center_x(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
-  return circle2D[0][0]
+  return circle2D[1][0]
 
 def _penta_circle2d_center_y(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
-  return circle2D[0][1]
+  return circle2D[1][1]
 
 def _penta_circle2d_radius(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
-  return circle2D[1]
+  return circle2D[0]
 
 def _penta_circle2d_diameter(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle2D = feature.circle2D()
 
-  return 2*circle2D[1]
+  return 2*circle2D[0]
 
 def _penta_circle_center_x(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
-  return circle[0][0]
+  return circle[1][0]
 
 def _penta_circle_center_y(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
-  return circle[0][1]
+  return circle[1][1]
 
 def _penta_circle_center_z(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
-  return circle[0][2]
+  return circle[1][2]
 
 def _penta_circle_radius(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
-  return circle[1]
+  return circle[0]
 
 def _penta_circle_diameter(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()
   circle = feature.circle()
 
-  return 2*circle[1]
+  return 2*circle[0]
 
 def _penta_circle_normal_x(self):
   feature = manager.getActiveFeatureMap().getActiveFeature()

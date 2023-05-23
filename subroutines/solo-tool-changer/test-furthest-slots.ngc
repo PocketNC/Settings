@@ -1,0 +1,37 @@
+; Must have no tool in spindle, and a tool in slot 5 and 8
+o<test-furthest-slots> sub
+
+#<count> = #1
+
+; tool clamped sensor
+M66 P60 L0
+o100 if [ #5399 EQ 1 ]
+  (abort,Tool detected in spindle. Remove tool before running this routine.)
+o100 endif
+
+; tool unclamped sensor
+M66 P59 L0
+o200 if [ #5399 EQ 1 ]
+  (abort,Spindle is unclamped. Clamp without tool before running this routine.)
+o200 endif
+
+; clamped without tool sensor
+M66 P61 L0
+o300 if [ #5399 EQ 0 ]
+  (abort,Spindle should be clamped without a tool in it.)
+o300 endif
+
+o400 repeat [#<count>]
+M6 T5
+M61 Q13
+
+M6 T8
+M61 Q5
+
+M6 T13
+M61 Q8
+o400 endrepeat
+
+o<return-tool> call
+
+o<test-furthest-slots> endsub

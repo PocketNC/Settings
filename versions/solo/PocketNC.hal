@@ -408,6 +408,7 @@ net vice-released [SOLO_PINS]VICE_AIR_BLAST_PIN
 ### Spindle ###
 
 sets spindle-max-speed 17970
+net measured-spindle-speed solo_vfd.speed-fb
 
 net spindle-enable spindle.0.on
 net spindle-enable solo_vfd.spindle-on

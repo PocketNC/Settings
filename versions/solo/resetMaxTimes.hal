@@ -1,0 +1,15 @@
+# Bug in hal_pru_generic causes the max_time to sometimes be incorrectly
+# set on the PRU even when max_time is set properly in HAL. This forces
+# it to reset to the proper value.
+# See SOFT-833 for more info.
+setp hpg2.pwmread.00.max_time 1
+setp hpg2.pwmread.01.max_time 1
+setp hpg2.pwmread.02.max_time 1
+setp hpg2.pwmread.03.max_time 1
+setp hpg2.pwmread.04.max_time 1
+
+setp hpg2.pwmread.00.max_time 0x001FA841
+setp hpg2.pwmread.01.max_time 0x001FA841
+setp hpg2.pwmread.02.max_time 0x001FA841
+setp hpg2.pwmread.03.max_time 0x001FA841
+setp hpg2.pwmread.04.max_time 0x001FA841

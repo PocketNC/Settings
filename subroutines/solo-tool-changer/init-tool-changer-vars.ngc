@@ -38,7 +38,7 @@ o100 endif
 ; we may need to adjust the how much allowance there is in the plunge distance
 ; of the probe to ensure we always hit the drawer.
 #<_drawerTopFace> = [ 1.8 ]
-#<_pickUpDist> = [ 0.02 ]
+#<_pickUpDist> = [ 0.005 ]
 
 #<_toolSetterDist> = [ 24.375 / 25.4 ] ; distance between probe slot center and tool setter center in the Y axis
 #<_toolSetterHeight> = [ 2 / 25.4 ]
@@ -109,10 +109,6 @@ o100 endif
 #<_tool13X> = [ #<_tool9X> - 4 * #<_toolDist> * #<yBasisX> ]
 #<_tool13Y> = [ #<_tool9Y> - 4 * #<_toolDist> * #<yBasisY> ] 
 #<_tool13Z> = [ #<_tool9Z> - 4 * #<_toolDist> * #<yBasisZ> ]
-
-#<_toolSetterX> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_X> + #<_toolSetterDist> * #<yBasisX> + #<_toolSetterHeight> * #<zBasisX> ]
-#<_toolSetterY> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Y> + #<_toolSetterDist> * #<yBasisY> + #<_toolSetterHeight> * #<zBasisY> ]
-#<_toolSetterZ> = [ #<_ini[TOOL_CHANGER]PROBE_SLOT_Z> + #<_toolSetterDist> * #<yBasisZ> + #<_toolSetterHeight> * #<zBasisZ> ]
 
 o<init-tool-changer-vars> endsub
 M2

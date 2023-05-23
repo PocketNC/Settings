@@ -17,9 +17,10 @@ M70
 
 G20 
 G90 G94 G40 G17 G91.1
-M429
+;M429
 
-G53 G0 Z0
+G0 Z3
+;G53 G0 Z0
 
 ;o200 if [ #<_z> GT 2 ]
 ;  (abort,Tool probe too short)
@@ -34,7 +35,8 @@ o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [.5] [0.25] [#<_ini[
 (logappend,z-oos.txt)
 (log,ZX #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 
-G53 G0 Z0
+G0 Z3
+;G53 G0 Z0
 
 G90 G1 X1.75 Y2.25
 G90 G1 Z2.15
@@ -44,7 +46,8 @@ o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [.5] [0.25] [#<_ini[
 (log,ZY #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 (logclose)
 
-G53 G0 Z0
+G0 Z3
+;G53 G0 Z0
 
 M72
 o<pop_feature_set> call

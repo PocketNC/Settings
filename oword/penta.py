@@ -2,6 +2,10 @@
 `oword`s for interacting with `metrology.Feature` objects.
 """
 import metrology
+import math
+import logging
+
+logger = logging.getLogger(__name__)
 
 # TODO - Take into account units, leaving the metrology and probe modules units agnostic.
 #      - The metrology and probe modules don't really need to know about units, but in G
@@ -100,9 +104,9 @@ def set_active_feature(self, id):
 def project_points_onto_plane(self, pointsId, planeId, newId):
   manager = metrology.FeatureManager.getInstance()
   featureMap = manager.getActiveFeatureMap()
-  pointsFeature = featureMap.getFeature(pointsId)
-  planeFeature = featureMap.getFeature(planeId)
-  newFeature = featureMap.getFeature(newId)
+  pointsFeature = featureMap.getFeature(int(pointsId))
+  planeFeature = featureMap.getFeature(int(planeId))
+  newFeature = featureMap.getFeature(int(newId))
 
   newFeature.clearPoints()
   plane = planeFeature.plane()
