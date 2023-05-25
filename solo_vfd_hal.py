@@ -13,6 +13,9 @@ DEBUG_REGISTER_PIN_NAME = "debug-register"
 SPEED_FB_PIN_NAME = "speed-fb"
 OUTPUT_TORQUE_PIN_NAME = "output-torque"
 OUTPUT_POWER_PIN_NAME = "output-power"
+OUTPUT_VOLTAGE_PIN_NAME = "output-voltage"
+OUTPUT_CURRENT_PIN_NAME = "output-current"
+POWER_ANGLE_PIN_NAME = "power-angle"
 MODBUS_OK_PIN_NAME = "modbus-ok"
 CLAMPED_NO_TOOL_PIN_NAME = "clamped-no-tool"
 CLAMPED_WITH_TOOL_PIN_NAME = "clamped-with-tool"
@@ -32,6 +35,9 @@ def main():
   outputs = [ 
     (SPEED_FB_PIN_NAME, hal.HAL_FLOAT),
     (OUTPUT_POWER_PIN_NAME, hal.HAL_FLOAT),
+    (OUTPUT_VOLTAGE_PIN_NAME, hal.HAL_FLOAT),
+    (OUTPUT_CURRENT_PIN_NAME, hal.HAL_FLOAT),
+    (POWER_ANGLE_PIN_NAME, hal.HAL_FLOAT),
     (OUTPUT_TORQUE_PIN_NAME, hal.HAL_FLOAT),
     (MODBUS_OK_PIN_NAME, hal.HAL_BIT),
     (CLAMPED_NO_TOOL_PIN_NAME, hal.HAL_BIT),
@@ -77,6 +83,9 @@ def main():
 
       h[SPEED_FB_PIN_NAME] = vfd.speed_fb
       h[OUTPUT_POWER_PIN_NAME] = vfd.output_power
+      h[OUTPUT_CURRENT_PIN_NAME] = vfd.output_current
+      h[OUTPUT_VOLTAGE_PIN_NAME] = vfd.output_voltage
+      h[POWER_ANGLE_PIN_NAME] = vfd.power_angle
       h[OUTPUT_TORQUE_PIN_NAME] = vfd.output_torque
       h[MODBUS_OK_PIN_NAME] = vfd.modbus_ok
       h[CLAMPED_NO_TOOL_PIN_NAME] = vfd.clamped_no_tool

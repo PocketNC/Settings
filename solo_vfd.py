@@ -1,4 +1,6 @@
 import minimalmodbus
+import serial
+import math
 
 COMMAND_REG   = 0x2000
 FREQUENCY_REG = 0x2001
@@ -6,7 +8,7 @@ FREQUENCY_REG = 0x2001
 STATUS_REG = 0x2100
 OUTPUT_VOLTAGE_REG = 0x2106
 OUTPUT_CURRENT_REG = 0x2104
-POWER_FACTOR_REG = 0x210A
+POWER_ANGLE_REG = 0x210A
 OUTPUT_TORQUE_REG = 0x210B
 OUTPUT_POWER_REG = 0x210F
 RPM_REG = 0x210C
@@ -42,6 +44,20 @@ class VFD:
     self.clamped_with_tool = False
     self.clamped_no_tool = False
     self.not_clamped = False
+
+    self.speed_fb = 0
+
+    self.output_voltage = 0
+    self.output_current = 0
+    self.power_angle = 0
+    self.output_power = 0
+    self.output_torque = 0
+
+    self.warn_code = 0
+    self.error_code = 0
+
+    self.debug_value = 0
+    self.modbus_ok = False
 
   def set_speed(self, on, speed):
     # TODO: Implement this function to set the VFD speed
@@ -81,9 +97,12 @@ class VFD:
 
       voltage = self.instVFD.read_register(OUTPUT_VOLTAGE_REG, 1)
       current = self.instVFD.read_register(OUTPUT_CURRENT_REG, 2)
-      power_factor = self.instVFD.read_register(POWER_FACTOR_REG, 1)/100
+      power_angle = self.instVFD.read_register(POWER_ANGLE_REG, 1)
 
-      self.output_power = voltage*current*power_factor
+      self.output_voltage = voltage
+      self.output_current = current
+      self.power_angle = power_angle
+      self.output_power = voltage*current*math.cos(math.radians(power_angle))
       self.output_torque = self.instVFD.read_register(OUTPUT_TORQUE_REG, 1)
 
       code = self.instVFD.read_register(STATUS_REG)
@@ -94,5 +113,7 @@ class VFD:
       self.modbus_ok = True
     except KeyboardInterrupt:
       raise
-    except:
+    except (TypeError, ValueError, minimalmodbus.ModbusException, serial.SerialException):
       self.modbus_ok = False
+    except:
+      raise
