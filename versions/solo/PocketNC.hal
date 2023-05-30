@@ -410,6 +410,10 @@ net vice-released [SOLO_PINS]VICE_AIR_BLAST_PIN
 sets spindle-max-speed 17970
 net measured-spindle-speed solo_vfd.speed-fb
 
+sets max-spindle-power 1300
+net spindle-power solo_vfd.output-power
+net spindle-torque solo_vfd.output-torque
+
 net spindle-enable spindle.0.on
 net spindle-enable solo_vfd.spindle-on
 # turn on air seal when spindle is enabled

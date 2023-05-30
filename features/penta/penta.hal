@@ -95,6 +95,15 @@ net cycle-start-and-is-paused halui.program.resume
 newsig measured-spindle-speed float
 sets measured-spindle-speed 0
 
+newsig max-spindle-power float
+sets max-spindle-power 1
+
+newsig spindle-power float
+sets spindle-power 0
+
+newsig spindle-torque float
+sets spindle-torque 0
+
 newsig vice-released bit
 sets vice-released 0
 
