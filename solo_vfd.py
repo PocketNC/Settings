@@ -43,7 +43,7 @@ class VFD:
 
     self.clamped_with_tool = False
     self.clamped_no_tool = False
-    self.not_clamped = False
+    self.unclamped = False
 
     self.speed_fb = 0
 
@@ -77,8 +77,15 @@ class VFD:
       print("Command: %s" % cmd)
       print("Frequency: %s" % (min(int(self.max_hz*100), int(abs(speed)*self.max_hz/self.max_rpm)),))
 
-    self.instVFD.write_register(COMMAND_REG, cmd)
-    self.instVFD.write_register(FREQUENCY_REG, min(self.max_hz, abs(speed)*self.max_hz/self.max_rpm), 2)
+    try:
+      self.instVFD.write_register(COMMAND_REG, cmd)
+      self.instVFD.write_register(FREQUENCY_REG, min(self.max_hz, abs(speed)*self.max_hz/self.max_rpm), 2)
+    except KeyboardInterrupt:
+      raise
+    except (TypeError, ValueError, minimalmodbus.ModbusException, serial.SerialException):
+      self.modbus_ok = False
+    except:
+      raise
 
   def set_debug_register(self, register):
     self.debug_register = register
