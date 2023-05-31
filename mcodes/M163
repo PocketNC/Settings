@@ -2,3 +2,7 @@
 
 # Schunk Mini90 close
 halcmd sets vice-released 0
+
+halcmd sets extra-vice-clamping-force 1
+sleep 2
+halcmd sets extra-vice-clamping-force 0

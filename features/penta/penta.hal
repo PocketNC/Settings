@@ -107,6 +107,9 @@ sets spindle-torque 0
 newsig vice-released bit
 sets vice-released 0
 
+newsig extra-vice-clamping-force bit
+sets extra-vice-clamping-force 0
+
 newsig tool-released bit
 sets tool-released 0
 
