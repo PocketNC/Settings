@@ -1,0 +1,10 @@
+unlinkp solo-estop.button
+setp solo-estop.button 0
+setp solo-estop.ignore-com-errors 1
+
+newinst constant no-hardware
+setp no-hardware.value 1
+
+unlinkp solo-tool-changer.closed-sensor
+setp solo-tool-changer.closed-sensor 1
+

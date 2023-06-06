@@ -5,10 +5,10 @@ o400 if [ #<T> LT 1 OR #<T> GT 13 ]
   (abort,Tool number must be between 1 and 13.)
 o400 endif
 
-; Uncomment these two lines to not perform a tool change when using M6
-; but still indicate that the tool changed
-;M6 T[#<T>]
-;o<solo-tool-change> RETURN
+o600 if [ EXISTS[#<_hal[no-hardware.out]>] ]
+M6 T[#<T>]
+o<solo-tool-change> RETURN
+o600 endif
 
 o<init-tool-changer-vars> call
 

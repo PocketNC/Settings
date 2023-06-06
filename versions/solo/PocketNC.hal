@@ -516,11 +516,11 @@ net tool-changer-close-cmd motion.digital-out-62
 
 net opened-sensor tool-changer-opened-pin.in
 net opened-sensor solo-tool-changer.opened-sensor
-net opened-sensor motion.digital-in-63
+net opened-sensor [SOLO_PINS]TOOL_CHANGER_OPEN_SENSOR
 
 net closed-sensor tool-changer-closed-pin.in
 net closed-sensor solo-tool-changer.closed-sensor
-net closed-sensor motion.digital-in-62
+net closed-sensor [SOLO_PINS]TOOL_CHANGER_CLOSE_SENSOR
 
 newinst debounce clamped-tool-debounce pincount=1
 newinst debounce clamped-notool-debounce pincount=1
