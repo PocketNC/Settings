@@ -1,0 +1,37 @@
+o<protected-move-relative> sub
+
+o<ensure-probe-ok> call
+
+M70
+
+G90
+G61.1
+
+#<startX> = #5420
+#<startY> = #5421
+#<startZ> = #5422
+
+#<cmdX> = [ #<startX>+#1 ]
+#<cmdY> = [ #<startY>+#2 ]
+#<cmdZ> = [ #<startZ>+#3 ]
+
+#<mag> = [ SQRT [ #1 * #1 + #2 * #2 + #3 * #3 ] ]
+#<dirX> = [ #1 / #<mag> ]
+#<dirY> = [ #2 / #<mag> ]
+#<dirZ> = [ #3 / #<mag> ]
+
+#<feedFast> = #4
+
+G38.3 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
+
+o<ensure-probe-ok> call
+
+o200 if [ #5070 EQ 1 ]
+  M72
+  (abort,Probe tripped during protected move.)
+o200 endif
+
+M72
+
+o<protected-move-relative> endsub
+M2

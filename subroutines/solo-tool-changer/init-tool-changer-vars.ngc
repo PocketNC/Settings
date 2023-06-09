@@ -110,5 +110,9 @@ o100 endif
 #<_tool13Y> = [ #<_tool9Y> - 4 * #<_toolDist> * #<yBasisY> ] 
 #<_tool13Z> = [ #<_tool9Z> - 4 * #<_toolDist> * #<yBasisZ> ]
 
+#<_tool14X> = [ #<_tool6X> + #<_toolDist> * #<yBasisX> ]
+#<_tool14Y> = [ #<_tool6Y> + #<_toolDist> * #<yBasisY> ] 
+#<_tool14Z> = [ #<_tool6Z> + #<_toolDist> * #<yBasisZ> ]
+
 o<init-tool-changer-vars> endsub
 M2

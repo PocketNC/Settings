@@ -1,0 +1,7 @@
+o<save-last-tool> sub
+M61 Q[#<Q>]
+o100 if [ EXISTS[ #<_lastToolInitialized> ] ]
+M199 P[#<Q>]
+o100 endif
+o<save-last-tool> endsub
+M2

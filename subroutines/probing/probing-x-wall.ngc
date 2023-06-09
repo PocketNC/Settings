@@ -1,0 +1,83 @@
+o<probing-x-wall> sub
+  #<width> = #1
+  #<z> = #2
+  #<overTravel> = #3
+  #<clearance> = #4
+  #<toleranceSizeCheck> = #5
+  #<toleranceSize> = #6
+  #<tolerancePositionCheck> = #7
+  #<tolerancePosition> = #8
+  #<updateWCS> = #9
+  #<wcs> = #10
+  #<printResults> = #11
+  #<feed> = #12
+
+  #<probeDiameter> = [ #<_ini[TOOL_PROBE]DIAMETER> * [ #<_metric> * 25.4 + #<_imperial> ] ]
+  #<fastFeed> =  [ #<_ini[TOOL_PROBE]FEED_FAST> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<backFeed> = [ #<_ini[TOOL_PROBE]FEED_BACK> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<slowFeed> = [ #<_ini[TOOL_PROBE]FEED_SLOW> * [ #<_metric> * 25.4 + #<_imperial> ]]
+
+  #<startX> = #5420
+  #<startY> = #5421
+  #<startZ> = #5422
+
+  #<dX> = [ #<width>*.5 + #<clearance> ]
+  #<dZ> = [ #<z> - #<startZ> ]
+
+  o<protected-move-relative> call [ #<dX> ] [ 0 ] [ 0 ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ #<dZ> ] [ #<feed> ]
+
+  o<probe-relative> call [ -#<clearance>-#<overTravel> ] [ 0 ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  #<probedX1> = [ #<_probedG5X_X> - #<probeDiameter> * .5 ]
+
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ -#<dZ> ] [ #<feed> ]
+  o<protected-move-relative> call [ -#<width> - 2 * #<clearance> ] [ 0 ] [ 0 ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ #<dZ> ] [ #<feed> ]
+
+  o<probe-relative> call [ #<clearance>+#<overTravel> ] [ 0 ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  #<probedX2> = [ #<_probedG5X_X> + #<probeDiameter> *.5 ]
+
+  #<size> = [ #<probedX1> - #<probedX2> ]
+  #<position> = [ [ #<probedX1> + #<probedX2> ] * .5 ]
+
+  #<positionDeviation> = [ #<position> - #<startX> ]
+  #<sizeDeviation> = [ #<size> - #<width> ]
+
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ -#<dZ> ] [ #<feed> ]
+  o<protected-move-relative> call [ #<dX> ] [ 0 ] [ 0 ] [ #<feed> ]
+
+  o300 if [ #<printResults> EQ 1 ]
+    (debug,Probed X wall x1 = #<probedX1>, x2 = #<probedX2>, Average = #<position>, Size = #<size>)
+  o300 endif
+
+  o600 if [ #<tolerancePositionCheck> EQ 1 ]
+    o200 if [ ABS [ #<positionDeviation> ]  GT #<tolerancePosition> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<positionDeviation> ] ]
+      (abort,Probing X wall failed positional tolerance check. Probed #<position>, expected #<startX>. #<absDev> > #<tolerancePosition>)
+    o200 endif
+  o600 endif
+
+  o700 if [ #<toleranceSizeCheck> EQ 1 ]
+    o800 if [ ABS [ #<sizeDeviation> ]  GT #<toleranceSize> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<sizeDeviation> ] ]
+      (abort,Probing X wall failed size tolerance check. Probed #<size>, expected #<width>. #<absDev> > #<toleranceSize>)
+    o800 endif
+  o700 endif
+
+  o400 if [ [ #<updateWCS> EQ 1 ] AND [ #<wcs> GE 1 ] AND [ #<wcs> LE 9 ]]
+    ; The numbered parameters for the current wcs offsets are always in inches, so convert to active units.
+    #<currentWCS_X> = [ #[5221+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
+
+    ; Then add the probed position
+    #<newWCS_X> = [ #<currentWCS_X> + #<position> ]
+
+    ; And store it in the appropriate WCS
+    G10 L2 P#<wcs> X#<newWCS_X>
+  o400 endif
+
+o<probing-x-wall> endsub
+M2

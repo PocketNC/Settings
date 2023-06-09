@@ -9,9 +9,9 @@ o<place-tool> sub
 
   #<toolSlot> = #1
 
-  o7200 if [ #<toolSlot> LT 1 OR #<toolSlot> GT 13 ]
+  o7200 if [ #<toolSlot> LT 1 OR #<toolSlot> GT 14 ]
     M66  E0 L0
-    (abort,Tool number must be between 1 and 13.)
+    (abort,Tool number must be between 1 and 14.)
   o7200 endif
 
   o[#<toolSlot> + 7000] call
@@ -84,6 +84,10 @@ o7012 endsub
 o7013 sub
   o<local-place-tool> call [#<_tool13X>] [#<_tool13Y>] [#<_tool13Z>]
 o7013 endsub
+
+o7014 sub
+  o<local-place-tool> call [#<_tool14X>] [#<_tool14Y>] [#<_tool14Z>]
+o7014 endsub
 
 o<local-place-tool> sub
   M66 P60 L0

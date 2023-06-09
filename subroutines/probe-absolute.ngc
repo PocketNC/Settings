@@ -1,0 +1,18 @@
+o<probe-absolute> sub
+
+#<startX> = #5420
+#<startY> = #5421
+#<startZ> = #5422
+
+#<cmdX> = [ #1 ]
+#<cmdY> = [ #2 ]
+#<cmdZ> = [ #3 ]
+
+#<dX> = [ #<cmdX> - #<startX> ]
+#<dY> = [ #<cmdY> - #<startY> ]
+#<dZ> = [ #<cmdZ> - #<startZ> ]
+
+o<probe-relative> call [ #<dX> ] [ #<dY> ] [ #<dZ> ] [ #4 ] [ #5 ] [ #6 ]
+
+o<probe-absolute> endsub
+M2

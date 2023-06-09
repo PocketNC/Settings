@@ -9,9 +9,9 @@ o<pick-up-tool> sub
     (abort,Spindle must be unclamped to pick up a tool.)
   o100 endif
 
-  o200 if [ #<toolSlot> LT 1 OR #<toolSlot> GT 13 ]
+  o200 if [ #<toolSlot> LT 1 OR #<toolSlot> GT 14 ]
     M66  E0 L0
-    (abort,Tool number must be between 1 and 13.)
+    (abort,Tool number must be between 1 and 14.)
   o200 endif
 
   o[#<toolSlot> + 8000] call
@@ -82,6 +82,11 @@ o8012 endsub
 o8013 sub
   o<local-pick-up-tool> call [#<_tool13X>] [#<_tool13Y>] [#<_tool13Z>]
 o8013 endsub
+
+; tool 14
+o8014 sub
+  o<local-pick-up-tool> call [#<_tool14X>] [#<_tool14Y>] [#<_tool14Z>]
+o8014 endsub
 
 o<local-pick-up-tool> sub
   #<_toolX> = #1

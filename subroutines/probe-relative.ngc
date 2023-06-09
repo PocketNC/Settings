@@ -1,9 +1,6 @@
 o<probe-relative> sub
 
-M66 P58 L0
-o100 if [ ABS[ #5399-1 ] LT .000001 ]
-  (abort,Probe is in an error state.)
-o100 endif
+o<ensure-probe-ok> call
 
 M70
 
@@ -30,6 +27,15 @@ G61.1
 G4 P.1
 G38.2 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
 
+M66 P58 L0
+o200 if [ ABS[ #5399-1 ] LT .000001 ]
+  ; The probe will trip if it is in an error state, so check
+  ; now to see if that's the case. This can prevent a crash
+  ; if we weren't in an error start before the probe began
+  ; but transition into an error start while probing.
+  (abort,Probe is in an error state.)
+o200 endif
+
 #<fastTrippedX> = #5061
 #<fastTrippedY> = #5062
 #<fastTrippedZ> = #5063
@@ -38,6 +44,15 @@ G38.4 F#<feedBack> X[ #<startX> ] Y[ #<startY> ] Z[ #<startZ> ]
 G91 G1 F#<feedBack> X[ -#<dirX>*.001 ] Y[ -#<dirY>*.001 ] Z[ -#<dirZ>*.001 ]
 G90
 G38.2 F#<feedSlow> X[ #<fastTrippedX> ] Y[ #<fastTrippedY> ] Z[ #<fastTrippedZ> ]
+
+M66 P58 L0
+o300 if [ ABS[ #5399-1 ] LT .000001 ]
+  ; The probe will trip if it is in an error state, so check
+  ; now to see if that's the case. This can prevent a crash
+  ; if we weren't in an error start before the probe began
+  ; but transition into an error start while probing.
+  (abort,Probe is in an error state.)
+o300 endif
 
 G30.1 ; Save the current position into #5181-5189
 o<set_probe_direction> call [#<dirX>] [#<dirY>] [#<dirZ>]

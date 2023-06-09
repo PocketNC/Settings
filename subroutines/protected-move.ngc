@@ -1,0 +1,28 @@
+o<protected-move> sub
+
+o<ensure-probe-ok> call
+
+M70
+
+G90
+G61.1
+
+#<cmdX> = [ #1 ]
+#<cmdY> = [ #2 ]
+#<cmdZ> = [ #3 ]
+
+#<feedFast> = #4
+
+G38.3 F#<feedFast> X[ #<cmdX> ] Y[ #<cmdY> ] Z[ #<cmdZ> ]
+
+o<ensure-probe-ok> call
+
+o200 if [ #5070 EQ 1 ]
+  M72
+  (abort,Probe tripped during protected move.)
+o200 endif
+
+M72
+
+o<protected-move> endsub
+M2

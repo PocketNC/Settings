@@ -1,0 +1,61 @@
+o<probing-z> sub
+  #<z> = #1
+  #<overTravel> = #2
+  #<toleranceCheck> = #3
+  #<tolerancePosition> = #4
+  #<updateWCS> = #5
+  #<wcs> = #6
+  #<printResults> = #7
+
+  #<probeDiameter> = [ #<_ini[TOOL_PROBE]DIAMETER> * [ #<_metric> * 25.4 + #<_imperial> ] ]
+  #<fastFeed> =  [ #<_ini[TOOL_PROBE]FEED_FAST> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<backFeed> = [ #<_ini[TOOL_PROBE]FEED_BACK> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<slowFeed> = [ #<_ini[TOOL_PROBE]FEED_SLOW> * [ #<_metric> * 25.4 + #<_imperial> ]]
+
+  #<startX> = #5420
+  #<startY> = #5421
+  #<startZ> = #5422
+
+  #<dX> = [ 0 ]
+  #<dY> = [ 0 ]
+  #<dZ> = [ #<z> - #<startZ> ]
+
+  o100 if [ #<dZ> GT 0 ]
+    #<dZ> = [ #<dZ> + #<overTravel> ]
+  o100 else
+    #<dZ> = [ #<dZ> - #<overTravel> ]
+  o100 endif
+
+  o<probe-relative> call [ #<dX> ] [ #<dY> ] [ #<dZ> ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  #<probedX> = #<_probedG5X_X>
+  #<probedY> = #<_probedG5X_Y>
+  #<probedZ> = [ #<_probedG5X_Z> - #<probeDiameter> *.5 ]
+
+  #<deviation> = [ #<probedZ> - #<z> ]
+
+  o300 if [ #<printResults> EQ 1 ]
+    (debug,Probed Z position #<probedZ>, expected #<z>. Deviation: #<deviation>)
+  o300 endif
+
+  o600 if [ #<toleranceCheck> EQ 1 ]
+    o200 if [ ABS [ #<deviation> ]  GT #<tolerancePosition> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<deviation> ] ]
+      (abort,Probing Z failed positional tolerance check. Probed #<probedZ>, expected #<z>. #<absDev> > #<tolerancePosition>)
+    o200 endif
+  o600 endif
+
+  o400 if [ [ #<updateWCS> EQ 1 ] AND [ #<wcs> GE 1 ] AND [ #<wcs> LE 9 ]]
+    ; The numbered parameters for the current wcs offsets are always in inches, so convert to active units.
+    #<currentWCS_Z> = [ #[5223+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
+
+    ; Then add the probed position
+    #<newWCS_Z> = [ #<currentWCS_Z> + #<probedZ> ]
+
+    ; And store it in the appropriate WCS
+    G10 L2 P#<wcs> Z#<newWCS_Z>
+  o400 endif
+
+o<probing-z> endsub
+M2
