@@ -1,10 +1,10 @@
 o<probing-x-channel> sub
   #<width> = #1
   #<overTravel> = #2
-  #<toleranceSizeCheck> = #3
-  #<toleranceSize> = #4
-  #<tolerancePositionCheck> = #5
-  #<tolerancePosition> = #6
+  #<tolerancePositionCheck> = #3
+  #<tolerancePosition> = #4
+  #<toleranceSizeCheck> = #5
+  #<toleranceSize> = #6
   #<updateWCS> = #7
   #<wcs> = #8
   #<printResults> = #9

@@ -3,10 +3,10 @@ o<probing-x-wall> sub
   #<z> = #2
   #<overTravel> = #3
   #<clearance> = #4
-  #<toleranceSizeCheck> = #5
-  #<toleranceSize> = #6
-  #<tolerancePositionCheck> = #7
-  #<tolerancePosition> = #8
+  #<tolerancePositionCheck> = #5
+  #<tolerancePosition> = #6
+  #<toleranceSizeCheck> = #7
+  #<toleranceSize> = #8
   #<updateWCS> = #9
   #<wcs> = #10
   #<printResults> = #11
