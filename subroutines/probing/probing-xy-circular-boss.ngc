@@ -1,0 +1,108 @@
+o<probing-xy-circular-boss> sub
+  #<diameter> = #1
+  #<z> = #2
+  #<overTravel> = #3
+  #<clearance> = #4
+  #<tolerancePositionCheck> = #5
+  #<tolerancePosition> = #6
+  #<toleranceSizeCheck> = #7
+  #<toleranceSize> = #8
+  #<updateWCS> = #9
+  #<wcs> = #10
+  #<printResults> = #11
+  #<feed> = #12
+
+  o<push_feature_set> call
+
+  #<probeDiameter> = [ #<_ini[TOOL_PROBE]DIAMETER> * [ #<_metric> * 25.4 + #<_imperial> ] ]
+  #<fastFeed> =  [ #<_ini[TOOL_PROBE]FEED_FAST> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<backFeed> = [ #<_ini[TOOL_PROBE]FEED_BACK> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<slowFeed> = [ #<_ini[TOOL_PROBE]FEED_SLOW> * [ #<_metric> * 25.4 + #<_imperial> ]]
+
+  #<startX> = #5420
+  #<startY> = #5421
+  #<startZ> = #5422
+
+  #<dX> = [ #<diameter>*.5 + #<clearance> ]
+  #<dY> = [ #<diameter>*.5 + #<clearance> ]
+  #<dZ> = [ #<z> - #<startZ> ]
+
+; X probes
+  o<protected-move-relative> call [ #<dX> ] [ 0 ] [ 0 ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ #<dZ> ] [ #<feed> ]
+
+  o<add-point-probe-relative> call [ -#<clearance>-#<overTravel> ] [ 0 ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ -#<dZ> ] [ #<feed> ]
+  o<protected-move-relative> call [ -#<diameter> - 2 * #<clearance> ] [ 0 ] [ 0 ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ #<dZ> ] [ #<feed> ]
+
+  o<add-point-probe-relative> call [ #<clearance>+#<overTravel> ] [ 0 ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ -#<dZ> ] [ #<feed> ]
+  o<protected-move-relative> call [ #<dX> ] [ 0 ] [ 0 ] [ #<feed> ]
+
+; Y probes
+  o<protected-move-relative> call [ 0 ] [ #<dY> ] [ 0 ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ #<dZ> ] [ #<feed> ]
+
+  o<add-point-probe-relative> call [ 0 ] [ -#<clearance>-#<overTravel> ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ -#<dZ> ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ -#<diameter> - 2 * #<clearance> ] [ 0 ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ #<dZ> ] [ #<feed> ]
+
+  o<add-point-probe-relative> call [ 0 ] [ #<clearance>+#<overTravel> ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  o<protected-move-relative> call [ 0 ] [ 0 ] [ -#<dZ> ] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ #<dY> ] [ 0 ] [ #<feed> ]
+
+  #<size> = [ #<_penta_circle_diameter> - #<probeDiameter> ]
+
+  #<centerX> = [ #<_penta_circle_center_x> ]
+  #<centerY> = [ #<_penta_circle_center_y> ]
+  #<centerZ> = [ #<_penta_circle_center_z> ]
+
+  #<cx> = [ #<centerX> - #<startX> ]
+  #<cy> = [ #<centerY> - #<startY> ]
+
+  #<sizeDeviation> = [ #<size> - #<diameter> ]
+  #<positionDeviation> = [ SQRT[ #<cx>*#<cx> + #<cy>*#<cy> ] ]
+
+  o300 if [ #<printResults> EQ 1 ]
+    ;debug,Probed XY circular boss center = (#<centerX>,#<centerY>), Diameter = #<size>
+  o300 endif
+
+  o600 if [ #<tolerancePositionCheck> EQ 1 ]
+    o200 if [ ABS [ #<positionDeviation> ]  GT #<tolerancePosition> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<positionDeviation> ] ]
+      ;abort,Probing XY circular boss failed positional tolerance check. Probed (#<centerX>,#<centerY>), expected (#<startX>,#<startY>). #<absDev> > #<tolerancePosition>
+    o200 endif
+  o600 endif
+
+  o700 if [ #<toleranceSizeCheck> EQ 1 ]
+    o800 if [ ABS [ #<sizeDeviation> ]  GT #<toleranceSize> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<sizeDeviation> ] ]
+      (abort,Probing XY circular boss failed size tolerance check. Probed #<size>, expected #<diameter>. #<absDev> > #<toleranceSize>)
+    o800 endif
+  o700 endif
+
+  o400 if [ [ #<updateWCS> EQ 1 ] AND [ #<wcs> GE 1 ] AND [ #<wcs> LE 9 ]]
+    ; The numbered parameters for the current wcs offsets are always in inches, so convert to active units.
+    #<currentWCS_X> = [ #[5221+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
+    #<currentWCS_Y> = [ #[5222+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
+
+    ; Then add the probed position
+    #<newWCS_X> = [ #<currentWCS_X> + #<centerX> ]
+    #<newWCS_Y> = [ #<currentWCS_Y> + #<centerY> ]
+
+    ; And store it in the appropriate WCS
+    G10 L2 P#<wcs> X#<newWCS_X> Y#<newWCS_Y>
+  o400 endif
+
+  o<pop_feature_set> call
+
+o<probing-xy-circular-boss> endsub
+M2
