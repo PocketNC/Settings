@@ -31,7 +31,6 @@ o<probing-xy-circular-partial-hole> sub
 
   #<dX3> = [ [ #<diameter>*.5 + #<overTravel> ] * COS[ #<angle3> ] ]
   #<dY3> = [ [ #<diameter>*.5 + #<overTravel> ] * SIN[ #<angle3> ] ]
-  (debug,#<dX1>,#<dY1>,#<dX2>,#<dY2>,#<dX3>,#<dY3>,#<angle1>,#<angle2>,#<angle3>)
 
   o<add-point-probe-relative> call [ #<dX1> ] [ #<dY1> ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
   o<add-point-probe-relative> call [ #<dX2> ] [ #<dY2> ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
