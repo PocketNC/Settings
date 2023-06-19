@@ -733,6 +733,9 @@ class FeatureMap:
   def values(self):
     return self.features.values()
 
+  def clear(self):
+    self.features = {}
+
 
 class FeatureManager:
   def __init__(self):

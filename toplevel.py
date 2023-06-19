@@ -3,9 +3,11 @@ import os
 import oword
 import namedparams
 import logging
+import json
 import sys
 import importlib
 import logging_constants
+import metrology
 from calibstate import CalibState, Stages
 from cmmmanager import Cmm
 import v2state
@@ -30,6 +32,29 @@ def __delete__(self):
 # handle any per-module shutdown tasks here
   logger.debug("interp __delete__ %s, %s",self.task,os.getpid())
 
+def write_feature_map(name):
+  try:
+    manager = metrology.FeatureManager.getInstance()
+    featureMap = manager.getActiveFeatureMap()
+    dataString = json.dumps(featureMap.features, cls=metrology.FeatureEncoder)
+    with open(os.path.join(POCKETNC_VAR_DIR, name + ".json"), "w") as file:
+      file.write(dataString)
+  except:
+    logger.debug("Error saving feature map %s", name, exc_info=True)
+
+def read_feature_map(name):
+  try:
+    manager = metrology.FeatureManager.getInstance()
+    featureMap = manager.getActiveFeatureMap()
+    featureMap.clear()
+    with open(os.path.join(POCKETNC_VAR_DIR,name + ".json"), "r") as file:
+      dataString = file.read()
+    data = metrology.convertJSONDataToFeatures(json.loads(dataString))
+    for k in data:
+      if isinstance(data[k], metrology.Feature):
+        featureMap.setFeature(int(k), data[k])
+  except:
+    logger.debug("Error reading feature map %s", name, exc_info=True)
 
 def reload_python():
   logger.debug("in reload_python");
