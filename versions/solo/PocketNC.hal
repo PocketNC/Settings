@@ -289,9 +289,20 @@ net z-max-and-home joint.2.home-sw-in
 
 # B Axis Limit
 newinst bb_gpio b-limit-pin pin=[SOLO_PINS]B_LIMIT_PIN direction=input
+newinst bb_gpio b-index-pin pin=[SOLO_PINS]B_INDEX_PIN direction=input
 setp b-limit-pin.invert 0
 net b-min-and-home b-limit-pin.in
 net b-min-and-home joint.3.home-sw-in
+
+loadrt encoder num_chan=1
+addf encoder.update-counters servo-thread
+addf encoder.capture-position servo-thread
+
+net b-index b-index-pin.in
+net b-index encoder.0.phase-Z
+
+net b-index-enable encoder.0.index-enable
+net b-index-enable joint.3.index-enable
 
 # C axis
 newinst bb_gpio c-limit-pin pin=[SOLO_PINS]C_LIMIT_PIN direction=input
