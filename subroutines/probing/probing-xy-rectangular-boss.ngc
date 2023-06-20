@@ -1,0 +1,5 @@
+o<probing-xy-rectangular-boss> sub
+  o<probing-x-wall> call [#1] [#3] [#4] [#5] [#6] [#7] [#8] [#9] [#10] [#11] [#12] [#13]
+  o<probing-y-wall> call [#2] [#3] [#4] [#5] [#6] [#7] [#8] [#9] [#10] [#11] [#12] [#13]
+o<probing-xy-rectangular-boss> endsub
+M2

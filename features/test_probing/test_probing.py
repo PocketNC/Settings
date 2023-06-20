@@ -11,10 +11,6 @@ h.newpin("z", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("tool-offset", hal.HAL_FLOAT, hal.HAL_IN)
 
 h.newpin("probe-diameter", hal.HAL_FLOAT, hal.HAL_IN)
-
-# different types of objects
-# 0 - No collision object
-# 1 - 2" cube, centered at origin
 h.newpin("type", hal.HAL_S32, hal.HAL_IN)
 
 h.newpin("probe-output", hal.HAL_BIT, hal.HAL_OUT)
@@ -76,13 +72,44 @@ class AABB:
 
     return sqDist <= r*r
 
-# TODO - add more collision objects and use them based on type pin
-noCollisions = NoCollisions()
-cubeObject = AABB(0,0,0,2,2,2)
+class RectangularBoreXY:
+  def __init__(self, x,y,z,width,height,depth,hole_width,hole_height):
+    x_thickness = .5*(width-hole_width)
+    y_thickness = .5*(height-hole_height)
+    self.top = AABB(x,y + .5*hole_height+.5*y_thickness,z,width,y_thickness,depth)
+    self.bottom = AABB(x,y - .5*hole_height-.5*y_thickness,z,width,y_thickness,depth)
+
+    self.left = AABB(x-.5*hole_width-.5*x_thickness,y,z, x_thickness, hole_height, depth)
+    self.right = AABB(x+.5*hole_width+.5*x_thickness,y,z, x_thickness, hole_height, depth)
+
+  def probe(self, x, y, z, diameter):
+    return (self.top.probe(x,y,z,diameter) or 
+            self.bottom.probe(x,y,z,diameter) or
+            self.left.probe(x,y,z,diameter) or
+            self.right.probe(x,y,z,diameter))
+
+class RectangularBoreXYWithIsland:
+  def __init__(self, x,y,z,width,height,depth,hole_width,hole_height,island_width, island_height):
+    self.bore = RectangularBoreXY(x,y,z,width,height,depth,hole_width,hole_height)
+    self.island = AABB(x,y,z,island_width,island_height,depth)
+
+  def probe(self, x, y, z, diameter):
+    return (self.bore.probe(x,y,z,diameter) or
+            self.island.probe(x,y,z,diameter))
+
 
 collisionTypes = {
-  0: noCollisions,
-  1: cubeObject
+# Won't trip probe at all
+  0: NoCollisions(),
+ 
+# 2" cube centered at origin
+  1: AABB(0,0,0,2,2,2),
+
+# 2" cube with 1" rectangular hole through it
+  2: RectangularBoreXY(0,0,0,2,2,2,1,1),
+
+# 2" cube with 1" rectangular hole through it, with .5" rectangular box through the center of the hole (so there is .25" channel around the central island) 
+  3: RectangularBoreXYWithIsland(0,0,0,2,2,2,1,1,.5,.5)
 }
 
 try:
