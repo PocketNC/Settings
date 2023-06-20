@@ -1,0 +1,3 @@
+newinst bb_gpio tool-setter-pin pin=[SOLO_PINS]TOOL_SETTER_PIN direction=input
+
+net [PENTA]TOOL_SETTER_SIG tool-setter-pin.in

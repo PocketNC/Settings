@@ -248,3 +248,21 @@ net home-all-5 home-all-pins.in-4
 net home-all home-all-pins.out
 net home-all halui.home-all
 net home-all halui.mode.joint
+
+# Probe input
+newinst lut5 probe-inputs
+setp probe-inputs.function 0xfffffffe
+
+addf probe-inputs servo-thread
+
+net probe-input-1 probe-inputs.in-0
+net probe-input-2 probe-inputs.in-1
+net probe-input-3 probe-inputs.in-2
+net probe-input-4 probe-inputs.in-3
+net probe-input-5 probe-inputs.in-4
+
+net probe-input probe-inputs.out
+net probe-input motion.probe-input
+
+newsig probe-on bit
+sets probe-on 0

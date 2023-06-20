@@ -1,8 +1,8 @@
 # Probe
 newinst bb_gpio probe-signal-pin pin=[POCKETNC_PINS]PROBE_SIGNAL_PIN direction=input
 setp probe-signal-pin.invert 1
-net tool-setter probe-signal-pin.in
-net tool-setter motion.probe-input
+
+net [PENTA]TOOL_SETTER_SIG probe-signal-pin.in
 
 newinst constant tool-setter-b-table-offset
 newinst constant tool-setter-sensor-123-offset

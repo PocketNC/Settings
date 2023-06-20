@@ -1,0 +1,13 @@
+####################################################
+# Test Probing
+####################################################
+loadusr -Wn test-probing /opt/pocketnc/Settings/features/test_probing/test_probing.py
+
+net x-pos test-probing.x
+net y-pos test-probing.y
+net z-pos test-probing.z
+net tool-offset test-probing.tool-offset
+
+setp test-probing.probe-diameter [TOOL_PROBE]DIAMETER
+
+net [PENTA]TEST_PROBING_SIG test-probing.probe-output

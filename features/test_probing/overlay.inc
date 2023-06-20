@@ -1,0 +1,2 @@
+[PENTA]
+TEST_PROBING_SIG=probe-input-3

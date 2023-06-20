@@ -387,36 +387,6 @@ newinst bb_gpio c-enable-pin pin=[SOLO_PINS]C_ENABLE_PIN direction=output
 net c-motor-enable solo-estop.c-motor-enable
 net c-motor-enable c-enable-pin.out
 
-# Tool Probe
-newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
-newinst bb_gpio tool-probe-error-pin pin=[SOLO_PINS]TOOL_PROBE_ERROR_PIN direction=input
-
-newinst or2 tool-probe-or-error
-addf tool-probe-or-error.funct servo-thread
-
-setp tool-probe-pin.invert 0
-setp tool-probe-error-pin.invert 0
-net tool-probe-error tool-probe-error-pin.in
-net tool-probe-error motion.digital-in-58
-net tool-probe-error tool-probe-or-error.in0
-
-newinst bb_gpio tool-setter-pin pin=[SOLO_PINS]TOOL_SETTER_PIN direction=input
-
-newinst or2 tool-setter-or-probe
-addf tool-setter-or-probe.funct servo-thread
-
-net tool-setter-raw tool-setter-pin.in
-net tool-setter-raw tool-setter-or-probe.in0
-
-net tool-probe-raw tool-probe-pin.in
-net tool-probe-raw tool-probe-or-error.in1
-
-net tool-probe-trigger tool-probe-or-error.out
-net tool-probe-trigger tool-setter-or-probe.in1
-
-net tool-probe tool-setter-or-probe.out
-net tool-probe motion.probe-input
-
 ## Air
 
 # Schunk Mini90 open
