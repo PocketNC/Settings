@@ -2,6 +2,7 @@
 
 import hal
 import time
+from scipy.spatial.transform import Rotation as R
 
 h = hal.component("test-probing")
 
@@ -97,6 +98,16 @@ class RectangularBoreXYWithIsland:
     return (self.bore.probe(x,y,z,diameter) or
             self.island.probe(x,y,z,diameter))
 
+class RotatedObject:
+  def __init__(self, obj, xRot,yRot,zRot):
+    self.rot = R.from_euler("xyz", (xRot,yRot,zRot), degrees=True)
+    self.obj = obj
+
+  def probe(self, x,y,z,diameter):
+    pt = self.rot.apply((x,y,z), inverse=True)
+
+    return self.obj.probe(pt[0], pt[1], pt[2], diameter)
+
 
 collisionTypes = {
 # Won't trip probe at all
@@ -109,7 +120,13 @@ collisionTypes = {
   2: RectangularBoreXY(0,0,0,2,2,2,1,1),
 
 # 2" cube with 1" rectangular hole through it, with .5" rectangular box through the center of the hole (so there is .25" channel around the central island) 
-  3: RectangularBoreXYWithIsland(0,0,0,2,2,2,1,1,.5,.5)
+  3: RectangularBoreXYWithIsland(0,0,0,2,2,2,1,1,.5,.5),
+
+# 2" cube rotated about Z 1 degree
+  4: RotatedObject(AABB(0,0,0,2,2,2), 0,0,1),
+
+# 2" cube with 1" rectangular hole through it rotated about Z 1 degree
+  5: RotatedObject(RectangularBoreXY(0,0,0,2,2,2,1,1), 0,0,1)
 }
 
 try:
