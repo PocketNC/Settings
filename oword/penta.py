@@ -140,3 +140,19 @@ def point_deviations_from_plane(self, pointsId, planeId, newId):
 
     newFeature.addPoint(dx,dy,dz)
 
+def intersect_lines(self, line1Id, line2Id, newId):
+  manager = metrology.FeatureManager.getInstance()
+  featureMap = manager.getActiveFeatureMap()
+  line1Feature = featureMap.getFeature(int(line1Id))
+  line2Feature = featureMap.getFeature(int(line2Id))
+  newFeature = featureMap.getFeature(int(newId))
+
+  newFeature.clearPoints()
+
+  line1 = line1Feature.line()
+  line2 = line2Feature.line()
+
+  (pt1,pt2) = metrology.intersectLines(line1,line2)
+
+  newFeature.addPoint(*pt1)
+  newFeature.addPoint(*pt2)

@@ -1,0 +1,146 @@
+o<probing-xy-outer-corner> sub
+  #<x> = #1
+  #<y> = #2
+  #<i> = #3
+  #<j> = #4
+  #<overtravel> = #5
+  #<tolerancePositionCheck> = #6
+  #<tolerancePosition> = #7
+  #<toleranceAngleCheck> = #8
+  #<toleranceAngle> = #9
+  #<updateWCS> = #10
+  #<wcs> = #11
+  #<printResults> = #12
+  #<feed> = #13
+
+  #<probeDiameter> = [ #<_ini[TOOL_PROBE]DIAMETER> * [ #<_metric> * 25.4 + #<_imperial> ] ]
+  #<fastFeed> =  [ #<_ini[TOOL_PROBE]FEED_FAST> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<backFeed> = [ #<_ini[TOOL_PROBE]FEED_BACK> * [ #<_metric> * 25.4 + #<_imperial> ]] 
+  #<slowFeed> = [ #<_ini[TOOL_PROBE]FEED_SLOW> * [ #<_metric> * 25.4 + #<_imperial> ]]
+
+  #<startX> = #5420
+  #<startY> = #5421
+  #<startZ> = #5422
+
+  #<dX> = [ #<x> - #<startX> ]
+  #<dY> = [ #<y> - #<startY> ]
+
+  o500 if [ #<dX> GT 0 ]
+    #<approachX> = 1
+  o500 else
+    #<approachX> = -1
+  o500 endif
+
+  o600 if [ #<dY> GT 0 ]
+    #<approachY> = 1
+  o600 else
+    #<approachY> = -1
+  o600 endif
+
+  o<push_feature_set> call
+  o<set_active_feature> call [ 0 ]
+
+  o<protected-move-relative> call [ 2*#<dX> ] [ 0 ] [ 0] [ #<feed> ]
+  o<add-point-probe-relative> call [ 0 ] [ #<dY>+#<approachY>*#<overtravel> ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  o700 if [ #<i> GT 0 ]
+    ; if i parameter is provided, probe a second time
+    o<protected-move-relative> call [ #<approachX>*#<i> ] [ 0 ] [ 0] [ #<feed> ]
+    o<add-point-probe-relative> call [ 0 ] [ #<dY>+#<approachY>*#<overtravel> ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+    o<protected-move-relative> call [ -#<approachX>*#<i> ] [ 0 ] [ 0] [ #<feed> ]
+  o700 else
+    ; otherwise, add another fake point so we can still perform the line intersection calculations below
+    o<add_point> call [ #<_probedG5X_X> + #<approachX> ] [ #<_probedG5X_Y> ] [ #<_probedG5X_Z> ]
+  o700 endif
+
+  #<dirX1> = #<_penta_line_direction_x>
+  #<dirY1> = #<_penta_line_direction_y>
+  #<angleX> = #<_penta_line_angle_about_z>
+
+  o<protected-move-relative> call [ -2*#<dX> ] [ 0 ] [ 0] [ #<feed> ]
+  o<protected-move-relative> call [ 0 ] [ 2*#<dY> ] [ 0] [ #<feed> ]
+
+  o<set_active_feature> call [ 1 ]
+
+  o<add-point-probe-relative> call [ #<dX>+#<approachX>*#<overtravel> ] [ 0 ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+
+  o800 if [ #<j> GT 0 ]
+    o<protected-move-relative> call [ 0 ] [ #<approachY>*#<j> ] [ 0] [ #<feed> ]
+    o<add-point-probe-relative> call [ #<dX>+#<approachX>*#<overtravel> ] [ 0 ] [ 0 ] [ #<fastFeed> ] [ #<backFeed> ] [ #<slowFeed> ]
+    o<protected-move-relative> call [ 0 ] [ -#<approachY>*#<j> ] [ 0] [ #<feed> ]
+  o800 else
+    o<add_point> call [ #<_probedG5X_X> ] [ #<_probedG5X_Y> + #<approachY> ] [ #<_probedG5X_Z> ]
+  o800 endif
+
+  #<dirX2> = #<_penta_line_direction_x>
+  #<dirY2> = #<_penta_line_direction_y>
+  #<angleY> = #<_penta_line_angle_about_z>
+  o2000 if [ #<angleY> LT 0 ]
+     #<angleY> = [ #<angleY> + 90 ]
+  o2000 else
+     #<angleY> = [ #<angleY> - 90 ]
+  o2000 endif
+
+  o<protected-move-relative> call [ 0 ] [ -2*#<dY> ] [ 0] [ #<feed> ]
+
+  ; intersect the two lines and put the resulting point in feature 2
+  o<intersect_lines> call [0] [1] [2]
+
+  ;py,write_feature_map("probing-xy-outer-corner-test")
+
+  o<set_active_feature> call [2]
+
+  #<cornerX> = [ #<_penta_first_x> + [ #<dirX1> + #<dirX2> ]*#<probeDiameter>*.5 ]
+  #<cornerY> = [ #<_penta_first_y> + [ #<dirY1> + #<dirY2> ]*#<probeDiameter>*.5 ]
+
+  #<cx> = [ #<cornerX> - #<x> ]
+  #<cy> = [ #<cornerY> - #<y> ]
+
+  #<positionDeviation> = [ SQRT[ #<cx>*#<cx> + #<cy>*#<cy> ] ]
+
+  o<pop_feature_set> call
+
+  o1500 if [ #<printResults> EQ 1 ]
+    o2700 if [ [#<i> GT 0 ] OR [ #<j> GT 0 ] ]
+      ;debug,Probed XY outer corner (#<cornerX>,#<cornerY>), Angle X #<angleX>, Angle Y #<angleY>
+    o2700 else
+      ;debug,Probed XY outer corner (#<cornerX>,#<cornerY>)
+    o2700 endif
+  o1500 endif
+
+  o2100 if [ #<toleranceAngleCheck> EQ 1 ]
+    o2300 if [ ABS [ #<angleX> ]  GT #<toleranceAngle> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<angleX> ] ]
+      ;abort,Probing XY outer corner failed angle tolerance check. Probed an X angle of #<absDev> degrees, expected less than #<toleranceAngle>.
+    o2300 endif
+    o2400 if [ ABS [ #<angleY> ]  GT #<toleranceAngle> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<angleY> ] ]
+      ;abort,Probing XY outer corner failed angle tolerance check. Probed a Y angle of #<absDev> degrees, expected less than #<toleranceAngle>.
+    o2400 endif
+  o2100 endif
+
+  o1000 if [ #<tolerancePositionCheck> EQ 1 ]
+    o1200 if [ ABS [ #<positionDeviation> ]  GT #<tolerancePosition> ]
+       M66  E0 L0
+      #<absDev> = [ ABS[ #<positionDeviation> ] ]
+      ;abort,Probing XY outer corner failed positional tolerance check. Probed (#<cornerX>,#<cornerY>), expected (#<x>,#<y>). #<absDev> > #<tolerancePosition>
+    o1200 endif
+  o1000 endif
+
+  o900 if [ [ #<updateWCS> EQ 1 ] AND [ #<wcs> GE 1 ] AND [ #<wcs> LE 9 ]]
+    ; The numbered parameters for the current wcs offsets are always in inches, so convert to active units.
+    #<currentWCS_X> = [ #[5221+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
+    #<currentWCS_Y> = [ #[5222+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
+
+    ; Then add the probed position
+    #<newWCS_X> = [ #<currentWCS_X> + #<cornerX> ]
+    #<newWCS_Y> = [ #<currentWCS_Y> + #<cornerY> ]
+
+    ; And store it in the appropriate WCS
+    G10 L2 P#<wcs> X#<newWCS_X> Y#<newWCS_Y>
+  o900 endif
+
+o<probing-xy-outer-corner> endsub
+M2
