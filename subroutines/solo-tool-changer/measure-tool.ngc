@@ -35,9 +35,7 @@ G38.2 F#<feedSlow> Z[ #<fastTrippedZ> ]
 G10 L1 P#5400 Z#<toolLengthOffset>
 
 G53 G0 Z0
-G53 G0 B[#5185]
-G53 G0 X[#5181] Y[#5182]
-G53 G1 F[#<_ini[TOOL_PROBE]FEED_TRAVEL>] Z[#5183]
+G53 G0 B0
 
 M72
 
