@@ -1,0 +1,16 @@
+; Assumes probe signal is already wired up. On a v2, this is done
+; by the v2_tool_setter feature, so splicing into that signal
+; and enabling this feature will allow probing routines to work.
+
+; This gets set via the o<probe-on> and o<probe-off> calls, which
+; are usually output by a post processor. Probing routines check
+; that the probe is on before proceeding, so this needs to be
+; hooked up for those routines to work.
+net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
+
+; This is an error pin that the probing routines check
+; in case the probe can report an error state. In this
+; case, we've hardcoded it to 0, meaning not in an error
+; state.
+net tool-probe-never-error [PENTA]PROBE_ERROR_DIGITAL_IN_PIN
+sets tool-probe-never-error 0

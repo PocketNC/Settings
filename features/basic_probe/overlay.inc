@@ -1,5 +1,4 @@
 [PENTA]
-TOOL_PROBE_SIG=probe-input-1
 PROBE_ON_DIGITAL_IN_PIN=motion.digital-in-55
 PROBE_ON_DIGITAL_IN=55
 PROBE_ERROR_DIGITAL_IN_PIN=motion.digital-in-58

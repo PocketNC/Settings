@@ -12,9 +12,11 @@ newinst and2 probe-on-and-error
 addf probe-on-and-error.funct servo-thread
 
 net probe-on probe-on-and-error.in0
+net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
 
 net tool-probe-error-raw tool-probe-error-pin.in
 net tool-probe-error-raw probe-on-and-error.in1
+net tool-probe-error-raw [PENTA]PROBE_ERROR_DIGITAL_IN_PIN
 
 newinst or2 tool-probe-or-error
 addf tool-probe-or-error.funct servo-thread
