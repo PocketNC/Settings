@@ -9,8 +9,87 @@ net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
 net flood-coolant cutting-fluid-enable-pin.out
 net flood-coolant hpg3.stepgen.01.enable
 
+newinst lut5 cutting-fluid-on
+setp cutting-fluid-on.function 0xfffffffe
+addf cutting-fluid-on servo-thread
+
+net cutting-fluid-on-1 cutting-fluid-on.in-0
+net cutting-fluid-on-2 cutting-fluid-on.in-1
+net cutting-fluid-on-3 cutting-fluid-on.in-2
+net cutting-fluid-on-4 cutting-fluid-on.in-3
+net cutting-fluid-on-5 cutting-fluid-on.in-4
+
+net cutting-fluid-on cutting-fluid-on.out
 net cutting-fluid-on halui.flood.on
+
+newinst lut5 cutting-fluid-off
+setp cutting-fluid-off.function 0xfffffffe
+addf cutting-fluid-off servo-thread
+
+net cutting-fluid-off-1 cutting-fluid-off.in-0
+net cutting-fluid-off-2 cutting-fluid-off.in-1
+net cutting-fluid-off-3 cutting-fluid-off.in-2
+net cutting-fluid-off-4 cutting-fluid-off.in-3
+net cutting-fluid-off-5 cutting-fluid-off.in-4
+
+net cutting-fluid-off cutting-fluid-off.out
 net cutting-fluid-off halui.flood.off
+
+newinst lut5 cutting-fluid-toggle
+setp cutting-fluid-toggle.function 0xfffffffe
+addf cutting-fluid-toggle servo-thread
+
+net cutting-fluid-toggle-1 cutting-fluid-toggle.in-0
+net cutting-fluid-toggle-2 cutting-fluid-toggle.in-1
+net cutting-fluid-toggle-3 cutting-fluid-toggle.in-2
+net cutting-fluid-toggle-4 cutting-fluid-toggle.in-3
+net cutting-fluid-toggle-5 cutting-fluid-toggle.in-4
+
+net cutting-fluid-toggle-out cutting-fluid-toggle.out
+net cutting-fluid-toggle-out cutting-fluid-toggle.oneshot.in
+
+loadusr -Wn rockhopper-cutting-fluid-toggle /opt/pocketnc/Settings/features/penta/reset_signal.py rockhopper-cutting-fluid-toggle
+
+net rockhopper-cutting-fluid-toggle rockhopper-cutting-fluid-toggle.in
+
+setp rockhopper-cutting-fluid-toggle.value 0
+setp rockhopper-cutting-fluid-toggle.enable 1
+
+net [PENTA]ROCKHOPPER_CUTTING_FLUID_TOGGLE_SIG rockhopper-cutting-fluid-toggle.out
+
+newinst debounce cutting-fluid-is-on.debounce pincount=1
+addf cutting-fluid-is-on.debounce servo-thread
+setp cutting-fluid-is-on.debounce.delay 200
+
+net cutting-fluid-halui-is-on halui.flood.is-on
+net cutting-fluid-halui-is-on cutting-fluid-is-on.debounce.0.in
+
+net cutting-fluid-is-on cutting-fluid-is-on.debounce.0.out
+newinst not cutting-fluid.not
+addf cutting-fluid.not servo-thread
+
+net cutting-fluid-is-on cutting-fluid.not.in
+net cutting-fluid-is-off cutting-fluid.not.out
+
+newinst and2 cutting-fluid-toggle-and-on 
+addf cutting-fluid-toggle-and-on servo-thread
+
+newinst oneshot cutting-fluid-toggle.oneshot
+addf cutting-fluid-toggle.oneshot servo-thread
+setp cutting-fluid-toggle.oneshot.width .25
+
+net cutting-fluid-toggle cutting-fluid-toggle.oneshot.out
+net cutting-fluid-toggle cutting-fluid-toggle-and-on.in0
+net cutting-fluid-is-on cutting-fluid-toggle-and-on.in1
+
+newinst and2 cutting-fluid-toggle-and-off 
+addf cutting-fluid-toggle-and-off servo-thread
+
+net cutting-fluid-toggle cutting-fluid-toggle-and-off.in0
+net cutting-fluid-is-off cutting-fluid-toggle-and-off.in1
+
+net [PENTA]CUTTING_FLUID_TOGGLE_ON_SIG cutting-fluid-toggle-and-off.out
+net [PENTA]CUTTING_FLUID_TOGGLE_OFF_SIG cutting-fluid-toggle-and-on.out
 
 # motor feedback
 setp hpg2.pwmread.06.max_time 2074689
