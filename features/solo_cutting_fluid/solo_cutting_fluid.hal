@@ -46,7 +46,6 @@ net cutting-fluid-toggle-4 cutting-fluid-toggle.in-3
 net cutting-fluid-toggle-5 cutting-fluid-toggle.in-4
 
 net cutting-fluid-toggle-out cutting-fluid-toggle.out
-net cutting-fluid-toggle-out cutting-fluid-toggle.oneshot.in
 
 loadusr -Wn rockhopper-cutting-fluid-toggle /opt/pocketnc/Settings/features/penta/reset_signal.py rockhopper-cutting-fluid-toggle
 
@@ -77,6 +76,8 @@ addf cutting-fluid-toggle-and-on servo-thread
 newinst oneshot cutting-fluid-toggle.oneshot
 addf cutting-fluid-toggle.oneshot servo-thread
 setp cutting-fluid-toggle.oneshot.width .25
+
+net cutting-fluid-toggle-out cutting-fluid-toggle.oneshot.in
 
 net cutting-fluid-toggle cutting-fluid-toggle.oneshot.out
 net cutting-fluid-toggle cutting-fluid-toggle-and-on.in0
