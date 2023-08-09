@@ -266,3 +266,6 @@ net probe-input motion.probe-input
 
 newsig probe-on bit
 sets probe-on 0
+
+newsig status s32
+sets status 0
