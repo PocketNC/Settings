@@ -1,0 +1,12 @@
+####################################################
+# LEDs
+####################################################
+loadusr -Wn solo-led-strips /opt/pocketnc/Settings/features/solo_led_strips/solo_led_strips.py
+
+# Status signal is not connected to anything, but is explicitly
+# set by Rockhopper based on polled status and reported errors.
+# Since Rockhopper is the sole error channel consumer it's the
+# ideal place to be setting the status. The loose coupling 
+# also allows for easy switching into party mode, which is a 
+# fun easter egg.
+net status solo-led-strips.status

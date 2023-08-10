@@ -33,7 +33,6 @@ class SoloLEDStrip:
     else:
       val = value
 
-    print(f"Writing {val} to {reg}")
     self.bus.write_byte_data(self.deviceAddress, reg, val)
 
   def success(self):
