@@ -1,7 +1,7 @@
 ####################################################
 # LEDs
 ####################################################
-loadusr -Wn solo-led-strips /opt/pocketnc/Settings/features/solo_led_strips/solo_led_strips.py
+loadusr -Wn solo-led-strips /opt/pocketnc/Settings/features/solo_led_strips/solo_led_strips.py status
 
 # Status signal is not connected to anything, but is explicitly
 # set by Rockhopper based on polled status and reported errors.
@@ -10,3 +10,12 @@ loadusr -Wn solo-led-strips /opt/pocketnc/Settings/features/solo_led_strips/solo
 # also allows for easy switching into party mode, which is a 
 # fun easter egg.
 net status solo-led-strips.status
+
+# transitioning reset pin from 0 to 1 explicitly sets the status signal (whatever is passed in on the command line above) back to normal
+net reset-estop solo-led-strips.reset
+
+# transitioning error pin from 0 to 1 explicitly sets the status signal (whatever is passed in on the command line above) back to error
+net estop-is-activated solo-led-strips.error
+
+net override-solo-led-strips solo-led-strips.override
+net override-status-solo-led-strips solo-led-strips.override-status
