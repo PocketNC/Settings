@@ -1,0 +1,24 @@
+####################################################
+# Test Solo Tool Setter
+####################################################
+loadusr -Wn test-solo-tool-setter /opt/pocketnc/Settings/features/test_solo_tool_setter/test_solo_tool_setter.py
+
+net x-pos test-solo-tool-setter.x
+net y-pos test-solo-tool-setter.y
+net z-pos test-solo-tool-setter.z
+net b-pos test-solo-tool-setter.b
+
+net x-pos test-solo-tool-setter.x
+net y-pos test-solo-tool-setter.y
+net z-pos test-solo-tool-setter.z
+net b-pos test-solo-tool-setter.b
+
+setp test-solo-tool-setter.trigger-x [TOOL_SETTER]X
+setp test-solo-tool-setter.trigger-y [TOOL_SETTER]Y
+setp test-solo-tool-setter.trigger-z [TOOL_SETTER]TRIGGER_Z
+setp test-solo-tool-setter.trigger-b -90
+
+# set this value to determine what the tool offset should be when performing a tool measurement
+setp test-solo-tool-setter.tool-offset -5.3
+
+net [PENTA]TEST_TOOL_SETTER_SIG test-solo-tool-setter.probe-output

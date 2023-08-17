@@ -1,0 +1,2 @@
+[PENTA]
+TEST_TOOL_SETTER_SIG=probe-input-4

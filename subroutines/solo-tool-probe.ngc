@@ -1,0 +1,6 @@
+o<solo-tool-probe> sub
+M6 T#<T>
+
+o<measure-tool> call
+o<solo-tool-probe> endsub
+M2
