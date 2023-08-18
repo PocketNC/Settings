@@ -108,7 +108,6 @@ class SoloToolChangerState(object):
     self.time_since_open_or_close = 0
 
   def on_enter_PERFORMING_TOOL_CHANGE(self):
-    print("PERFORMING_TOOL_CHANGE")
     self.h["state"] = self.state.value
     self.h["open-out"] = True
     self.h["close-out"] =  False
@@ -120,7 +119,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_NOT_CLOSED_AT_STARTUP(self):
-    print("NOT_CLOSED_AT_STARTUP")
     self.h["state"] = self.state.value
     self.h["open-out"] = False
     self.h["close-out"] =  False
@@ -132,7 +130,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_STARTUP(self):
-    print("STARTUP")
     self.h["state"] = self.state.value
     self.h["open-out"] = False
     self.h["close-out"] =  False
@@ -144,7 +141,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_OPEN(self):
-    print("OPEN")
     self.resetTime()
 
     self.h["state"] = self.state.value
@@ -159,7 +155,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_CLOSE(self):
-    print("CLOSE")
     self.resetTime()
 
     self.h["state"] = self.state.value
@@ -174,7 +169,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_OK_TO_HOME(self):
-    print("OK_TO_HOME")
     self.h["state"] = self.state.value
     self.h["open-out"] = False
     self.h["close-out"] =  True
@@ -187,7 +181,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_OK_TO_OPEN(self):
-    print("OK_TO_OPEN")
     self.h["state"] = self.state.value
     self.h["open-out"] = False
     self.h["close-out"] =  True
@@ -200,7 +193,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = True
 
   def on_enter_NOT_SAFE_TO_OPEN(self):
-    print("NOT_SAFE_TO_OPEN")
     self.h["state"] = self.state.value
     self.h["open-out"] = False
     self.h["close-out"] =  True
@@ -213,7 +205,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_OK_TO_CLOSE(self):
-    print("OK_TO_CLOSE")
     self.h["state"] = self.state.value
     self.h["open-out"] = True
     self.h["close-out"] =  False
@@ -227,7 +218,6 @@ class SoloToolChangerState(object):
 
 
   def on_enter_NOT_SAFE_TO_CLOSE(self):
-    print("NOT_SAFE_TO_CLOSE")
     self.h["state"] = self.state.value
     self.h["open-out"] = True
     self.h["close-out"] =  False
@@ -240,8 +230,6 @@ class SoloToolChangerState(object):
     self.h["ok-to-open"] = False
 
   def on_enter_UNEXPECTED_NOT_CLOSED(self):
-    print("UNEXPECTED_NOT_CLOSED")
-    print("Tool changer drawer started to open unexpectedly.")
     self.h["fault-reason"] = FAULT_UNEXPECTED_NOT_CLOSED
     self.messageClient.send(json.dumps({
       "type": "error",
@@ -251,8 +239,6 @@ class SoloToolChangerState(object):
     self.to_FAULT()
 
   def on_enter_UNEXPECTED_NOT_OPENED(self):
-    print("UNEXPECTED_NOT_OPENED")
-    print("Tool changer drawer started to close unexpectedly.")
     self.h["fault-reason"] = FAULT_UNEXPECTED_NOT_OPENED
     self.messageClient.send(json.dumps({
       "type": "error",
@@ -262,8 +248,6 @@ class SoloToolChangerState(object):
     self.to_FAULT()
 
   def on_enter_NOT_OPENED(self):
-    print("NOT_OPENED")
-    print("Failed to open tool changer drawer")
     self.h["fault-reason"] = FAULT_FAILED_TO_OPEN
     self.messageClient.send(json.dumps({
       "type": "error",
@@ -273,8 +257,6 @@ class SoloToolChangerState(object):
     self.to_FAULT()
 
   def on_enter_NOT_CLOSED(self):
-    print("NOT_CLOSED")
-    print("Failed to close tool changer drawer")
     self.h["fault-reason"] = FAULT_FAILED_TO_CLOSE
     self.messageClient.send(json.dumps({
       "type": "error",
@@ -284,7 +266,6 @@ class SoloToolChangerState(object):
     self.to_FAULT()
 
   def on_enter_FAULT(self):
-    print("FAULT")
     self.h["state"] = self.state.value
     self.h["open-out"] = False
     self.h["close-out"] =  False

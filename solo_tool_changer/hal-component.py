@@ -154,14 +154,12 @@ try:
     state.next()
 
     if state.is_clamp_requested:
-      print("clamp was requested");
       # TODO - be smart about allowing clamping, perhaps ensure we're all the way down 
       # to the tool change position (but we likely need to allow the user to load a tool
       # manually, too)
       h["clamp-out"] = True
       h["unclamp-out"] = False
     elif state.is_unclamp_requested:
-      print("unclamp was requested");
       # TODO - be smart about allowing unclamping, i.e. don't unclamp with spindle on.
       # Maybe only allow unclamping over a tool slot unless the user provides some
       # confirmation that the tool will be caught safely.
