@@ -14,8 +14,13 @@
 #*******************************************************************
 import hal
 import time
+import os
 from state_machine import SoloToolChangerState, SAFE_Z, SAFE_X, EPS, B_MIN, B_MAX, X_MIN, X_MAX, Y_MIN, Y_MAX, Z_MIN
 from tool_info import is_over_tool_slot, get_tool_slot_position, get_tool_slot_num, TOOL_1_Z
+import penta_messages
+
+USER_MESSAGES_END_POINT = os.environ.get('USER_MESSAGES_END_POINT')
+messageClient = penta_messages.Client(USER_MESSAGES_END_POINT)
 
 h = hal.component("solo-tool-changer")
 
@@ -139,7 +144,7 @@ h["fault-reason"] = False
 
 # state for ensuring drawer safely opens and closes
 # also limits ability to home if the drawer isn't closed
-state = SoloToolChangerState(h)
+state = SoloToolChangerState(h, messageClient)
 
 try:
   while not h["enabled"]: 

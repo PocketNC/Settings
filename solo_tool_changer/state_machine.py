@@ -1,5 +1,6 @@
 from transitions import Machine
 from enum import Enum, auto
+import penta_messages
 
 # TODO - get these from configuration
 X_MIN = -3.3736
@@ -42,8 +43,9 @@ class States(Enum):
 NEXT = "next"
 
 class SoloToolChangerState(object):
-  def __init__(self, h):
+  def __init__(self, h, messageClient):
     self.h = h
+    self.messageClient = messageClient
 
     self.last_open_cmd = False
     self.last_close_cmd = False
@@ -241,24 +243,44 @@ class SoloToolChangerState(object):
     print("UNEXPECTED_NOT_CLOSED")
     print("Tool changer drawer started to open unexpectedly.")
     self.h["fault-reason"] = FAULT_UNEXPECTED_NOT_CLOSED
+    self.messageClient.send(json.dumps({
+      "type": "error",
+      "kind": "solo-tool-changer",
+      "text": "Tool changer started to open unexpectedly."
+    }))
     self.to_FAULT()
 
   def on_enter_UNEXPECTED_NOT_OPENED(self):
     print("UNEXPECTED_NOT_OPENED")
     print("Tool changer drawer started to close unexpectedly.")
     self.h["fault-reason"] = FAULT_UNEXPECTED_NOT_OPENED
+    self.messageClient.send(json.dumps({
+      "type": "error",
+      "kind": "solo-tool-changer",
+      "text": "Tool changer started to close unexpectedly."
+    }))
     self.to_FAULT()
 
   def on_enter_NOT_OPENED(self):
     print("NOT_OPENED")
     print("Failed to open tool changer drawer")
     self.h["fault-reason"] = FAULT_FAILED_TO_OPEN
+    self.messageClient.send(json.dumps({
+      "type": "error",
+      "kind": "solo-tool-changer",
+      "text": "Tool changer failed to open within %s seconds." % (TIME_ALLOWED_TO_OPEN_OR_CLOSE ,)
+    }))
     self.to_FAULT()
 
   def on_enter_NOT_CLOSED(self):
     print("NOT_CLOSED")
     print("Failed to close tool changer drawer")
     self.h["fault-reason"] = FAULT_FAILED_TO_CLOSE
+    self.messageClient.send(json.dumps({
+      "type": "error",
+      "kind": "solo-tool-changer",
+      "text": "Tool changer failed to close within %s seconds." % (TIME_ALLOWED_TO_OPEN_OR_CLOSE ,)
+    }))
     self.to_FAULT()
 
   def on_enter_FAULT(self):
