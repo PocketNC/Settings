@@ -498,8 +498,8 @@ setp tool-changer-closed-pin.invert 1
 loadusr -Wn tool-changer-open-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py tool-changer-open-cmd-reset
 loadusr -Wn tool-changer-close-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py tool-changer-close-cmd-reset
 
-net solo-tool-changer-open-cmd tool-changer-open-cmd-reset.pin
-net solo-tool-changer-close-cmd tool-changer-close-cmd-reset.pin
+net solo-tool-changer-open-cmd tool-changer-open-cmd-reset.in
+net solo-tool-changer-close-cmd tool-changer-close-cmd-reset.in
 
 net tool-changer-open-cmd solo-tool-changer.open-cmd
 net tool-changer-open-cmd tool-changer-open-cmd-reset.out

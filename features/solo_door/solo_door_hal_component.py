@@ -2,7 +2,7 @@
 
 #********************************************************************
 # Description:  solo_door
-#               This file, 'solo_door/hal-component.py', is a HAL component that 
+#               This file, 'solo_door/solo_door_hal_component.py', is a HAL component that 
 #               controls the behavior of the door on the Penta Solo machine.
 #
 # Author: John Allwine <john@pocketnc.com>
@@ -13,7 +13,7 @@
 #*******************************************************************
 import hal
 import time
-from state_machine import SoloDoorState
+from solo_door_state_machine import SoloDoorState
 import penta_messages
 import os
 
@@ -53,6 +53,7 @@ h.newpin("close-out", hal.HAL_BIT, hal.HAL_OUT)
 
 # outputs for limiting machine movements/spindle
 h.newpin("inhibit-spindle", hal.HAL_BIT, hal.HAL_OUT)
+h.newpin("inhibit-cutting-fluid", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("joint.0.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("joint.1.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("joint.2.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)

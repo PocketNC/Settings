@@ -19,6 +19,9 @@ class States(Enum):
   UNEXPECTED_DOOR_NOT_CLOSED = auto()
   FAULT = auto()
 
+def int_to_solo_door_state(i):
+  return States(i).name
+
 NEXT = "next"
 
 FAULT_TIMEOUT_OPENING_DOOR = -1
@@ -30,6 +33,12 @@ class SoloDoorState(object):
     self.h = h
     self.messageClient = messageClient
     self.time_since_open_or_close = 0
+    self.enteredRunning = False
+
+    self.warnedSpindleOn = False
+    self.warnedCuttingFluidIsOn = False
+    self.warnedRunning = False
+    self.warnedNoClose = False
 
     self.machine = Machine(self, states=States, initial=States.STARTUP, ignore_invalid_triggers=True)
 
@@ -39,6 +48,7 @@ class SoloDoorState(object):
     self.machine.add_transition(NEXT, States.STARTUP, States.UNCERTAIN, conditions="is_door_uncertain")
 
     self.machine.add_transition(NEXT, States.UP, States.CLOSING, conditions="is_close_requested")
+    self.machine.add_transition(NEXT, States.UP, States.UNCERTAIN, conditions="is_door_uncertain")
 
     self.machine.add_transition(NEXT, States.DOWN_LID_OPENED, States.DOWN_LID_CLOSED, conditions="is_door_down_lid_closed")
 
@@ -47,6 +57,9 @@ class SoloDoorState(object):
     self.machine.add_transition(NEXT, States.DOWN_LID_CLOSED, States.RUNNING, conditions="is_running")
 
     self.machine.add_transition(NEXT, States.RUNNING, States.UNEXPECTED_DOOR_NOT_CLOSED, unless="is_door_down")
+    self.machine.add_transition(NEXT, States.RUNNING, States.STARTUP, unless="is_running")
+
+    # repeatedly transition back to the same state to evaluate warnings in the on_enter_RUNNING method
     self.machine.add_transition(NEXT, States.RUNNING, States.RUNNING)
 
     self.machine.add_transition(NEXT, States.UNCERTAIN, States.OPENING, conditions="is_open_requested")
@@ -59,11 +72,16 @@ class SoloDoorState(object):
     self.machine.add_transition(NEXT, States.UNCERTAIN, States.DOWN_LID_OPENED, conditions="is_door_down_lid_opened")
     self.machine.add_transition(NEXT, States.UNCERTAIN, States.DOWN_LID_CLOSED, conditions="is_door_down_lid_closed")
 
+    # repeatedly transition back to the same state to evaluate warnings in the on_enter_UNCERTAIN method
+    self.machine.add_transition(NEXT, States.UNCERTAIN, States.UNCERTAIN)
+
     self.machine.add_transition(NEXT, States.OPENING, States.UP, conditions="is_door_up")
+    self.machine.add_transition(NEXT, States.OPENING, States.CLOSING, conditions="is_close_requested")
     self.machine.add_transition(NEXT, States.OPENING, States.TIMEOUT_OPENING_DOOR, conditions="has_timed_out")
 
     self.machine.add_transition(NEXT, States.CLOSING, States.DOWN_LID_CLOSED, conditions="is_door_down_lid_closed")
     self.machine.add_transition(NEXT, States.CLOSING, States.DOWN_LID_OPENED, conditions="is_door_down_lid_opened")
+    self.machine.add_transition(NEXT, States.CLOSING, States.OPENING, conditions="is_open_requested")
     self.machine.add_transition(NEXT, States.CLOSING, States.TIMEOUT_CLOSING_DOOR, conditions="has_timed_out")
 
     self.machine.add_transition(NEXT, States.FAULT, States.STARTUP, conditions="is_reset_requested")
@@ -88,6 +106,7 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.open-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
+    self.h["inhibit-cutting-fluid"] = 1
 
   def on_enter_UP(self):
     print("DOOR UP")
@@ -102,6 +121,7 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.open-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
+    self.h["inhibit-cutting-fluid"] = 1
 
 
   def on_enter_DOWN_LID_OPENED(self):
@@ -118,6 +138,7 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.max-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.max-velocity"]
     self.h["inhibit-spindle"] = 0
+    self.h["inhibit-cutting-fluid"] = 0
 
   def on_enter_DOWN_LID_CLOSED(self):
     print("DOOR DOWN LID CLOSED")
@@ -133,9 +154,9 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.max-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.max-velocity"]
     self.h["inhibit-spindle"] = 0
+    self.h["inhibit-cutting-fluid"] = 0
 
   def on_enter_UNCERTAIN(self):
-    print("DOOR UNCERTAIN")
     self.h["state"] = self.state.value
     self.h["open-out"] = 0
     self.h["close-out"] = 0
@@ -148,6 +169,18 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.open-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
+    self.h["inhibit-cutting-fluid"] = 1
+
+    if self.h["close-cmd"]:
+      if not self.warnedNoClose:
+        self.warnedNoClose = True
+        self.messageClient.send(json.dumps({
+          "type": "warning",
+          "kind": "solo-door",
+          "text": "Must first open door in case door is up and tilted back."
+        }))
+    else:
+      self.warnedNoClose = False
 
   def on_enter_OPENING(self):
     print("DOOR OPENING")
@@ -164,6 +197,7 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.open-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
+    self.h["inhibit-cutting-fluid"] = 1
 
   def on_enter_CLOSING(self):
     print("DOOR CLOSING")
@@ -180,9 +214,9 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.open-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
+    self.h["inhibit-cutting-fluid"] = 1
 
   def on_enter_RUNNING(self):
-    #print("DOOR RUNNING")
     self.h["state"] = self.state.value
     self.h["open-out"] = 0
     self.h["close-out"] = 1
@@ -195,28 +229,37 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.max-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.max-velocity"]
     self.h["inhibit-spindle"] = 0
+    self.h["inhibit-cutting-fluid"] = 0
 
     if self.h["open-cmd"]:
-      if self.h["spindle-on"]:
+      if self.h["spindle-on"] and not self.warnedSpindleOn:
+        self.warnedSpindleOn = True
         self.messageClient.send(json.dumps({
           "type": "warning",
           "kind": "solo-door",
           "text": "Cannot open door while spindle is on."
         }))
 
-      if self.h["cutting-fluid-is-on"]:
+      if self.h["cutting-fluid-is-on"] and not self.warnedCuttingFluidIsOn:
+        self.warnedCuttingFluidIsOn = True
         self.messageClient.send(json.dumps({
           "type": "warning",
           "kind": "solo-door",
           "text": "Cannot open door while coolant is on."
         }))
 
-      if self.h["running"]:
+      if self.h["running"] and not self.warnedRunning:
+        self.warnedRunning = True
         self.messageClient.send(json.dumps({
           "type": "warning",
           "kind": "solo-door",
           "text": "Cannot open door while interpreter is running."
         }))
+    else:
+      self.warnedSpindleOn = False
+      self.warnedCuttingFluidIsOn = False
+      self.warnedRunning = False
+
 
 
   def on_enter_TIMEOUT_OPENING_DOOR(self):
@@ -257,6 +300,7 @@ class SoloDoorState(object):
     self.h["joint.3.max-velocity-out"] = self.h["joint.3.open-velocity"]
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
+    self.h["inhibit-cutting-fluid"] = 1
 
   @property
   def is_door_up(self):

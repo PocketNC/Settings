@@ -1,7 +1,7 @@
 ####################################################
 # Solo Door
 ####################################################
-loadusr -Wn solo-door /opt/pocketnc/Settings/features/solo_door/hal-component.py
+loadusr -Wn solo-door /opt/pocketnc/Settings/features/solo_door/solo_door_hal_component.py
 
 newinst bb_gpio door-sensor-1-pin pin=[SOLO_PINS]DOOR_DOWN_SENSOR_PIN direction=input
 setp door-sensor-1-pin.invert 1
@@ -41,11 +41,11 @@ setp solo-door.joint.4.open-velocity [SOLO_DOOR]OPEN_MAX_ROTARY_VELOCITY
 loadusr -Wn solo-door-open-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py solo-door-open-cmd-reset
 loadusr -Wn solo-door-close-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py solo-door-close-cmd-reset
 
-net solo-door-open-cmd solo-door-open-cmd-reset.pin
+net solo-door-open-cmd solo-door-open-cmd-reset.in
 net solo-door-open-cmd-out solo-door-open-cmd-reset.out
 net solo-door-open-cmd-out solo-door.open-cmd
 
-net solo-door-close-cmd solo-door-close-cmd-reset.pin
+net solo-door-close-cmd solo-door-close-cmd-reset.in
 net solo-door-close-cmd-out solo-door-close-cmd-reset.out
 net solo-door-close-cmd-out solo-door.close-cmd
 
@@ -75,6 +75,10 @@ net joint-4-max-velocity solo-door.joint.4.max-velocity-out
 net [SOLO_DOOR]INHIBIT_SPINDLE_SIG solo-door.inhibit-spindle
 net [SOLO_DOOR]ESTOP_SIG solo-door.fault
 
+net inhibit-cutting-fluid solo-door.inhibit-cutting-fluid
+
 net program-is-running solo-door.running
 net is-spindle-enabled solo-door.spindle-on
 net cutting-fluid-halui-is-on solo-door.cutting-fluid-is-on
+
+net solo-door-state solo-door.state

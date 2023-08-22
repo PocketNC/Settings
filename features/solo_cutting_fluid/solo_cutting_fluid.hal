@@ -4,7 +4,22 @@
 
 newinst bb_gpio cutting-fluid-enable-pin pin=[SOLO_PINS]CUTTING_FLUID_ENABLE_PIN direction=output
 
-net flood-coolant iocontrol.0.coolant-flood
+newinst not inhibit-cutting-fluid.not
+newinst and2 cf-and-not-inhibit
+
+addf cf-and-not-inhibit servo-thread
+addf inhibit-cutting-fluid.not servo-thread
+
+net inhibit-cutting-fluid inhibit-cutting-fluid.not.in
+sets inhibit-cutting-fluid 0
+
+net flood-coolant-condition-0 inhibit-cutting-fluid.not.out
+net flood-coolant-condition-0 cf-and-not-inhibit.in0
+
+net flood-coolant-condition-1 iocontrol.0.coolant-flood
+net flood-coolant-condition-1 cf-and-not-inhibit.in1
+
+net flood-coolant cf-and-not-inhibit.out
 net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
 net flood-coolant cutting-fluid-enable-pin.out
 net flood-coolant hpg3.stepgen.01.enable
@@ -47,14 +62,17 @@ net cutting-fluid-toggle-5 cutting-fluid-toggle.in-4
 
 net cutting-fluid-toggle-out cutting-fluid-toggle.out
 
-loadusr -Wn rockhopper-cutting-fluid-toggle /opt/pocketnc/Settings/features/penta/reset_signal.py rockhopper-cutting-fluid-toggle
+loadusr -Wn rockhopper-cutting-fluid-toggle /opt/pocketnc/Settings/features/penta/reset_pin.py rockhopper-cutting-fluid-toggle
+loadusr -Wn rockhopper-cutting-fluid-on /opt/pocketnc/Settings/features/penta/reset_pin.py rockhopper-cutting-fluid-on
+loadusr -Wn rockhopper-cutting-fluid-off /opt/pocketnc/Settings/features/penta/reset_pin.py rockhopper-cutting-fluid-off
 
 net rockhopper-cutting-fluid-toggle rockhopper-cutting-fluid-toggle.in
-
-setp rockhopper-cutting-fluid-toggle.value 0
-setp rockhopper-cutting-fluid-toggle.enable 1
+net rockhopper-cutting-fluid-on rockhopper-cutting-fluid-on.in
+net rockhopper-cutting-fluid-off rockhopper-cutting-fluid-off.in
 
 net [PENTA]ROCKHOPPER_CUTTING_FLUID_TOGGLE_SIG rockhopper-cutting-fluid-toggle.out
+net [PENTA]ROCKHOPPER_CUTTING_FLUID_ON_SIG rockhopper-cutting-fluid-on.out
+net [PENTA]ROCKHOPPER_CUTTING_FLUID_OFF_SIG rockhopper-cutting-fluid-off.out
 
 newinst debounce cutting-fluid-is-on.debounce pincount=1
 addf cutting-fluid-is-on.debounce servo-thread
