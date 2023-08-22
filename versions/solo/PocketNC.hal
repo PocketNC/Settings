@@ -363,9 +363,8 @@ net estop-button estop-button-pin.in
 
 # Machine power
 newinst bb_gpio enable-pin pin=[SOLO_PINS]ENABLE_PIN direction=output
-#net motors-on solo-estop.power
-net motors-on enable-pin.out
-sets motors-on 1
+net software-estop solo-estop.power
+net software-estop enable-pin.out
 
 newinst bb_gpio x-enable-pin pin=[SOLO_PINS]X_ENABLE_PIN direction=output
 net x-motor-enable solo-estop.x-motor-enable

@@ -1,0 +1,80 @@
+####################################################
+# Solo Door
+####################################################
+loadusr -Wn solo-door /opt/pocketnc/Settings/features/solo_door/hal-component.py
+
+newinst bb_gpio door-sensor-1-pin pin=[SOLO_PINS]DOOR_DOWN_SENSOR_PIN direction=input
+setp door-sensor-1-pin.invert 1
+
+newinst bb_gpio door-sensor-2-pin pin=[SOLO_PINS]DOOR_UP_OR_TILTED_SENSOR_PIN direction=input
+setp door-sensor-2-pin.invert 1
+
+newinst debounce door-sensor-debounce pincount=2
+addf door-sensor-debounce.funct servo-thread
+
+setp door-sensor-debounce.delay 300
+
+net solo-door-sensor-1-raw door-sensor-1-pin.in
+net solo-door-sensor-1-raw door-sensor-debounce.0.in
+
+net solo-door-sensor-1 door-sensor-debounce.0.out
+net solo-door-sensor-1 solo-door.door-sensor-1
+
+net solo-door-sensor-2-raw door-sensor-2-pin.in
+net solo-door-sensor-2-raw door-sensor-debounce.1.in
+
+net solo-door-sensor-2 door-sensor-debounce.1.out
+net solo-door-sensor-2 solo-door.door-sensor-2
+
+setp solo-door.joint.0.max-velocity [JOINT_0]MAX_VELOCITY
+setp solo-door.joint.1.max-velocity [JOINT_1]MAX_VELOCITY
+setp solo-door.joint.2.max-velocity [JOINT_2]MAX_VELOCITY
+setp solo-door.joint.3.max-velocity [JOINT_3]MAX_VELOCITY
+setp solo-door.joint.4.max-velocity [JOINT_4]MAX_VELOCITY
+
+setp solo-door.joint.0.open-velocity [SOLO_DOOR]OPEN_MAX_LINEAR_VELOCITY
+setp solo-door.joint.1.open-velocity [SOLO_DOOR]OPEN_MAX_LINEAR_VELOCITY
+setp solo-door.joint.2.open-velocity [SOLO_DOOR]OPEN_MAX_LINEAR_VELOCITY
+setp solo-door.joint.3.open-velocity [SOLO_DOOR]OPEN_MAX_ROTARY_VELOCITY
+setp solo-door.joint.4.open-velocity [SOLO_DOOR]OPEN_MAX_ROTARY_VELOCITY
+
+loadusr -Wn solo-door-open-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py solo-door-open-cmd-reset
+loadusr -Wn solo-door-close-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py solo-door-close-cmd-reset
+
+net solo-door-open-cmd solo-door-open-cmd-reset.pin
+net solo-door-open-cmd-out solo-door-open-cmd-reset.out
+net solo-door-open-cmd-out solo-door.open-cmd
+
+net solo-door-close-cmd solo-door-close-cmd-reset.pin
+net solo-door-close-cmd-out solo-door-close-cmd-reset.out
+net solo-door-close-cmd-out solo-door.close-cmd
+
+net solo-door-open-out solo-door.open-out
+net solo-door-open-out [SOLO_PINS]DOOR_OPEN_PIN
+
+net solo-door-close-out solo-door.close-out
+net solo-door-close-out [SOLO_PINS]DOOR_CLOSE_PIN
+
+net reset-estop solo-door.reset-cmd
+
+net joint-0-max-velocity solo-door.joint.0.max-velocity-out
+#net joint-0-max-velocity ini.0.max_velocity
+
+net joint-1-max-velocity solo-door.joint.1.max-velocity-out
+#net joint-1-max-velocity ini.1.max_velocity
+
+net joint-2-max-velocity solo-door.joint.2.max-velocity-out
+#net joint-2-max-velocity ini.2.max_velocity
+
+net joint-3-max-velocity solo-door.joint.3.max-velocity-out
+#net joint-3-max-velocity ini.3.max_velocity
+
+net joint-4-max-velocity solo-door.joint.4.max-velocity-out
+#net joint-4-max-velocity ini.4.max_velocity
+
+net [SOLO_DOOR]INHIBIT_SPINDLE_SIG solo-door.inhibit-spindle
+net [SOLO_DOOR]ESTOP_SIG solo-door.fault
+
+net program-is-running solo-door.running
+net is-spindle-enabled solo-door.spindle-on
+net cutting-fluid-halui-is-on solo-door.cutting-fluid-is-on
