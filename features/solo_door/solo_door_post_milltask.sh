@@ -14,9 +14,4 @@ while [ -z "$ini_pin_data" ]; do
   ini_pin_data=$(halcmd show pin ini | grep ini -m 1)
 done
 
-
-sleep 1
-halcmd -f /opt/pocketnc/Settings/versions/solo/PocketNC_PostMillTask.hal
-
-sleep 10
-halcmd -f /opt/pocketnc/Settings/versions/solo/resetMaxTimes.hal
+halcmd -f /opt/pocketnc/Settings/features/solo_door/solo_door_post_milltask.hal

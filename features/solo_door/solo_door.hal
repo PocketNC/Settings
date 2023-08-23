@@ -1,7 +1,7 @@
 ####################################################
 # Solo Door
 ####################################################
-loadusr -Wn solo-door /opt/pocketnc/Settings/features/solo_door/solo_door_hal_component.py
+loadusr -Wn solo-door $(POCKETNC_DIRECTORY)/Settings/features/solo_door/solo_door_hal_component.py
 
 newinst bb_gpio door-sensor-1-pin pin=[SOLO_PINS]DOOR_DOWN_SENSOR_PIN direction=input
 setp door-sensor-1-pin.invert 1
@@ -58,19 +58,14 @@ net solo-door-close-out [SOLO_PINS]DOOR_CLOSE_PIN
 net reset-estop solo-door.reset-cmd
 
 net joint-0-max-velocity solo-door.joint.0.max-velocity-out
-#net joint-0-max-velocity ini.0.max_velocity
 
 net joint-1-max-velocity solo-door.joint.1.max-velocity-out
-#net joint-1-max-velocity ini.1.max_velocity
 
 net joint-2-max-velocity solo-door.joint.2.max-velocity-out
-#net joint-2-max-velocity ini.2.max_velocity
 
 net joint-3-max-velocity solo-door.joint.3.max-velocity-out
-#net joint-3-max-velocity ini.3.max_velocity
 
 net joint-4-max-velocity solo-door.joint.4.max-velocity-out
-#net joint-4-max-velocity ini.4.max_velocity
 
 net [SOLO_DOOR]INHIBIT_SPINDLE_SIG solo-door.inhibit-spindle
 net [SOLO_DOOR]ESTOP_SIG solo-door.fault

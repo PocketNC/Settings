@@ -1,0 +1,14 @@
+net joint-0-max-velocity ini.0.max_velocity
+net joint-0-max-velocity ini.x.max_velocity
+
+net joint-1-max-velocity ini.1.max_velocity
+net joint-1-max-velocity ini.y.max_velocity
+
+net joint-2-max-velocity ini.2.max_velocity
+net joint-2-max-velocity ini.z.max_velocity
+
+net joint-3-max-velocity ini.3.max_velocity
+net joint-3-max-velocity ini.b.max_velocity
+
+net joint-4-max-velocity ini.4.max_velocity
+net joint-4-max-velocity ini.c.max_velocity
