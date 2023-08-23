@@ -60,8 +60,12 @@ h.newpin("joint.2.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("joint.3.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("joint.4.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 
+# filtered door sensor inputs, these are more for debugging
+h.newpin("door-sensor-1-out", hal.HAL_BIT, hal.HAL_OUT)
+h.newpin("door-sensor-2-out", hal.HAL_BIT, hal.HAL_OUT)
 
-# outputs for signaling a tool changer fault
+
+# outputs for signaling a fault
 h.newpin("fault", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("fault-reason", hal.HAL_S32, hal.HAL_OUT)
 

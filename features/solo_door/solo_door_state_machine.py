@@ -5,6 +5,8 @@ import json
 TIME_ALLOWED_TO_OPEN_OR_CLOSE = 10
 EPS = .0001
 
+DELAY = .5
+
 class States(Enum):
   STARTUP = auto()
   UP = auto()
@@ -34,6 +36,10 @@ class SoloDoorState(object):
     self.messageClient = messageClient
     self.time_since_open_or_close = 0
     self.enteredRunning = False
+
+    self.doorSensorTimes = [ 0, 0, 0, 0 ]
+    self.door_sensor_1 = 0
+    self.door_sensor_2 = 0
 
     self.warnedSpindleOn = False
     self.warnedCuttingFluidIsOn = False
@@ -88,6 +94,30 @@ class SoloDoorState(object):
 
   def update(self, dt):
     self.time_since_open_or_close += dt
+
+    # decrement all times by dt, but don't go less than 0
+    self.doorSensorTimes[0] = max(0, self.doorSensorTimes[0]-dt)
+    self.doorSensorTimes[1] = max(0, self.doorSensorTimes[1]-dt)
+    self.doorSensorTimes[2] = max(0, self.doorSensorTimes[2]-dt)
+    self.doorSensorTimes[3] = max(0, self.doorSensorTimes[3]-dt)
+
+    rawDoorSensorData = (self.h["door-sensor-1"] << 1) | self.h["door-sensor-2"]
+
+    # add 2*dt for the current raw state to compensate for the fact that we decremented the active one as well above
+    # Between this line and the decrements above, we're essentially saying increment the active state and decrement all the others.
+    self.doorSensorTimes[rawDoorSensorData] = min(self.doorSensorTimes[rawDoorSensorData]+2*dt, DELAY)
+
+    try:
+      # When one state reaches DELAY, change the state
+      filteredDoorSensorData = self.doorSensorTimes.index(DELAY)
+
+      self.door_sensor_1 = not not (filteredDoorSensorData & 2)
+      self.door_sensor_2 = not not (filteredDoorSensorData & 1)
+      self.h["door-sensor-1-out"] = self.door_sensor_1
+      self.h["door-sensor-2-out"] = self.door_sensor_2
+    except:
+      # otherwise, don't do anything
+      pass
 
   def resetTime(self):
     self.time_since_open_or_close = 0
@@ -304,23 +334,23 @@ class SoloDoorState(object):
 
   @property
   def is_door_up(self):
-    return not self.h["door-sensor-1"] and self.h["door-sensor-2"]
+    return not self.door_sensor_1 and self.door_sensor_2
 
   @property
   def is_door_down_lid_closed(self):
-    return self.h["door-sensor-1"] and self.h["door-sensor-2"]
+    return self.door_sensor_1 and self.door_sensor_2
 
   @property
   def is_door_down_lid_opened(self):
-    return self.h["door-sensor-1"] and not self.h["door-sensor-2"]
+    return self.door_sensor_1 and not self.door_sensor_2
 
   @property
   def is_door_down(self):
-    return self.h["door-sensor-1"]
+    return self.door_sensor_1
 
   @property
   def is_door_uncertain(self):
-    return not self.h["door-sensor-1"] and not self.h["door-sensor-2"]
+    return not self.door_sensor_1 and not self.door_sensor_2
 
   @property
   def has_timed_out(self):
