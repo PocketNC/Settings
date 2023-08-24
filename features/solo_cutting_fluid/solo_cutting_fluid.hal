@@ -134,7 +134,17 @@ addf cf-mult2 servo-thread
 setp cf-mult2.in0 -10
 setp cf-mult2.in1 100
 
+newinst limit2 cf-limit2
+addf cf-limit2 servo-thread
+
+setp cf-limit2.min 0
+setp cf-limit2.max 100
+setp cf-limit2.load 1
+
 net cutting-fluid-pressure-out cf-mult2.out
 net cutting-fluid-pressure-out hpg3.stepgen.01.velocity-cmd
 
-net cutting-fluid-pressure cf-mult2.in1
+net cutting-fluid-pressure cf-limit2.in
+
+net cutting-fluid-pressure-limited cf.limit2.out
+net cutting-fluid-pressure-limited cf-mult2.in1
