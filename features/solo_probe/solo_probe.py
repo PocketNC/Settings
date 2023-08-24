@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-#import IrDA_Probe_I2C
+from IrDA_Probe_I2C import IrDA_Probe_I2C
 from i2c import busNum
 import hal
 import time
 
 address = 0x44
 
-#probe = IrDA_Probe_I2C(address, busNum)
+probe = IrDA_Probe_I2C(address, busNum)
 
 h = hal.component("solo-probe")
 
@@ -23,12 +23,10 @@ try:
       if h["probe-on"] != lastProbeOn:
         if h["probe-on"]:
           # Probe was commanded to turn on
-          # probe.wake()
-          pass
+          probe.wake()
         else:
           # Probe was commanded to turn off
-          # probe.sleep()
-          pass
+          probe.sleep()
 
       lastProbeOn = h["probe-on"]
     except:

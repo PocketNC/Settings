@@ -1,3 +1,5 @@
 #!/bin/bash
 
 halcmd sets probe-on ${1%.*}
+
+sleep 2

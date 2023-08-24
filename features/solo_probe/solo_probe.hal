@@ -2,6 +2,8 @@
 # Solo Probe
 ####################################################
 
+loadusr -Wn solo-probe $(POCKETNC_DIRECTORY)/Settings/features/solo_probe/solo_probe.py
+
 newinst bb_gpio tool-probe-pin pin=[SOLO_PINS]TOOL_PROBE_PIN direction=input
 newinst bb_gpio tool-probe-error-pin pin=[SOLO_PINS]TOOL_PROBE_ERROR_PIN direction=input
 
@@ -13,6 +15,7 @@ addf probe-on-and-error.funct servo-thread
 
 net probe-on probe-on-and-error.in0
 net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
+net probe-on solo-probe.probe-on
 
 net tool-probe-error-raw tool-probe-error-pin.in
 net tool-probe-error-raw probe-on-and-error.in1
