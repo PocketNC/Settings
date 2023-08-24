@@ -1,15 +1,20 @@
 from transitions import Machine
 from enum import Enum, auto
 import penta_messages
+import ini
+import os
 
-# TODO - get these from configuration
-X_MIN = -3.3736
-X_MAX = 6.2312 
-Y_MIN = -3.6487
-Y_MAX = 3.7486
-Z_MIN = -6.8746
-B_MIN = -135
-B_MAX = 45
+POCKETNC_VAR_DIRECTORY = os.environ["POCKETNC_VAR_DIRECTORY"]
+
+INI_DATA = ini.read_ini_data(os.path.join(POCKETNC_VAR_DIRECTORY, "PocketNC.ini"))
+
+X_MIN = float(ini.get_parameter(INI_DATA, 'JOINT_0', 'MIN_LIMIT')['values']['value'])
+X_MAX = float(ini.get_parameter(INI_DATA, 'JOINT_0', 'MAX_LIMIT')['values']['value'])
+Y_MIN = float(ini.get_parameter(INI_DATA, 'JOINT_1', 'MIN_LIMIT')['values']['value'])
+Y_MAX = float(ini.get_parameter(INI_DATA, 'JOINT_1', 'MAX_LIMIT')['values']['value'])
+Z_MIN = float(ini.get_parameter(INI_DATA, 'JOINT_2', 'MIN_LIMIT')['values']['value'])
+B_MIN = float(ini.get_parameter(INI_DATA, 'JOINT_3', 'MIN_LIMIT')['values']['value'])
+B_MAX = float(ini.get_parameter(INI_DATA, 'JOINT_3', 'MAX_LIMIT')['values']['value'])
 
 EPS = .0001
 
