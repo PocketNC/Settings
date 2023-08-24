@@ -126,7 +126,6 @@ class SoloDoorState(object):
     self.time_since_open_or_close = 0
 
   def on_enter_STARTUP(self):
-    print("DOOR STARTUP")
     self.h["state"] = self.state.value
     self.h["open-out"] = 0
     self.h["close-out"] = 0
@@ -142,7 +141,6 @@ class SoloDoorState(object):
     self.h["inhibit-cutting-fluid"] = 1
 
   def on_enter_UP(self):
-    print("DOOR UP")
     self.h["state"] = self.state.value
     self.h["open-out"] = 1
     self.h["close-out"] = 0
@@ -158,7 +156,6 @@ class SoloDoorState(object):
 
 
   def on_enter_DOWN_LID_OPENED(self):
-    print("DOOR DOWN LID OPENED")
     self.h["state"] = self.state.value
     self.h["open-out"] = 0
     self.h["close-out"] = 1
@@ -174,7 +171,6 @@ class SoloDoorState(object):
     self.h["inhibit-cutting-fluid"] = 0
 
   def on_enter_DOWN_LID_CLOSED(self):
-    print("DOOR DOWN LID CLOSED")
     self.h["state"] = self.state.value
     self.h["open-out"] = 0
     self.h["close-out"] = 1
@@ -216,7 +212,6 @@ class SoloDoorState(object):
       self.warnedNoClose = False
 
   def on_enter_OPENING(self):
-    print("DOOR OPENING")
     self.resetTime()
     self.h["state"] = self.state.value
     self.h["open-out"] = 1
@@ -233,7 +228,6 @@ class SoloDoorState(object):
     self.h["inhibit-cutting-fluid"] = 1
 
   def on_enter_CLOSING(self):
-    print("DOOR CLOSING")
     self.resetTime()
     self.h["state"] = self.state.value
     self.h["open-out"] = 0
@@ -296,7 +290,6 @@ class SoloDoorState(object):
 
 
   def on_enter_TIMEOUT_OPENING_DOOR(self):
-    print("DOOR TIMEOUT OPENING DOOR")
     self.h["fault-reason"] = FAULT_TIMEOUT_OPENING_DOOR
     self.messageClient.send(json.dumps({
       "type": "error",
@@ -306,12 +299,10 @@ class SoloDoorState(object):
     self.to_FAULT()
 
   def on_enter_TIMEOUT_CLOSING_DOOR(self):
-    print("DOOR TIMEOUT CLOSING DOOR")
     self.h["fault-reason"] = FAULT_TIMEOUT_CLOSING_DOOR
     self.to_FAULT()
 
   def on_enter_UNEXPECTED_DOOR_NOT_CLOSED(self):
-    print("DOOR UNEXPECTED DOOR NOT CLOSED")
     self.h["fault-reason"] = FAULT_UNEXPECTED_DOOR_NOT_CLOSED
     self.messageClient.send(json.dumps({
       "type": "error",
@@ -321,7 +312,6 @@ class SoloDoorState(object):
     self.to_FAULT()
 
   def on_enter_FAULT(self):
-    print("DOOR FAULT")
     self.h["state"] = self.state.value
     self.h["fault"] = 1
     self.h["open-out"] = 0
