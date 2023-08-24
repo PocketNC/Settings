@@ -127,3 +127,14 @@ setp hpg3.stepgen.01.steppin         [SOLO_PINS]CUTTING_FLUID_STEP_PIN
 setp hpg3.stepgen.01.dirpin          [SOLO_PINS]CUTTING_FLUID_DIR_PIN
 setp hpg3.stepgen.01.control-type 1
 setp hpg3.stepgen.01.velocity-cmd -1000
+
+newinst mult2 cf-mult2
+addf cf-mult2 servo-thread
+
+setp cf-mult2.in0 -10
+setp cf-mult2.in1 100
+
+net cutting-fluid-pressure-out cf-mult2.out
+net cutting-fluid-pressure-out hpg3.stepgen.01.velocity-cmd
+
+net cutting-fluid-pressure cf-mult2.in1
