@@ -63,7 +63,10 @@ class SoloDoorState(object):
     self.machine.add_transition(NEXT, States.DOWN_LID_CLOSED, States.RUNNING, conditions="is_running")
 
     self.machine.add_transition(NEXT, States.RUNNING, States.UNEXPECTED_DOOR_NOT_CLOSED, unless="is_door_down")
-    self.machine.add_transition(NEXT, States.RUNNING, States.STARTUP, unless="is_running")
+    self.machine.add_transition(NEXT, States.RUNNING, States.UP, conditions="is_door_up_and_not_running")
+    self.machine.add_transition(NEXT, States.RUNNING, States.DOWN_LID_OPENED, conditions="is_door_down_lid_opened_and_not_running")
+    self.machine.add_transition(NEXT, States.RUNNING, States.DOWN_LID_CLOSED, conditions="is_door_down_lid_closed_and_not_running")
+    self.machine.add_transition(NEXT, States.RUNNING, States.UNCERTAIN, conditions="is_door_uncertain_and_not_running")
 
     # repeatedly transition back to the same state to evaluate warnings in the on_enter_RUNNING method
     self.machine.add_transition(NEXT, States.RUNNING, States.RUNNING)
@@ -331,6 +334,22 @@ class SoloDoorState(object):
     self.h["joint.4.max-velocity-out"] = self.h["joint.4.open-velocity"]
     self.h["inhibit-spindle"] = 1
     self.h["inhibit-cutting-fluid"] = 1
+
+  @property
+  def is_door_up_and_not_running(self):
+    return self.is_door_up and not self.is_running
+
+  @property
+  def is_door_down_lid_closed_and_not_running(self):
+    return self.is_door_down_lid_closed and not self.is_running
+
+  @property
+  def is_door_down_lid_opened_and_not_running(self):
+    return self.is_door_down_lid_opened and not self.is_running
+
+  @property
+  def is_door_uncertain_and_not_running(self):
+    return self.is_door_uncertain and not self.is_running
 
   @property
   def is_door_up(self):
