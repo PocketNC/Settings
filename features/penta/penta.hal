@@ -270,5 +270,5 @@ sets probe-on 0
 newsig status s32
 sets status 0
 
-newsig cutting-fluid-pressure
+newsig cutting-fluid-pressure float
 sets cutting-fluid-pressure 100

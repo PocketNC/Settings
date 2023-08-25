@@ -140,11 +140,12 @@ addf cf-limit2 servo-thread
 setp cf-limit2.min 0
 setp cf-limit2.max 100
 setp cf-limit2.load 1
+setp cf-limit2.in 100
 
 net cutting-fluid-pressure-out cf-mult2.out
 net cutting-fluid-pressure-out hpg3.stepgen.01.velocity-cmd
 
 net cutting-fluid-pressure cf-limit2.in
 
-net cutting-fluid-pressure-limited cf.limit2.out
+net cutting-fluid-pressure-limited cf-limit2.out
 net cutting-fluid-pressure-limited cf-mult2.in1
