@@ -389,9 +389,9 @@ net c-motor-enable c-enable-pin.out
 ## Air
 
 # Schunk Mini90 open
-net vice-released [SOLO_PINS]MINI90_OPEN_PIN
-net vice-released [SOLO_PINS]VICE_AIR_BLAST_PIN
-net extra-vice-clamping-force [SOLO_PINS]MINI90_EXTRA_FORCE_PIN 
+net vise-released [SOLO_PINS]MINI90_OPEN_PIN
+net vise-released [SOLO_PINS]VICE_AIR_BLAST_PIN
+net extra-vise-clamping-force [SOLO_PINS]MINI90_EXTRA_FORCE_PIN 
 
 ### Spindle ###
 

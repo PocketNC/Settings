@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Schunk Mini90 open
-halcmd sets vice-released 1
+halcmd sets vise-released 1
