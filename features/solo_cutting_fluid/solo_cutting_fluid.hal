@@ -149,3 +149,13 @@ net cutting-fluid-pressure cf-limit2.in
 
 net cutting-fluid-pressure-limited cf-limit2.out
 net cutting-fluid-pressure-limited cf-mult2.in1
+
+#unlinkp [SOLO_PINS]AIR_SEAL_PIN
+newinst or2 cf-or2
+addf cf-or2 servo-thread
+
+net spindle-enable cf-or2.in0
+net cutting-fluid-halui-is-on cf-or2.in1
+
+net air-seal cf-or2.out
+net air-seal [SOLO_PINS]AIR_SEAL_PIN

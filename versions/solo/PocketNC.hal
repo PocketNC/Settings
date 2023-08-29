@@ -404,8 +404,12 @@ net spindle-torque solo_vfd.output-torque
 
 net spindle-enable spindle.0.on
 net spindle-enable solo_vfd.spindle-on
-# turn on air seal when spindle is enabled
-net spindle-enable [SOLO_PINS]AIR_SEAL_PIN
+
+# This is currently connected in the solo_cutting_fluid feature
+# as we want to turn this on when the coolant is on or the spindle
+# is on. TODO - In SOFT-1190, we'll need to be aware of where this
+# is hooked up and when.
+#net spindle-enable [SOLO_PINS]AIR_SEAL_PIN
 
 net spindle-speed spindle.0.speed-out
 net spindle-speed solo_vfd.speed-cmd
