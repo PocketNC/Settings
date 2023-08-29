@@ -68,7 +68,7 @@ net joint-3-max-velocity solo-door.joint.3.max-velocity-out
 net joint-4-max-velocity solo-door.joint.4.max-velocity-out
 
 net [SOLO_DOOR]INHIBIT_SPINDLE_SIG solo-door.inhibit-spindle
-net [SOLO_DOOR]ESTOP_SIG solo-door.fault
+net [SOLO_DOOR]FAULT_SIG solo-door.fault
 
 net inhibit-cutting-fluid solo-door.inhibit-cutting-fluid
 
