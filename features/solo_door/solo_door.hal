@@ -55,8 +55,6 @@ net solo-door-open-out [SOLO_PINS]DOOR_OPEN_PIN
 net solo-door-close-out solo-door.close-out
 net solo-door-close-out [SOLO_PINS]DOOR_CLOSE_PIN
 
-net reset-estop solo-door.reset-cmd
-
 net joint-0-max-velocity solo-door.joint.0.max-velocity-out
 
 net joint-1-max-velocity solo-door.joint.1.max-velocity-out

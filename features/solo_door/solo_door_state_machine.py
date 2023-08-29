@@ -93,7 +93,7 @@ class SoloDoorState(object):
     self.machine.add_transition(NEXT, States.CLOSING, States.OPENING, conditions="is_open_requested")
     self.machine.add_transition(NEXT, States.CLOSING, States.TIMEOUT_CLOSING_DOOR, conditions="has_timed_out")
 
-    self.machine.add_transition(NEXT, States.FAULT, States.STARTUP, conditions="is_reset_requested")
+    self.machine.add_transition(NEXT, States.FAULT, States.STARTUP)
 
   def update(self, dt):
     self.time_since_open_or_close += dt
