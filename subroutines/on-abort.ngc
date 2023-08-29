@@ -1,15 +1,18 @@
 o<on-abort> sub
 
-G54
+G40
+
+M429
+
 G17
 G90
 G94
 M48
-G40
 M5
 G80
 M9
-M429
+
+G54
 
 o<on-abort> endsub
 M2
