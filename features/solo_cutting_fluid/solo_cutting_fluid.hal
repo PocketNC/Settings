@@ -150,6 +150,10 @@ net cutting-fluid-pressure cf-limit2.in
 net cutting-fluid-pressure-limited cf-limit2.out
 net cutting-fluid-pressure-limited cf-mult2.in1
 
+# TODO - In SOFT-1190, this will either need to go in the 
+# spindle feature or remain here, but we'll likely need
+# to set a priority to ensure the proper signals have been
+# properly set up.
 #unlinkp [SOLO_PINS]AIR_SEAL_PIN
 newinst or2 cf-or2
 addf cf-or2 servo-thread
