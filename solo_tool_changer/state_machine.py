@@ -3,6 +3,7 @@ from enum import Enum, auto
 import penta_messages
 import ini
 import os
+import json
 
 POCKETNC_VAR_DIRECTORY = os.environ["POCKETNC_VAR_DIRECTORY"]
 
