@@ -20,14 +20,14 @@ G53 G0 Z0
 
 ;F#<_ini[TOOL_PROBE]FEED_TRAVEL>
 ;G90 G1 Y1.75 X1.75
-;G90 G1 Z1.959
+;G90 G1 Z1.3291
 ;o<add-points-probe-line> call [-1] [0] [0] [0] [0] [-1] [2] [3.5] [0.51] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 ;G91 G0 B[ -#<_penta_line_angle_about_y> ]
 ;o<clear_points> call
 
 F#<_ini[TOOL_PROBE]FEED_TRAVEL>
 G90 G1 Y1.75 X1.75
-G90 G1 Z2.565
+G90 G1 Z1.9351
 
 o<add-points-probe-line> call [-1] [0] [0] [0] [0] [-1] [10] [3.5] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 

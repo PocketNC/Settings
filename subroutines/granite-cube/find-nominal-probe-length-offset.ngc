@@ -4,7 +4,7 @@ o<find-nominal-probe-length-offset> sub
 #<toolNumber> = #2
 #<probeTipDiameter> = #3
 
-#<nominalDistFromTableToTopFace> = 60.6
+#<nominalDistFromTableToTopFace> = 44.6
 
 M70
 
