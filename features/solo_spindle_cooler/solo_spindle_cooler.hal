@@ -1,0 +1,2 @@
+loadusr -Wn spindle-d5next /opt/pocketnc/Settings/d5next_hal.py spindle-d5next [SOLO_PINS]SPINDLE_D5NEXT_ADDRESS
+net spindle-temperature spindle-d5next.temperature_c

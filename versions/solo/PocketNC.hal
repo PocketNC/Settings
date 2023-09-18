@@ -5,10 +5,6 @@ loadusr -Wn mcp22 hal_gpio_mcp23017 -n mcp22 -b 3 -a 34 -op A00,A04,A05,A06,A07,
 # Spindle VFD control over serial
 loadusr -Wn solo_vfd /opt/pocketnc/Settings/solo_vfd_hal.py
 
-# D5 Next water cooler data
-loadusr -Wn d5next /opt/pocketnc/Settings/d5next.py
-net spindle-temperature d5next.temperature_c
-
 newinst bb_gpio init
 
 loadrt torque axes=xyzbct

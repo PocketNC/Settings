@@ -1,0 +1,2 @@
+loadusr -Wn frame-d5next /opt/pocketnc/Settings/d5next_hal.py frame-d5next [SOLO_PINS]FRAME_D5NEXT_ADDRESS
+net frame-temperature frame-d5next.temperature_c

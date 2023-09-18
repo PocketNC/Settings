@@ -1,40 +1,14 @@
-#!/usr/bin/python3
-
-#********************************************************************
-# Description:  d5next
-#               This file, 'd5next.py', is a HAL component that 
-#               reads data from a D5 Next water cooler via I2C.
-#
-# Author: John Allwine <john@pocketnc.com>
-# License: GPL Version 2
-#    
-# Copyright (c) 2021 Pocket NC Company All rights reserved.
-#
-#*******************************************************************
-
 from smbus import SMBus
-import hal
-import time
+import sys
 
-b = SMBus(3)
-h = hal.component("d5next")
+class D5NextError(Exception):
+  pass
 
-h.newpin("fan.output", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("fan.voltage", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("fan.current", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("fan.speed", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("fan.flags", hal.HAL_FLOAT, hal.HAL_OUT)
+class D5NextCommunicationError(D5NextError):
+  pass
 
-h.newpin("pump.output", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("pump.voltage", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("pump.current", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("pump.speed", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("pump.flags", hal.HAL_FLOAT, hal.HAL_OUT)
-
-h.newpin("flow", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("temperature_c", hal.HAL_FLOAT, hal.HAL_OUT)
-h.newpin("temperature_f", hal.HAL_FLOAT, hal.HAL_OUT)
-h.ready()
+class D5NextInvalidDataError(D5NextError):
+  pass
 
 crc_table = [0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0]
 def docrc16(data, crc):
@@ -56,34 +30,52 @@ def crc16(data):
   crc ^= 0xffff
   return crc
 
-try:
-  while True:
+class D5Next:
+  def __init__(self, address=0x1e):
+    self.b = SMBus(3)
+    self.address = address
+
+  def readData(self):
     try:
-      data = b.read_i2c_block_data(0x1e, 0x00)
-
-      crc = ((data[23] << 8) | data[24])
-      if crc == crc16(data[0:23]):
-        h['fan.output'] = ((data[1] << 8) | data[2])/100    # in percentage
-        h['fan.voltage'] = ((data[3] << 8) | data[4])/100   # in volts
-        h['fan.current'] = ((data[5] << 8) | data[6])/1000  # in amps
-        h['fan.speed'] = ((data[7] << 8) | data[8])         # in RPM
-        h['fan.flags'] = data[9]
-
-        h['pump.output'] = ((data[10] << 8) | data[11])/100    # in percentage
-        h['pump.voltage'] = ((data[12] << 8) | data[13])/100   # in volts
-        h['pump.current'] = ((data[14] << 8) | data[15])/1000  # in amps
-        h['pump.speed'] = ((data[16] << 8) | data[17])         # in RPM
-        h['pump.flags'] = data[18]
-
-        h['flow'] = ((data[19] << 8) | data[20])/10          # in liters / hour
-        h['temperature_c'] = ((data[21] << 8) | data[22])/100  # in degrees C
-        h['temperature_f'] = ((data[21] << 8) | data[22])/100*9./5+32  # in degrees F
-
+      data = self.b.read_i2c_block_data(self.address, 0x00)
     except:
-      pass
+      raise D5NextCommunicationError("Error reading from address %s" % (self.address,))
 
-    time.sleep(1)
-except KeyboardInterrupt:
-  raise SystemExit
+    crc = ((data[23] << 8) | data[24])
+    if crc == crc16(data[0:23]):
+      self.fan_output = ((data[1] << 8) | data[2])/100    # in percentage
+      self.fan_voltage = ((data[3] << 8) | data[4])/100   # in volts
+      self.fan_current = ((data[5] << 8) | data[6])/1000  # in amps
+      self.fan_speed = ((data[7] << 8) | data[8])         # in RPM
+      self.fan_flags = data[9]
 
+      self.pump_output = ((data[10] << 8) | data[11])/100    # in percentage
+      self.pump_voltage = ((data[12] << 8) | data[13])/100   # in volts
+      self.pump_current = ((data[14] << 8) | data[15])/1000  # in amps
+      self.pump_speed = ((data[16] << 8) | data[17])         # in RPM
+      self.pump_flags = data[18]
 
+      self.flow = ((data[19] << 8) | data[20])/10          # in liters / hour
+      self.temperature_c = ((data[21] << 8) | data[22])/100  # in degrees C
+      self.temperature_f = ((data[21] << 8) | data[22])/100*9./5+32  # in degrees F
+    else:
+      raise D5NextInvalidDataError("Invalid CRC16 checksum")
+
+  def getDataAsObject(self):
+    return {
+     "fan_output": self.fan_output,
+     "fan_voltage": self.fan_voltage,
+     "fan_current": self.fan_current,
+     "fan_speed": self.fan_speed,
+     "fan_flags": self.fan_flags,
+
+     "pump_output": self.pump_output,
+     "pump_voltage": self.pump_voltage,
+     "pump_current": self.pump_current,
+     "pump_speed": self.pump_speed,
+     "pump_flags": self.pump_flags,
+
+     "flow": self.flow,
+     "temperature_c": self.temperature_c,
+     "temperature_f": self.temperature_f
+    }
