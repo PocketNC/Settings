@@ -35,6 +35,7 @@ def detect_trinket():
 
 if __name__ == "__main__":
     # What shows up in halcmd show comp
+    pause = 60
     hal_component = hal.component("gpio_expander")
     hal_component.setprefix("gpio_expander") # What does this do?
     in_01 = hal_component.newpin("in-0", hal.HAL_BIT, hal.HAL_OUT)
@@ -59,7 +60,13 @@ if __name__ == "__main__":
     try:
         print("Listening for events")
         while True:
-            acm = '/dev/ttyACM1'
+            try:
+                acm = '/dev/ttyACM1'
+            except:
+                print("Serial interface disappeared")
+                print("Sleeping 20 seconds before attempting again")
+                time.sleep(20)
+                pass
             # acm = detect_trinket()  # In future Python releases (3.8+), we can use acm := 
             # while not acm:
             #     acm = detect_trinket()
