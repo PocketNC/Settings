@@ -38,7 +38,7 @@ h.newpin("flow", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("temperature_c", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("temperature_f", hal.HAL_FLOAT, hal.HAL_OUT)
 
-h.newpin("error", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("error", hal.HAL_S32, hal.HAL_OUT)
 h.ready()
 
 device = d5next.D5Next(address)
@@ -62,6 +62,7 @@ try:
       h['flow'] = device.flow
       h['temperature_c'] = device.temperature_c
       h['temperature_f'] = device.temperature_f
+
       h['error'] = 0
     except d5next.D5NextCommunicationError:
       h['error'] = 1

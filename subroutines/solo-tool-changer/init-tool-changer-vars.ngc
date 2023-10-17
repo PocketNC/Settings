@@ -30,7 +30,7 @@ o100 endif
 ; We also probe the top face of the granite cube and then measure
 ; the center of rotation of the B axis using that probe. We can 
 ; then shift this number by that amount (seems right!).
-#<_spindleFaceToolLengthOffset> = #<_ini[TOOL_CHANGER]SPINDLE_TOOL_OFFSET>
+#<_spindleFaceToolLengthOffset> = [ #<_ini[TOOL_SETTER]Z> - #<_ini[TOOL_SETTER]TRIGGER_Z> ]
 
 ; #_drawerTopFace is used by calibrate-tool-changer to initially position
 ; the probe above the open drawer so it can probe the actual position.

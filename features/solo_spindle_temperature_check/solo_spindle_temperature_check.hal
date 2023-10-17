@@ -1,0 +1,12 @@
+loadusr -Wn spindle-check /opt/pocketnc/Settings/features/solo_spindle_temperature_check/solo_spindle_temperature_check.py
+
+net spindle-temperature spindle-check.temperature-c
+net temp-sensor-error spindle-check.sensor-error
+net temp-sensor-error spindle-d5next.error
+
+setp spindle-check.temperature-max-c 37.777
+
+net [PENTA]SOLO_SPINDLE_ABORT_SIG spindle-check.abort
+net [PENTA]SOLO_SPINDLE_STOP_SIG spindle-check.spindle-stop
+net [PENTA]SOLO_SPINDLE_OK_TO_RUN_SIG spindle-check.ok-to-run
+net [PENTA]SOLO_SPINDLE_INHIBIT_SIG spindle-check.inhibit-spindle
