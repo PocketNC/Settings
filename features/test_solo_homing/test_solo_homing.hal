@@ -1,0 +1,24 @@
+####################################################
+# Test Solo Homing
+####################################################
+loadusr -Wn test-solo-homing /opt/pocketnc/Settings/features/test_solo_homing/test_solo_homing.py
+
+net x-pos test-solo-homing.x
+net y-pos test-solo-homing.y
+net z-pos test-solo-homing.z
+net b-pos test-solo-homing.b
+net c-pos test-solo-homing.c
+
+unlinkp x-limit-pin.in
+unlinkp y-limit-pin.in
+unlinkp z-limit-pin.in
+unlinkp b-limit-pin.in
+unlinkp b-index-pin.in
+unlinkp c-limit-pin.in
+
+net x-max-and-home test-solo-homing.x-limit 
+net y-max-and-home test-solo-homing.y-limit 
+net z-max-and-home test-solo-homing.z-limit 
+net b-min-and-home test-solo-homing.b-limit 
+net b-index test-solo-homing.b-index 
+net c-home-and-index test-solo-homing.c-limit 
