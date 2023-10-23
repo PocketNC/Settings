@@ -10,11 +10,18 @@ addf estop-button-while-estopped.and servo-thread
 newinst and2 estop-while-not-estopped.and
 addf estop-while-not-estopped.and servo-thread
 
+newinst debounce estop-button.debounce pincount=1
+addf estop-button.debounce.funct servo-thread
+setp estop-button.debounce.delay 50
+
 newinst oneshot estop-button.oneshot
 setp estop-button.oneshot.width 0.1
 addf estop-button.oneshot servo-thread
 
-net estop-button-triggered estop-button-pin.in
+net estop-button-raw estop-button-pin.in
+net estop-button-raw estop-button.debounce.0.in
+
+net estop-button-triggered estop-button.debounce.0.out
 net estop-button-triggered estop-button.oneshot.in
 
 net estop-button-signal estop-button.oneshot.out

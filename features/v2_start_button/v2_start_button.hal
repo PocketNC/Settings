@@ -9,11 +9,18 @@ addf start-button-while-running.and servo-thread
 newinst and2 start-button-while-not-running.and
 addf start-button-while-not-running.and servo-thread
 
+newinst debounce start-button.debounce pincount=1
+addf start-button.debounce.funct servo-thread
+setp start-button.debounce.delay 50
+
 newinst oneshot start-button.oneshot
 setp start-button.oneshot.width 0.1
 addf start-button.oneshot servo-thread
 
-net start-button-triggered start-button-pin.in
+net start-button-raw start-button-pin.in
+net start-button-raw start-button.debounce.0.in
+
+net start-button-triggered start-button.debounce.0.out
 net start-button-triggered start-button.oneshot.in
 
 net start-button-signal start-button.oneshot.out
