@@ -1,0 +1,46 @@
+from _typeshed import Incomplete
+
+DBG_state: int
+DBG_supress: bool
+
+def DBG(str) -> None: ...
+
+class _WidgetBase:
+    metadata: Incomplete
+    widgets: Incomplete
+    cmd: Incomplete
+    state: bool
+    pintype: Incomplete
+    true_state: Incomplete
+    false_state: Incomplete
+    true_command: Incomplete
+    false_command: Incomplete
+    status_pin: bool
+    default_state: bool
+    def hal_init(self, comp, name, metadata, command, widgets, dbg) -> None: ...
+    def toggle_state(self, pressed: bool = ...) -> None: ...
+    def set_state(self, state) -> None: ...
+    def hal_update(self) -> None: ...
+
+class _ToggleBase(_WidgetBase):
+    def find_method(self, meth_name): ...
+    state: Incomplete
+    def toggle_state(self, pressed) -> None: ...
+    def hal_update(self, *a) -> None: ...
+
+class GROUP(_WidgetBase):
+    group_list: Incomplete
+    def add_list(self, grouplist) -> None: ...
+    output: Incomplete
+    def toggle_state(self, skip) -> None: ...
+    def hal_update(self, *a) -> None: ...
+
+class TOGGLE_BUTTONS(_ToggleBase): ...
+
+class MOMENTARY_BUTTONS(_ToggleBase):
+    state: Incomplete
+    def toggle_state(self, pressed) -> None: ...
+
+class RADIO_BUTTONS(_ToggleBase):
+    state: Incomplete
+    def toggle_state(self, pressed) -> None: ...

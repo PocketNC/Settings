@@ -1,0 +1,20 @@
+####################################################
+# GPIO Expander
+####################################################
+loadusr -Wn gpio_expander /opt/pocketnc/Settings/features/gpio_expander/gpio_expander.py
+# net [GPIO_EXPANDER]BUTTON_0_SIGNAL  gpio_expander.in-0
+# net [GPIO_EXPANDER]BUTTON_1_SIGNAL  gpio_expander.in-1
+
+
+
+net estop-5 gpio_expander.in-0
+setp gpio_expander.in-0.inverted 1
+
+
+
+net reset-estop-5 gpio_expander.in-1
+setp gpio_expander.in-1.inverted 1
+
+
+net estop-is-activated gpio_expander.out-0
+# net estop-5 gpio_expander.out-1

@@ -1,0 +1,3 @@
+[GPIO_EXPANDER]
+BUTTON_0_SIGNAL=estop-5
+BUTTON_1_SIGNAL=reset-estop-5
