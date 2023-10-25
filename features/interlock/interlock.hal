@@ -7,7 +7,14 @@ net program-is-idle interlock.idle
 net program-is-running interlock.running
 net program-is-paused interlock.paused
 
-net interlock-open interlock-open-pin.in
+newinst debounce interlock.debounce pincount=1
+addf interlock.debounce.funct servo-thread
+setp interlock.debounce.delay 50
+
+net interlock-raw interlock-open-pin.in
+net interlock-raw interlock.debounce.0.in
+
+net interlock-open interlock.debounce.0.out
 net interlock-open interlock.open
 
 net is-spindle-enabled interlock.spindle-on
