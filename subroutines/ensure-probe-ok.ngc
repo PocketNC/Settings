@@ -7,7 +7,7 @@ o100 endif
 
 M66 P#<_ini[PENTA]PROBE_ERROR_DIGITAL_IN> L0
 o200 if [ ABS[ #5399-1 ] LT .000001 ]
-  (abort,Probe is in an error state. Ensure the probe is charged and has line of sight to a receiver in the middle of one of the LED strips on the door.)
+  (abort,Probe is in an error state. Ensure the probe is charged and has line of sight to a receiver.)
 o200 endif
 
 o<ensure-probe-ok> endsub
