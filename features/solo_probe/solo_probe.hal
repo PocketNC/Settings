@@ -31,3 +31,20 @@ net tool-probe-raw tool-probe-pin.in
 net tool-probe-raw tool-probe-or-error.in1
 
 net [PENTA]TOOL_PROBE_SIG tool-probe-or-error.out
+
+loadrt probe-error
+addf probe-error.funct servo-thread
+
+net motion-type motion.motion-type
+net motion-type probe-error.motion-type
+
+net tool-probe-error-raw probe-error.probe-error
+
+newinst oneshot tool-probe-abort.oneshot
+setp tool-probe-abort.oneshot.width 0.1
+addf tool-probe-abort.oneshot servo-thread
+
+net tool-probe-error-abort probe-error.abort
+net tool-probe-error-abort tool-probe-abort.oneshot.in
+
+net [PENTA]TOOL_PROBE_ABORT_SIG tool-probe-abort.oneshot.out
