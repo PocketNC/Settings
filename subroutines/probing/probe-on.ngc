@@ -1,4 +1,5 @@
 o<probe-on> sub
 M198 P1
+G4 P2
 o<probe-on> endsub
 M2

@@ -47,4 +47,6 @@ addf tool-probe-abort.oneshot servo-thread
 net tool-probe-error-abort probe-error.abort
 net tool-probe-error-abort tool-probe-abort.oneshot.in
 
+net probe-on probe-error.probe-on
+
 net [PENTA]TOOL_PROBE_ABORT_SIG tool-probe-abort.oneshot.out

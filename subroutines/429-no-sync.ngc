@@ -1,0 +1,8 @@
+;M429 by remap: select Identity kinematics
+o<429-no-sync>sub
+  #<SWITCHKINS_PIN> = 3  ; set N as required: motion.analog-out-0N
+  #<kinstype> = 0        ; Identity kinematics
+
+   M68  E#<SWITCHKINS_PIN> Q#<kinstype> ; set kinstype value
+o<429-no-sync> endsub
+M2

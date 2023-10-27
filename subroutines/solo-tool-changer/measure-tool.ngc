@@ -1,5 +1,11 @@
 o<measure-tool> sub
 
+; Ensure the probe is off when tool setting
+M66 P#<_ini[PENTA]PROBE_ON_DIGITAL_IN> L0
+o100 if [ ABS[ 1 - #5399 ] LT .000001 ]
+  o<probe-off> call
+o100 endif
+
 #<feedTravel> = #<_ini[TOOL_PROBE]FEED_TRAVEL>
 #<feedFast> = #<_ini[TOOL_PROBE]FEED_FAST>
 #<feedBack> = #<_ini[TOOL_PROBE]FEED_BACK>

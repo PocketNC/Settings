@@ -2,7 +2,7 @@ o<on-abort> sub
 
 G40
 
-M429
+o<429-no-sync> call
 
 G17
 G90
@@ -12,7 +12,10 @@ M5
 G80
 M9
 
+M198 P0
+
 G54
+
 
 o<on-abort> endsub
 M2
