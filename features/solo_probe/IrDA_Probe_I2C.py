@@ -18,8 +18,6 @@ class Probe_COMMANDS():
         self.WAKE = 0b10011001
         self.SLEEP = 0b01100110
         self.POWERSAVE = 0b01000100
-        self.DETACH_USB = 0x43
-        self.ATTACH_USB = 0x42
         self.RESET_PROBE = 0x47
         self.SETBEEPCOMMAND = 0x45
         self.CLEAR_PROBE_COMMAND = 0x00
@@ -168,7 +166,7 @@ class IrDA_Probe_I2C():
         self.COMMAND_REG    = 0x00
         self.BATTERY_REG    = 0x01
         self.STATUS_REG     = 0x02
-        self.SLEEP_REG      = 0x03
+        self.I2C_CMD_REG      = 0x03
         self.SLEEP_TIMEOUT_REG = 0x04
         self.BEEP_REG       = 0x05
         self.PER2_REG       = 0x06
@@ -181,19 +179,19 @@ class IrDA_Probe_I2C():
         self.CCB1_REG       = 0x0D
         self.CCB0_REG       = 0x0E
 
-    def setBeep(self,frequency:float, period:float):
-        """set the frequency and period for the beep"""
+    def setBeep(self,frequency:float, duty_cycle:float):
+        """set the frequency and duty_cycle for the beep"""
         clock = 24000000
         #print(frequency)
         #print(type(frequency))
         PER = int(clock/float(frequency))
-        CCA = int(PER*period)
+        CCA = int(PER*duty_cycle)
         CCB = CCA
         if(frequency > clock/2):
             raise ValueError("Frequency {} is not allowed use a frequency > 0.5x the clock frequency({})".format(frequency,clock))
         elif( (CCA > 0xFFFFFF) | (CCB > 0xFFFFFF) ):
-            raise ValueError("CCA {} or CCB {} register is out of range make sure you are using a valid period (0.50 for 50%)!".format(CCA,CCB))
-        print("Frequency: {}\r\nCCA: {}\r\nCCB: {}".format(PER,CCA,CCB))
+            raise ValueError("CCA {} or CCB {} register is out of range make sure you are using a valid duty_cycle (0.50 for 50%)!".format(CCA,CCB))
+        #print("Frequency: {}\r\nCCA: {}\r\nCCB: {}".format(PER,CCA,CCB))
         new = [
             (PER >> 16)&0xFF,
             (PER >> 8)&0xFF,
@@ -208,7 +206,7 @@ class IrDA_Probe_I2C():
         #write all the Waveform Registers
         self.writeBlock(self.PER2_REG,new)
         #send a command to process the new values.
-        self.write(self.SLEEP_REG, self.COMMANDS.SETBEEPCOMMAND)
+        self.write(self.I2C_CMD_REG, self.COMMANDS.SETBEEPCOMMAND)
     
 
     def read(self,address):
@@ -240,7 +238,7 @@ class IrDA_Probe_I2C():
     
     def readSleep(self):
         """Reads the status register and returns that value - the command status is also stored in self.COMMAND"""
-        self.SLEEP = self.read(self.SLEEP_REG)
+        self.SLEEP = self.read(self.I2C_CMD_REG)
         return self.SLEEP
     
     def readCommand(self):
@@ -260,24 +258,18 @@ class IrDA_Probe_I2C():
     
     def wake(self):
         """Sends Wake Up Command to Probe Interface"""
-        self.write(self.SLEEP_REG,self.COMMANDS.WAKE)
+        self.write(self.I2C_CMD_REG,self.COMMANDS.WAKE)
 
     def sleep(self):
         """Sends Sleep Command to Probe Interface"""
-        self.write(self.SLEEP_REG,self.COMMANDS.SLEEP)
+        self.write(self.I2C_CMD_REG,self.COMMANDS.SLEEP)
         
-    def detachUSB(self):
-        """Sends detach USB Command to Probe Interface"""
-        self.write(self.SLEEP_REG,self.COMMANDS.DETACH_USB)
-    def attachUSB(self):
-        """Sends Sleep Command to Probe Interface"""
-        self.write(self.SLEEP_REG,self.COMMANDS.ATTACH_USB)
     def resetProbe(self):
         """sends reset Command to the Probe"""
-        self.write(self.SLEEP_REG,self.COMMANDS.RESET_PROBE)
+        self.write(self.I2C_CMD_REG,self.COMMANDS.RESET_PROBE)
     def clearCommands(self):
         """sends reset Command to the Probe"""
-        self.write(self.SLEEP_REG,self.COMMANDS.CLEAR_PROBE_COMMAND)
+        self.write(self.I2C_CMD_REG,self.COMMANDS.CLEAR_PROBE_COMMAND)
     def beepOFF(self):
         """sends beep off command"""
         self.write(self.BEEP_REG,0)
@@ -327,12 +319,6 @@ if( __name__ == "__main__"):
     parser.add_argument("-w","--wake",
                         action='store_true',
                         help="Command the probe to wake up.")
-    parser.add_argument("-a","--attach",
-                        action='store_true',
-                        help="Command the probe to attach USB (for Programming).")
-    parser.add_argument("-d","--detach",
-                        action='store_true',
-                        help="Command the probe to detach USB (for Programming).")
     parser.add_argument("-r","--reset",
                         action='store_true',
                         help="Command the probe reset.")
@@ -355,7 +341,7 @@ if( __name__ == "__main__"):
     ###SECTION FOR settime COMMAND
     parser_setTime = subparsers.add_parser("note", help="Set the Note - Note there are no hard limits set Some frequencies will not performe as well as others.")
     parser_setTime.add_argument("frequency",type=float,help="frequency in Hz")
-    parser_setTime.add_argument("period",type=float,help="duty cycle in decimal example 50 percent is 0.5")
+    parser_setTime.add_argument("duty_cycle",type=float,help="duty cycle in decimal example 50 percent is 0.5")
 
     arg = parser.parse_args()
     #connect the probe
@@ -371,10 +357,6 @@ if( __name__ == "__main__"):
         probe.sleep()
     elif arg.wake:
         probe.wake()
-    elif arg.attach:
-        probe.attachUSB()
-    elif arg.detach:
-        probe.detachUSB()
     elif arg.reset:
         probe.resetProbe()
     elif arg.clear:
@@ -385,7 +367,7 @@ if( __name__ == "__main__"):
     elif (arg.subparser_name=="note"):
         print(arg)
         print(arg.subparser_name)
-        probe.setBeep(arg.frequency,arg.period)
+        probe.setBeep(arg.frequency,arg.duty_cycle)
     else:
         parser.print_help()
 

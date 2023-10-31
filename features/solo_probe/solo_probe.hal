@@ -50,3 +50,9 @@ net tool-probe-error-abort tool-probe-abort.oneshot.in
 net probe-on probe-error.probe-on
 
 net [PENTA]TOOL_PROBE_ABORT_SIG tool-probe-abort.oneshot.out
+
+net probe-beep-frequency solo-probe.beep.frequency
+net probe-beep-on solo-probe.beep.on
+
+net probe-battery-voltage solo-probe.battery.voltage
+net probe-battery-percentage solo-probe.battery.percentage
