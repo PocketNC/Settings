@@ -96,7 +96,7 @@ try:
       if time.time()-lastBattery > 60:
         probe.updateStatus()
         voltage = probe.BATTERY/256*2*2.8
-        percentage = (voltage-3.3)/(4.2-3.3)
+        percentage = (voltage-3.3)/(4.2-3.3)*100
 
         h["battery.voltage"] = voltage
         h["battery.percentage"] = percentage
