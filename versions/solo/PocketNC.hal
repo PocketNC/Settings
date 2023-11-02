@@ -571,11 +571,20 @@ net tool-released [SOLO_PINS]TOOL_OPEN_PIN
 net taper-air-purge motion.digital-out-61
 net taper-air-purge [SOLO_PINS]TAPER_AIR_PURGE_PIN
 
+loadusr -Wn unclamp-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py unclamp-cmd-reset
+loadusr -Wn clamp-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py clamp-cmd-reset
+
+setp unclamp-cmd-reset.delay .3
+setp clamp-cmd-reset.delay .3
+
+net solo-clamp-cmd clamp-cmd-reset.in
+net solo-unclamp-cmd unclamp-cmd-reset.in
+
 net unclamp-cmd solo-tool-changer.unclamp-cmd
-net unclamp-cmd motion.digital-out-59
+net unclamp-cmd unclamp-cmd-reset.out
 
 net clamp-cmd solo-tool-changer.clamp-cmd
-net clamp-cmd motion.digital-out-60
+net clamp-cmd clamp-cmd-reset.out
 
 # See more solo-tool-changer connections in PocketNC_PostMillTask.hal
 
