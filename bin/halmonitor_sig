@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+
+import machinekit.hal
+import sys
+import time
+
+args = sys.argv[1:]
+
+pins = [ machinekit.hal.Signal(arg) for arg in args ]
+
+oldValues = [ float(p.get()) for p in pins ]
+print("\t".join([ "%0.6f" % (value,) for value in oldValues ]))
+
+while True:
+  newValues = [ float(p.get()) for p in pins ]
+  if any([ abs(newValue-oldValue) > .000001 for (newValue,oldValue) in zip(newValues, oldValues) ]):
+    print("\t".join([ "%0.6f" % (value,) for value in newValues ]))
+    oldValues = newValues
+
+  time.sleep(.01)
