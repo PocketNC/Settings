@@ -4,6 +4,9 @@ o<init-tool-changer-vars> call
 
 M70
 
+G20
+M429
+
 G61
 
 G90

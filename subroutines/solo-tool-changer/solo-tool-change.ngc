@@ -31,6 +31,9 @@ o500 endif
 #<backupMotionMode> = #<_motion_mode>
 M70                                            ( save current modal state )
 
+G20
+M429
+
 G61
 
 G90
