@@ -24,7 +24,7 @@ M429
 G53 G0 Z0
 G53 G0 B-90
 
-G1 F#<feedTravel> X#<_ini[TOOL_SETTER]X> Y#<_ini[TOOL_SETTER]Y>
+G53 G1 F#<feedTravel> X#<_ini[TOOL_SETTER]X> Y#<_ini[TOOL_SETTER]Y>
 
 G54 G91
 G38.2 F20 Z[ #<_ini[TOOL_SETTER]Z> ]
