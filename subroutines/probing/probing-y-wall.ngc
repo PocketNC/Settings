@@ -73,7 +73,7 @@ o<probing-y-wall> sub
     #<currentWCS_Y> = [ #[5222+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
 
     ; Then add the probed position
-    #<newWCS_Y> = [ #<currentWCS_Y> + #<position> ]
+    #<newWCS_Y> = [ #<currentWCS_Y> + #<positionDeviation> ]
 
     ; And store it in the appropriate WCS
     G10 L2 P#<wcs> Y#<newWCS_Y>

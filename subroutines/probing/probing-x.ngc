@@ -53,7 +53,7 @@ o<probing-x> sub
     #<currentWCS_X> = [ #[5221+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
 
     ; Then add the probed position
-    #<newWCS_X> = [ #<currentWCS_X> + #<probedX> ]
+    #<newWCS_X> = [ #<currentWCS_X> + #<deviation> ]
 
     ; And store it in the appropriate WCS
     G10 L2 P#<wcs> X#<newWCS_X>

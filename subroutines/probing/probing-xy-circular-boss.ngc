@@ -95,8 +95,8 @@ o<probing-xy-circular-boss> sub
     #<currentWCS_Y> = [ #[5222+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
 
     ; Then add the probed position
-    #<newWCS_X> = [ #<currentWCS_X> + #<centerX> ]
-    #<newWCS_Y> = [ #<currentWCS_Y> + #<centerY> ]
+    #<newWCS_X> = [ #<currentWCS_X> + #<cx> ]
+    #<newWCS_Y> = [ #<currentWCS_Y> + #<cy> ]
 
     ; And store it in the appropriate WCS
     G10 L2 P#<wcs> X#<newWCS_X> Y#<newWCS_Y>

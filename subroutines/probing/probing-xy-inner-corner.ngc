@@ -129,8 +129,8 @@ o<probing-xy-inner-corner> sub
     #<currentWCS_Y> = [ #[5222+20*[#5220-1]] * [ #<_metric> * 25.4 + #<_imperial> ] ]
 
     ; Then add the probed position
-    #<newWCS_X> = [ #<currentWCS_X> + #<cornerX> ]
-    #<newWCS_Y> = [ #<currentWCS_Y> + #<cornerY> ]
+    #<newWCS_X> = [ #<currentWCS_X> + #<cx> ]
+    #<newWCS_Y> = [ #<currentWCS_Y> + #<cy> ]
 
     ; And store it in the appropriate WCS
     G10 L2 P#<wcs> X#<newWCS_X> Y#<newWCS_Y>
