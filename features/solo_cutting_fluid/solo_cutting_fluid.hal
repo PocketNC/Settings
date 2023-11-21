@@ -62,9 +62,13 @@ net cutting-fluid-toggle-5 cutting-fluid-toggle.in-4
 
 net cutting-fluid-toggle-out cutting-fluid-toggle.out
 
-loadusr -Wn rockhopper-cutting-fluid-toggle /opt/pocketnc/Settings/features/penta/reset_pin.py rockhopper-cutting-fluid-toggle
-loadusr -Wn rockhopper-cutting-fluid-on /opt/pocketnc/Settings/features/penta/reset_pin.py rockhopper-cutting-fluid-on
-loadusr -Wn rockhopper-cutting-fluid-off /opt/pocketnc/Settings/features/penta/reset_pin.py rockhopper-cutting-fluid-off
+newinst reset-pin rockhopper-cutting-fluid-toggle
+newinst reset-pin rockhopper-cutting-fluid-on
+newinst reset-pin rockhopper-cutting-fluid-off
+
+addf rockhopper-cutting-fluid-toggle.funct servo-thread
+addf rockhopper-cutting-fluid-on.funct servo-thread
+addf rockhopper-cutting-fluid-off.funct servo-thread
 
 net rockhopper-cutting-fluid-toggle rockhopper-cutting-fluid-toggle.in
 net rockhopper-cutting-fluid-on rockhopper-cutting-fluid-on.in

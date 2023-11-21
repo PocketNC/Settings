@@ -38,8 +38,11 @@ setp solo-door.joint.2.open-velocity [SOLO_DOOR]OPEN_MAX_LINEAR_VELOCITY
 setp solo-door.joint.3.open-velocity [SOLO_DOOR]OPEN_MAX_ROTARY_VELOCITY
 setp solo-door.joint.4.open-velocity [SOLO_DOOR]OPEN_MAX_ROTARY_VELOCITY
 
-loadusr -Wn solo-door-open-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py solo-door-open-cmd-reset
-loadusr -Wn solo-door-close-cmd-reset /opt/pocketnc/Settings/features/penta/reset_pin.py solo-door-close-cmd-reset
+newinst reset-pin solo-door-open-cmd-reset
+newinst reset-pin solo-door-close-cmd-reset
+
+addf solo-door-open-cmd-reset.funct servo-thread
+addf solo-door-close-cmd-reset.funct servo-thread
 
 net solo-door-open-cmd solo-door-open-cmd-reset.in
 net solo-door-open-cmd-out solo-door-open-cmd-reset.out
