@@ -95,7 +95,7 @@ def main():
       h[ERROR_CODE_PIN_NAME] = vfd.error_code
       h[DEBUG_VALUE_PIN_NAME] = vfd.debug_value
 
-    time.sleep(.016)
+    time.sleep(.05)
 
 if __name__ == "__main__":
   main()
