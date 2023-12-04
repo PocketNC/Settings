@@ -118,6 +118,16 @@ net [PENTA]CUTTING_FLUID_TOGGLE_OFF_SIG cutting-fluid-toggle-and-on.out
 setp hpg2.pwmread.06.max_time 2074689
 setp hpg2.pwmread.06.pin [SOLO_PINS]CUTTING_FLUID_FEEDBACK_PIN
 
+net t-duty-cycle hpg2.pwmread.06.duty_cycle
+net t-duty-cycle torque.duty_cycle.t
+
+net t-frequency hpg2.pwmread.06.frequency
+net t-frequency torque.frequency.t
+setp torque.filter.t .999
+
+net t-fault torque.fault.t
+net t-fault solo-estop.t-fault
+
 # timing parameters
 setp hpg3.stepgen.01.dirsetup        [CUTTING_FLUID]DIRSETUP
 setp hpg3.stepgen.01.dirhold         [CUTTING_FLUID]DIRHOLD

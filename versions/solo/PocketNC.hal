@@ -125,9 +125,6 @@ net c-f-errored solo-estop.c-f-error
 
 setp hpg2.pwmread.05.pin [SOLO_PINS]SPINDLE_FEEDBACK_PIN
 
-net tool-changer-duty-cycle hpg2.pwmread.06.duty_cycle
-net tool-changer-duty-cycle torque.duty_cycle.t
-
 # ################
 # X [0] Axis
 # ################
