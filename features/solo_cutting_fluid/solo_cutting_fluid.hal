@@ -3,6 +3,7 @@
 ####################################################
 
 newinst bb_gpio cutting-fluid-enable-pin pin=[SOLO_PINS]CUTTING_FLUID_ENABLE_PIN direction=output
+setp cutting-fluid-enable-pin.out 1
 
 newinst not inhibit-cutting-fluid.not
 newinst and2 cf-and-not-inhibit
@@ -21,7 +22,6 @@ net flood-coolant-condition-1 cf-and-not-inhibit.in1
 
 net flood-coolant cf-and-not-inhibit.out
 net flood-coolant [SOLO_PINS]FLOOD_COOLANT_PIN
-net flood-coolant cutting-fluid-enable-pin.out
 net flood-coolant hpg3.stepgen.01.enable
 
 newinst lut5 cutting-fluid-on
