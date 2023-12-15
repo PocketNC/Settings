@@ -40,6 +40,8 @@ h.newpin("beep.on", hal.HAL_BIT, hal.HAL_IN)
 h['beep.frequency'] = state['beep.frequency']
 h['beep.duty_cycle'] = state['beep.duty_cycle']
 h['beep.on'] = state['beep.on']
+h["battery.voltage"] = -1
+h["battery.percentage"] = -1
 
 try:
   probe.setBeep(state["beep.frequency"], state["beep.duty_cycle"])
@@ -93,7 +95,12 @@ try:
         except:
           logging.error("Error writing solo probe settings file", exc_info=True)
 
-      if time.time()-lastBattery > 60:
+# if we haven't gotten a status from the battery, then check every 2 seconds
+# otherwise, check only every minute
+      if(
+        (probe.BATTERY < 150 and time.time()-lastBattery > 2) or
+        (time.time()-lastBattery > 60)
+      ):
         probe.updateStatus()
         voltage = probe.BATTERY/256*2*2.8
         percentage = (voltage-3.3)/(4.2-3.3)*100

@@ -159,7 +159,7 @@ class IrDA_Probe_I2C():
         self.I2CAddress = I2CAddress
         self.BusAddress = BusAddress
 
-        self.BATTERY = 0
+        self.BATTERY = -1
         self.COMMAND = 0
         self.SLEEP = 0
 
