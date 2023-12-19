@@ -33,6 +33,7 @@ h = hal.component("solo-probe")
 h.newpin("probe-on", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("battery.voltage", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("battery.percentage", hal.HAL_FLOAT, hal.HAL_OUT)
+h.newpin("battery.raw", hal.HAL_U32, hal.HAL_OUT)
 h.newpin("beep.frequency", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("beep.duty_cycle", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("beep.on", hal.HAL_BIT, hal.HAL_IN)
@@ -42,6 +43,7 @@ h['beep.duty_cycle'] = state['beep.duty_cycle']
 h['beep.on'] = state['beep.on']
 h["battery.voltage"] = -1
 h["battery.percentage"] = -1
+h['battery.raw'] = 0
 
 try:
   probe.setBeep(state["beep.frequency"], state["beep.duty_cycle"])
@@ -51,11 +53,14 @@ try:
     probe.beepOFF()
 
   probe.updateStatus()
-  voltage = probe.BATTERY/256*2*2.8
+
+  battery = probe.BATTERY & 0b00111111
+  voltage = min(max(2.8 + battery / 45,3.3), 4.2)
   percentage = (voltage-3.3)/(4.2-3.3)*100
 
   h["battery.voltage"] = voltage
   h["battery.percentage"] = percentage
+  h["battery.raw"] = probe.BATTERY
 except:
   logging.error("Error writing solo probe settings to I2C bus", exc_info=True)
 
@@ -102,11 +107,14 @@ try:
         (time.time()-lastBattery > 60)
       ):
         probe.updateStatus()
-        voltage = probe.BATTERY/256*2*2.8
+
+        battery = probe.BATTERY & 0b00111111
+        voltage = min(max(2.8 + battery / 45,3.3), 4.2)
         percentage = (voltage-3.3)/(4.2-3.3)*100
 
         h["battery.voltage"] = voltage
         h["battery.percentage"] = percentage
+        h["battery.raw"] = probe.BATTERY
 
         lastBattery = time.time()
       lastProbeOn = h["probe-on"]
