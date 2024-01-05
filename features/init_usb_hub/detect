@@ -1,5 +1,0 @@
-#!/usr/bin/python3
-
-import version
-
-print("1" if version.getVersion() == "solo" else "0")
