@@ -64,7 +64,10 @@ def success():
 def party():
   LEDs.party()
 
-commands = [ normal, error, success, party ]
+def off():
+  LEDs.off()
+
+commands = [ normal, error, success, party, off ]
 
 try:
   while True:

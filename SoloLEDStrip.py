@@ -69,3 +69,11 @@ class SoloLEDStrip:
     self.write(Registers.MODE, Modes.COLOR_WHEEL)
     self.write(Registers.TIME_MULTIPLIER, 30)
     self.write(Registers.PIXEL_MULTIPLIER, 40)
+
+  def off(self):
+    self.write(Registers.MODE, Modes.RGBW)
+    self.write(Registers.RED, 0)
+    self.write(Registers.GREEN, 0)
+    self.write(Registers.BLUE, 0)
+    self.write(Registers.WHITE, 0)
+    self.write(Registers.PULSE, 0)
