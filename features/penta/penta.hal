@@ -10,6 +10,8 @@ addf motion-controller             servo-thread
 newinst not program-is-not-running.not
 addf program-is-not-running.not servo-thread
 
+net tool-diameter halui.tool.diameter
+
 net program-is-idle    halui.program.is-idle
 net program-is-running halui.program.is-running
 net program-is-running program-is-not-running.not.in
