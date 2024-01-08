@@ -17,7 +17,7 @@ o<probing-xy-circular-partial-boss> sub
 
   o<push_feature_set> call
 
-  #<probeDiameter> = [ #<_ini[TOOL_PROBE]DIAMETER> * [ #<_metric> * 25.4 + #<_imperial> ] ]
+  #<probeDiameter> = [ #5410 * [ #<_metric> * 25.4 + #<_imperial> ] ]
   #<fastFeed> =  [ #<_ini[TOOL_PROBE]FEED_FAST> * [ #<_metric> * 25.4 + #<_imperial> ]] 
   #<backFeed> = [ #<_ini[TOOL_PROBE]FEED_BACK> * [ #<_metric> * 25.4 + #<_imperial> ]] 
   #<slowFeed> = [ #<_ini[TOOL_PROBE]FEED_SLOW> * [ #<_metric> * 25.4 + #<_imperial> ]]
