@@ -1,0 +1,133 @@
+####################################################
+# Tool Changer
+####################################################
+loadusr -Wn solo-tool-changer /opt/pocketnc/Settings/solo_tool_changer/hal-component.py
+
+# No tool prep necessary
+net tool-prep-loop		<= iocontrol.0.tool-prepare
+net tool-prep-loop		=> iocontrol.0.tool-prepared
+
+net tool-change-loop		<= iocontrol.0.tool-change
+net tool-change-loop		=> iocontrol.0.tool-changed
+
+net new-tool iocontrol.0.tool-prep-number
+net new-tool solo-tool-changer.new-tool
+
+net old-tool iocontrol.0.tool-number
+net old-tool solo-tool-changer.old-tool
+
+net x-pos solo-tool-changer.x-position
+net y-pos solo-tool-changer.y-position
+net z-pos solo-tool-changer.z-position
+net b-pos solo-tool-changer.b-position
+
+net x-homed solo-tool-changer.x-homed
+net y-homed solo-tool-changer.y-homed
+net z-homed solo-tool-changer.z-homed
+net b-homed solo-tool-changer.b-homed
+
+newinst bb_gpio tool-changer-opened-pin pin=[SOLO_PINS]TOOL_CHANGER_OPENED_PIN direction=input
+newinst bb_gpio tool-changer-closed-pin pin=[SOLO_PINS]TOOL_CHANGER_CLOSED_PIN direction=input
+setp tool-changer-opened-pin.invert [PENTA]INVERT_SOLO_TOOL_CHANGER_OPENED
+setp tool-changer-closed-pin.invert [PENTA]INVERT_SOLO_TOOL_CHANGER_CLOSED
+
+newinst reset-pin tool-changer-open-cmd-reset
+newinst reset-pin tool-changer-close-cmd-reset
+
+addf tool-changer-open-cmd-reset.funct servo-thread
+addf tool-changer-close-cmd-reset.funct servo-thread
+
+setp tool-changer-open-cmd-reset.delay 300
+setp tool-changer-close-cmd-reset.delay 300
+
+net solo-tool-changer-open-cmd tool-changer-open-cmd-reset.in
+net solo-tool-changer-close-cmd tool-changer-close-cmd-reset.in
+
+net tool-changer-open-cmd solo-tool-changer.open-cmd
+net tool-changer-open-cmd tool-changer-open-cmd-reset.out
+
+net tool-changer-close-cmd solo-tool-changer.close-cmd
+net tool-changer-close-cmd tool-changer-close-cmd-reset.out
+
+net opened-sensor tool-changer-opened-pin.in
+net opened-sensor solo-tool-changer.opened-sensor
+net opened-sensor [SOLO_PINS]TOOL_CHANGER_OPEN_SENSOR
+
+net closed-sensor tool-changer-closed-pin.in
+net closed-sensor solo-tool-changer.closed-sensor
+net closed-sensor [SOLO_PINS]TOOL_CHANGER_CLOSE_SENSOR
+
+newinst debounce clamped-tool-debounce pincount=1
+newinst debounce clamped-notool-debounce pincount=1
+addf clamped-tool-debounce.funct servo-thread
+addf clamped-notool-debounce.funct servo-thread
+
+setp clamped-tool-debounce.delay 300
+setp clamped-notool-debounce.delay 300
+
+net clamped-no-tool-raw solo_vfd.clamped-no-tool
+net clamped-no-tool-raw clamped-notool-debounce.0.in
+
+net clamped-no-tool clamped-notool-debounce.0.out
+net clamped-no-tool motion.digital-in-61
+net clamped-no-tool solo-tool-changer.clamped-no-tool
+
+net tool-clamped-raw solo_vfd.clamped-with-tool
+net tool-clamped-raw clamped-tool-debounce.0.in
+
+net tool-clamped clamped-tool-debounce.0.out
+net tool-clamped motion.digital-in-60
+net tool-clamped solo-tool-changer.clamped-with-tool
+
+net tool-unclamped solo_vfd.unclamped
+net tool-unclamped motion.digital-in-59
+net tool-unclamped solo-tool-changer.unclamped
+
+net open-tool-changer [SOLO_PINS]OPEN_TOOL_CHANGER_PIN
+net open-tool-changer solo-tool-changer.open-out
+
+net close-tool-changer [SOLO_PINS]CLOSE_TOOL_CHANGER_PIN
+net close-tool-changer solo-tool-changer.close-out
+
+net inhibit-feed-1 solo-tool-changer.inhibit-feed
+
+net inhibit-homing motion.homing-inhibit
+net inhibit-homing solo-tool-changer.inhibit-homing
+
+net ok-to-open-tool-changer solo-tool-changer.ok-to-open
+net ok-to-open-tool-changer motion.digital-in-57
+
+net ok-to-close-tool-changer solo-tool-changer.ok-to-close
+net ok-to-close-tool-changer motion.digital-in-56
+
+setp solo-tool-changer.enabled 1
+
+# unclamp tool
+net tool-released solo-tool-changer.unclamp-out
+net tool-released [SOLO_PINS]TOOL_OPEN_PIN
+
+# taper air purge is for clearing chips around tool
+net taper-air-purge motion.digital-out-61
+net taper-air-purge [SOLO_PINS]TAPER_AIR_PURGE_PIN
+
+newinst reset-pin unclamp-cmd-reset
+newinst reset-pin clamp-cmd-reset
+
+addf unclamp-cmd-reset.funct servo-thread
+addf clamp-cmd-reset.funct servo-thread
+
+setp unclamp-cmd-reset.delay 300
+setp clamp-cmd-reset.delay 300
+
+net solo-clamp-cmd clamp-cmd-reset.in
+net solo-unclamp-cmd unclamp-cmd-reset.in
+
+net unclamp-cmd solo-tool-changer.unclamp-cmd
+net unclamp-cmd unclamp-cmd-reset.out
+
+net clamp-cmd solo-tool-changer.clamp-cmd
+net clamp-cmd clamp-cmd-reset.out
+
+# See more solo-tool-changer connections in PocketNC_PostMillTask.hal
+
+net estop-1 solo-tool-changer.fault

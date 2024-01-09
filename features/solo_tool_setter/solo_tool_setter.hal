@@ -1,3 +1,4 @@
 newinst bb_gpio tool-setter-pin pin=[SOLO_PINS]TOOL_SETTER_PIN direction=input
 
 net [PENTA]TOOL_SETTER_SIG tool-setter-pin.in
+setp tool-setter-pin.invert [PENTA]INVERT_SOLO_TOOL_SETTER
