@@ -1,0 +1,48 @@
+o<measure-probe> sub
+
+M6 T14
+
+#<feedFast> = #<_ini[TOOL_PROBE]FEED_FAST>
+#<feedBack> = #<_ini[TOOL_PROBE]FEED_BACK>
+#<feedSlow> = #<_ini[TOOL_PROBE]FEED_SLOW>
+#<feedTravel> = #<_ini[TOOL_PROBE]FEED_TRAVEL>
+
+M70
+
+G30.1
+
+G20
+G90 G94 G40 G17 G91.1
+G49
+G61.1
+M429
+
+G53 G0 Z0
+G53 G0 B-90
+
+G53 G1 F#<feedTravel> X[ #<_ini[TOOL_SETTER]TRUNNION_X> ] Y[ #<_ini[TOOL_SETTER]TRUNNION_Y> ]
+
+o<probe-on> call
+G54 G91
+G38.2 F[ #<feedFast> ] Z[ #<_ini[TOOL_SETTER]Z> ]
+
+#<fastTrippedZ> = [ #5063 + #5223 ]
+
+G38.4 F#<feedBack> Z.2
+G91 G1 F#<feedBack> Z0.001
+G38.2 F#<feedSlow> Z-.201
+#<slowTrippedZ> = [ #5063 + #5223 ]
+
+#<toolLengthOffset> = [ #<slowTrippedZ> - [ #<_ini[TOOL_SETTER]TRUNNION_Z> + [ #5410 * .5 ] ] ]
+
+G90
+
+G10 L1 P#5400 Z#<toolLengthOffset>
+
+G53 G0 Z0
+G53 G0 B0
+
+M72
+
+o<measure-probe> endsub
+M2
