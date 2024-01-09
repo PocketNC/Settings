@@ -31,6 +31,8 @@ M70
 G20 
 G90 G94 G40 G17 G91.1
 
+o<probe-on> call
+
 ; Feature 0 is the tooling ball 
 o<set_active_feature> call [0]
 o<add-points-probe-sphere> call [ #<ballDiameter> ] [ #<probeDiameter> ] [ #<plungeDepth> ] [ #<theta> ] [ #<rings> ] [ #<samplesPerRing> ] [ #<positioningFeed> ] [ #<feedFast> ] [ #<feedBack> ] [ #<feedSlow> ]
@@ -66,6 +68,8 @@ o300 while [ #<measurement> LT #<numMeasurements> ]
 
   #<measurement> = [ #<measurement> + 1 ]
 o300 endwhile
+
+o<probe-off> call
 
 (logappend,c-axis.txt)
 (log,C Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)

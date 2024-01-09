@@ -35,6 +35,8 @@ G90 G1 Z[ #<_drawerTopFace> + #<probeDiameter>*.5 + .1 ]
 
 G91 X[ .5 * #<_middleOffsetX> ]
 
+o<probe-on> call
+
 o<probe-relative> call [0] [0] [-.15] [#<_ini[TOOL_PROBE]FEED_FAST> ] [ #<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ]
 
 #<probeSlotZTmp> = [ #<_probedG5X_Z> - .5 * #<probeDiameter> ]
@@ -67,6 +69,8 @@ o<add-points-probe-line> call [0] [-1] [0] [0] [0] [-1] [4] [ 3 * #<_toolDist> ]
 
 G91 G1 X[ -1.4 * #<_middleOffsetX> ]
 o<add-points-probe-line> call [0] [1] [0] [0] [0] [-1] [4] [ 3 * #<_toolDist> ] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [0]
+
+o<probe-off> call
 
 #<zBasisX> = #<_penta_plane_normal_x>
 #<zBasisY> = #<_penta_plane_normal_y>
