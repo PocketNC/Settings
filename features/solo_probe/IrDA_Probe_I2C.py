@@ -34,7 +34,7 @@ class IrDA_Probe_I2C():
         self.COMMANDS = Probe_COMMANDS()
         self.registers(I2CAddress,BusAddress)
         self.notes()
-        self.READ_DELAY = 1
+        self.READ_DELAY = 0
         #Setup I2C
         try:
             from smbus import SMBus
