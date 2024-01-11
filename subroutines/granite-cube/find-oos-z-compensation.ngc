@@ -32,9 +32,9 @@ G90 G1 Z1.52
 
 o<probe-on> call
 o<set_active_feature> call [0]
-o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
-o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
-o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [5] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [20] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [20] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [-1] [0] [0] [20] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 o<probe-off> call
 (logappend,z-oos.txt)
 (log,ZX #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
@@ -47,12 +47,14 @@ G90 G1 Z1.52
 
 o<probe-on> call
 o<set_active_feature> call [1]
-o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
-o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
-o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [5] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [20] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [20] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [0] [-1] [0] [-1] [0] [20] [.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 o<probe-off> call
 (log,ZY #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 (logclose)
+
+;py,write_feature_map("z-oos")
 
 G0 Z2.37
 ;G53 G0 Z0

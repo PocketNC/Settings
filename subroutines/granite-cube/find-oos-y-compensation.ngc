@@ -26,8 +26,7 @@ G90 G1 Z1.52
 
 o<probe-on> call
 o<set_active_feature> call [0]
-o<add-points-probe-line> call [0] [-1] [0] [-1] [0] [0] [5] [3.5] [0.26] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
-o<probe-off> call
+o<add-points-probe-line> call [0] [-1] [0] [-1] [0] [0] [20] [3.5] [0.26] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 (logappend,y-oos.txt)
 (log,YX #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 
@@ -37,12 +36,13 @@ G0 Z2.37
 G90 G1 X1.75 Y1.75
 G90 G1 Z1.9351
 
-o<probe-on> call
 o<set_active_feature> call [2]
-o<add-points-probe-line> call [0] [-1] [0] [0] [0] [-1] [5] [3.5] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [0] [-1] [0] [0] [0] [-1] [20] [3.5] [0.15] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 o<probe-off> call
 (log,YZ #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 (logclose)
+
+;py,write_feature_map("y-oos")
 
 G0 Z2.37
 ;G53 G0 Z0
