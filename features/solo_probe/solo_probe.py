@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import logging
-from IrDA_Probe_I2C import IrDA_Probe_I2C
+from IrDA_Probe_I2C import IrDA_Probe_I2C, PROBE_STATE_NORMAL
 from i2c import busNum
 import hal
 import time
@@ -37,6 +37,7 @@ h.newpin("battery.raw", hal.HAL_U32, hal.HAL_OUT)
 h.newpin("beep.frequency", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("beep.duty_cycle", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("beep.on", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("tripped", hal.HAL_BIT, hal.HAL_IN)
 
 h['beep.frequency'] = state['beep.frequency']
 h['beep.duty_cycle'] = state['beep.duty_cycle']
@@ -67,6 +68,7 @@ except:
 h.ready()
 
 lastProbeOn = False
+lastTripped = False
 lastBattery = time.time()
 try:
   while True:
@@ -78,6 +80,13 @@ try:
         else:
           # Probe was commanded to turn off
           probe.sleep()
+
+      if not h["tripped"] and lastTripped and not h["probe-on"]:
+        # If the probe was tripped while sleeping, it will wake up.
+        # We need to put it back to sleep if the probe is off to save power.
+        # When the probe is no longer tripped and the probe is supposed to be off,
+        # go back to sleep.
+        probe.sleep()
 
       if( h["beep.frequency"] != state["beep.frequency"] or 
           h["beep.duty_cycle"] != state["beep.duty_cycle"] or
@@ -103,7 +112,7 @@ try:
 # if we haven't gotten a status from the battery, then check every 2 seconds
 # otherwise, check only every minute
       if(
-        (probe.BATTERY < 150 and time.time()-lastBattery > 2) or
+        (probe.BATTERY < 0 and time.time()-lastBattery > 2) or
         (time.time()-lastBattery > 60)
       ):
         probe.updateStatus()
@@ -116,8 +125,14 @@ try:
         h["battery.percentage"] = percentage
         h["battery.raw"] = probe.BATTERY
 
+        if probe.STATUS == PROBE_STATE_NORMAL and not h["probe-on"] and not h["tripped"]:
+          # The probe is reporting a normal state, but we should be off, so put the probe
+          # back to sleep (this is likely due to the probe being tripped).
+          probe.sleep()
+
         lastBattery = time.time()
       lastProbeOn = h["probe-on"]
+      lastTripped = h["tripped"]
     except:
       pass
 

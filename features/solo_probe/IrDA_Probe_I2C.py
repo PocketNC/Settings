@@ -7,6 +7,8 @@ This Module interacts over I2C with a microcontroller to drive Addressable LED s
 import time
 import binascii
 
+PROBE_STATE_NORMAL = 2
+
 class Probe_COMMANDS():
     """This holds all of the commands and lookup values for the Probe Status."""
     def __init__(self):

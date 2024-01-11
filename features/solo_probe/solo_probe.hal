@@ -13,13 +13,40 @@ setp tool-probe-error-pin.invert 0
 newinst and2 probe-on-and-error
 addf probe-on-and-error.funct servo-thread
 
+# Use a oneshot and or to extend tripped or error states.
+# Extending tripped allows python HAL component time to see quick trips.
+# Extending error state allows the error state that occurs during sleep mode
+# to bridge the time where we briefly are in a good state after the update
+# that happens after a 1-2 second sleep. We can then wait for this extended error
+# state to turn off in G code to ensure the probe is properly activated.
+newinst or2 tool-probe-oneshot-or
+addf tool-probe-oneshot-or servo-thread
+
+newinst oneshot tool-probe-oneshot 
+addf tool-probe-oneshot servo-thread
+setp tool-probe-oneshot.width .5
+
+newinst or2 tool-probe-error-oneshot-or
+addf tool-probe-error-oneshot-or servo-thread
+
+newinst oneshot tool-probe-error-oneshot 
+addf tool-probe-error-oneshot servo-thread
+setp tool-probe-error-oneshot.width 2
+
 net probe-on probe-on-and-error.in0
 net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
 net probe-on solo-probe.probe-on
 
 net tool-probe-error-raw tool-probe-error-pin.in
 net tool-probe-error-raw probe-on-and-error.in1
-net tool-probe-error-raw [PENTA]PROBE_ERROR_DIGITAL_IN_PIN
+net tool-probe-error-raw tool-probe-error-oneshot.in
+net tool-probe-error-raw tool-probe-error-oneshot-or.in0
+
+net tool-probe-error-oneshot-out tool-probe-error-oneshot.out
+net tool-probe-error-oneshot-out tool-probe-error-oneshot-or.in1
+
+net tool-probe-error-extended tool-probe-error-oneshot-or.out
+net tool-probe-error-extended [PENTA]PROBE_ERROR_DIGITAL_IN_PIN
 
 newinst or2 tool-probe-or-error
 addf tool-probe-or-error.funct servo-thread
@@ -29,6 +56,14 @@ net tool-probe-error tool-probe-or-error.in0
 
 net tool-probe-raw tool-probe-pin.in
 net tool-probe-raw tool-probe-or-error.in1
+net tool-probe-raw tool-probe-oneshot.in
+net tool-probe-raw tool-probe-oneshot-or.in0
+
+net tool-probe-oneshot-out tool-probe-oneshot.out
+net tool-probe-oneshot-out tool-probe-oneshot-or.in1
+
+net tool-probe-extended tool-probe-oneshot-or.out
+net tool-probe-extended solo-probe.tripped
 
 net [PENTA]TOOL_PROBE_SIG tool-probe-or-error.out
 

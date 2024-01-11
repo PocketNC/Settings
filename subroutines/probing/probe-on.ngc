@@ -1,5 +1,8 @@
 o<probe-on> sub
 M198 P1
-G4 P2
+M66 P[ #<_ini[PENTA]PROBE_ERROR_DIGITAL_IN> ] L4 Q10
+o100 if [ ABS[ #5399+1 ] LT .000001  ]
+  ;abort,Failed to turn on probe.
+o100 endif 
 o<probe-on> endsub
 M2
