@@ -11,11 +11,11 @@ G0 B0 C0
 
 G49
 
+
 G53 G0 Z0
 G90 G1 F200 Y-2.25 X0
-G90 G1 F60 Z-3.63
-
 o<probe-on> call
+o<protected-move-relative> call [0] [0] [-3.63] [60]
 
 o<set_active_feature> call [1]
 o<probe-relative> call [0] [.5] [0] [#<_ini[TOOL_PROBE]FEED_FAST>] [#<_ini[TOOL_PROBE]FEED_BACK>] [#<_ini[TOOL_PROBE]FEED_SLOW> ]
@@ -23,17 +23,17 @@ o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
 
 G53 G0 Z0
 G90 G1 F200 Y2.25 X0
-G90 G1 F60 Z-3.63
+o<protected-move-relative> call [0] [0] [-3.63] [60]
 
 o<set_active_feature> call [1]
 o<probe-relative> call [0] [-.5] [0] [#<_ini[TOOL_PROBE]FEED_FAST>] [#<_ini[TOOL_PROBE]FEED_BACK>] [#<_ini[TOOL_PROBE]FEED_SLOW> ]
 o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
 
 G53 G0 Z0
-G0 C180
+G0 C-180
 
 G90 G1 F200 Y-2.25 X0
-G90 G1 F60 Z-3.63
+o<protected-move-relative> call [0] [0] [-3.63] [60]
 
 o<set_active_feature> call [1]
 o<probe-relative> call [0] [.5] [0] [#<_ini[TOOL_PROBE]FEED_FAST>] [#<_ini[TOOL_PROBE]FEED_BACK>] [#<_ini[TOOL_PROBE]FEED_SLOW> ]
@@ -41,7 +41,7 @@ o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
 
 G53 G0 Z0
 G90 G1 F200 Y2.25 X0
-G90 G1 F60 Z-3.63
+o<protected-move-relative> call [0] [0] [-3.63] [60]
 
 o<set_active_feature> call [1]
 o<probe-relative> call [0] [-.5] [0] [#<_ini[TOOL_PROBE]FEED_FAST>] [#<_ini[TOOL_PROBE]FEED_BACK>] [#<_ini[TOOL_PROBE]FEED_SLOW> ]
@@ -56,6 +56,8 @@ o<probe-off> call
 (logclose)
 
 G53 G0 Z0
+G0 C1
+G0 C0
 
 M72
 o<pop_feature_set> call

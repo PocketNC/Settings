@@ -28,18 +28,23 @@ G53 G0 Z0
 ;o<clear_points> call
 
 F#<_ini[TOOL_PROBE]FEED_TRAVEL>
-G90 G1 Y2.15 X1.75
+G90 G1 Y2.15 X2.25
 G90 G1 Z1.52
+G90 G1 X1.75
 o<probe-on> call
-o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [10] [3.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
+o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [30] [3.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 o<probe-off> call
 
 G53 G0 Z0
 
-G91 G0 C[ -#<_penta_line_angle_about_z> ]
+;G91 G0 C[ -#<_penta_line_angle_about_z> ]
+
+#<cOffset> = [ #5425 - #<_penta_line_angle_about_z> ]
+
+;debug,C Offset #<cOffset>
 
 (logappend,c-offsets.txt)
-(log,#<_penta_line_angle_about_z>)
+(log,#<cOffset>)
 (logclose)
 
 M72
