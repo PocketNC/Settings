@@ -161,6 +161,10 @@ def mapRange(value, input_min, input_max, output_min, output_max):
 # manually pull all relevant axis values from the device
 # and process their values
 def syncInitialState():
+  global last_jog_count
+
+  last_jog_count = hidConsole.absinfo(ecodes.ABS_WHEEL).value
+
   feedOverride = hidConsole.absinfo(ecodes.ABS_X)
   processOverrideEvent('ABS_X', feedOverride.value)
 
