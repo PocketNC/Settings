@@ -3,28 +3,31 @@
 ####################################################
 loadusr -Wn solo-door $(POCKETNC_DIRECTORY)/Settings/features/solo_door/solo_door_hal_component.py
 
-newinst bb_gpio door-sensor-1-pin pin=[SOLO_PINS]DOOR_DOWN_SENSOR_PIN direction=input
-setp door-sensor-1-pin.invert 1
+setp solo-door.timeout-enabled [SOLO_DOOR]TIMEOUT_ENABLED
+setp solo-door.timeout [SOLO_DOOR]TIMEOUT
 
-newinst bb_gpio door-sensor-2-pin pin=[SOLO_PINS]DOOR_UP_OR_TILTED_SENSOR_PIN direction=input
-setp door-sensor-2-pin.invert 1
+newinst bb_gpio door-down-sensor-pin pin=[SOLO_PINS]DOOR_DOWN_SENSOR_PIN direction=input
+setp door-down-sensor-pin.invert 0
+
+newinst bb_gpio door-up-sensor-pin pin=[SOLO_PINS]DOOR_UP_SENSOR_PIN direction=input
+setp door-up-sensor-pin.invert 0
 
 newinst debounce door-sensor-debounce pincount=2
 addf door-sensor-debounce.funct servo-thread
 
 setp door-sensor-debounce.delay 300
 
-net solo-door-sensor-1-raw door-sensor-1-pin.in
-net solo-door-sensor-1-raw door-sensor-debounce.0.in
+net solo-door-up-sensor-raw door-up-sensor-pin.in
+net solo-door-up-sensor-raw door-sensor-debounce.0.in
 
-net solo-door-sensor-1 door-sensor-debounce.0.out
-net solo-door-sensor-1 solo-door.door-sensor-1
+net solo-door-up-sensor door-sensor-debounce.0.out
+net solo-door-up-sensor solo-door.door-up-sensor
 
-net solo-door-sensor-2-raw door-sensor-2-pin.in
-net solo-door-sensor-2-raw door-sensor-debounce.1.in
+net solo-door-down-sensor-raw door-down-sensor-pin.in
+net solo-door-down-sensor-raw door-sensor-debounce.1.in
 
-net solo-door-sensor-2 door-sensor-debounce.1.out
-net solo-door-sensor-2 solo-door.door-sensor-2
+net solo-door-down-sensor door-sensor-debounce.1.out
+net solo-door-down-sensor solo-door.door-down-sensor
 
 setp solo-door.joint.0.max-velocity [JOINT_0]MAX_VELOCITY
 setp solo-door.joint.1.max-velocity [JOINT_1]MAX_VELOCITY
@@ -43,6 +46,22 @@ newinst reset-pin solo-door-close-cmd-reset
 
 addf solo-door-open-cmd-reset.funct servo-thread
 addf solo-door-close-cmd-reset.funct servo-thread
+
+newinst or2 solo-door-abort-or
+addf solo-door-abort-or servo-thread
+
+newinst oneshot solo-door-abort-oneshot
+addf solo-door-abort-oneshot servo-thread
+setp solo-door-abort-oneshot.width .2
+
+net abort solo-door-abort-or.in0
+net abort solo-door-abort-oneshot.in
+
+net solo-door-abort-oneshot-out solo-door-abort-oneshot.out
+net solo-door-abort-oneshot-out solo-door-abort-or.in1
+
+net solo-door-stop-cmd solo-door-abort-or.out
+net solo-door-stop-cmd solo-door.stop-cmd
 
 net solo-door-open-cmd solo-door-open-cmd-reset.in
 net solo-door-open-cmd-out solo-door-open-cmd-reset.out

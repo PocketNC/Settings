@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 #********************************************************************
-# Description:  solo_door
-#               This file, 'solo_door/solo_door_hal_component.py', is a HAL component that 
+# Description:  beta_solo_door
+#               This file, 'beta_solo_door/beta_solo_door_hal_component.py', is a HAL component that 
 #               controls the behavior of the door on the Penta Solo machine.
 #
 # Author: John Allwine <john@pocketnc.com>
@@ -13,22 +13,21 @@
 #*******************************************************************
 import hal
 import time
-from solo_door_state_machine import SoloDoorState
+from beta_solo_door_state_machine import SoloDoorState
 import penta_messages
 import os
 
 USER_MESSAGES_END_POINT = os.environ.get('USER_MESSAGES_END_POINT')
 messageClient = penta_messages.Client(USER_MESSAGES_END_POINT)
 
-h = hal.component("solo-door")
+h = hal.component("beta-solo-door")
 
 h.newpin("open-cmd", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("close-cmd", hal.HAL_BIT, hal.HAL_IN)
-h.newpin("stop-cmd", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("reset-cmd", hal.HAL_BIT, hal.HAL_IN)
 
-h.newpin("door-up-sensor", hal.HAL_BIT, hal.HAL_IN)
-h.newpin("door-down-sensor", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("door-sensor-1", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("door-sensor-2", hal.HAL_BIT, hal.HAL_IN)
 
 h.newpin("running", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("spindle-on", hal.HAL_BIT, hal.HAL_IN)
@@ -61,13 +60,14 @@ h.newpin("joint.2.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("joint.3.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("joint.4.max-velocity-out", hal.HAL_FLOAT, hal.HAL_OUT)
 
+# filtered door sensor inputs, these are more for debugging
+h.newpin("door-sensor-1-out", hal.HAL_BIT, hal.HAL_OUT)
+h.newpin("door-sensor-2-out", hal.HAL_BIT, hal.HAL_OUT)
+
 
 # outputs for signaling a fault
 h.newpin("fault", hal.HAL_BIT, hal.HAL_OUT)
 h.newpin("fault-reason", hal.HAL_S32, hal.HAL_OUT)
-
-h.newpin("timeout-enabled", hal.HAL_BIT, hal.HAL_IN)
-h.newpin("timeout", hal.HAL_FLOAT, hal.HAL_IN)
 
 # debugging pin to show the internal state machine state
 h.newpin("state", hal.HAL_S32, hal.HAL_OUT)
@@ -79,8 +79,6 @@ pollTime = .05
 # if improperly wired up or machine is in fault state
 h["fault"] = False
 h["fault-reason"] = False
-h["timeout-enabled"] = False
-h["timeout"] = 10
 
 state = SoloDoorState(h, messageClient)
 
