@@ -55,7 +55,6 @@ class SoloDoorState(object):
     self.machine.add_transition(NEXT, States.RUNNING, States.UNEXPECTED_DOOR_NOT_CLOSED, unless="is_door_down")
     self.machine.add_transition(NEXT, States.RUNNING, States.UP, conditions="is_door_up_and_not_running")
     self.machine.add_transition(NEXT, States.RUNNING, States.DOWN, conditions="is_door_down_and_not_running")
-    self.machine.add_transition(NEXT, States.RUNNING, States.DOWN, conditions="is_door_down_and_not_running")
     self.machine.add_transition(NEXT, States.RUNNING, States.PARTIALLY_OPEN, conditions="is_door_partially_open_and_not_running")
 
     # repeatedly transition back to the same state to evaluate warnings in the on_enter_RUNNING method
@@ -262,7 +261,7 @@ class SoloDoorState(object):
     return self.is_door_up and not self.is_running
 
   @property
-  def is_door_down_not_running(self):
+  def is_door_down_and_not_running(self):
     return self.is_door_down and not self.is_running
 
   @property
