@@ -69,6 +69,8 @@ h.newpin("fault-reason", hal.HAL_S32, hal.HAL_OUT)
 h.newpin("timeout-enabled", hal.HAL_BIT, hal.HAL_IN)
 h.newpin("timeout", hal.HAL_FLOAT, hal.HAL_IN)
 
+h.newpin("enabled", hal.HAL_BIT, hal.HAL_IN)
+
 # debugging pin to show the internal state machine state
 h.newpin("state", hal.HAL_S32, hal.HAL_OUT)
 h.ready()
@@ -81,13 +83,15 @@ h["fault"] = False
 h["fault-reason"] = False
 h["timeout-enabled"] = False
 h["timeout"] = 10
+h["enabled"] = 0
 
 state = SoloDoorState(h, messageClient)
 
 try:
   while True:
-    state.next()
-    state.update(pollTime)
+    if h["enabled"]:
+      state.next()
+      state.update(pollTime)
     time.sleep(pollTime)
 except KeyboardInterrupt:
   raise SystemExit

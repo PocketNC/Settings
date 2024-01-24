@@ -97,3 +97,5 @@ net is-spindle-enabled solo-door.spindle-on
 net cutting-fluid-halui-is-on solo-door.cutting-fluid-is-on
 
 net solo-door-state solo-door.state
+
+setp solo-door.enabled 1

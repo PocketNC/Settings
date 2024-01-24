@@ -33,10 +33,6 @@ class SoloDoorState(object):
     self.h = h
     self.messageClient = messageClient
     self.time_since_open_or_close = 0
-    self.enteredRunning = False
-
-    self.door_sensor_1 = 0
-    self.door_sensor_2 = 0
 
     self.warnedSpindleOn = False
     self.warnedCuttingFluidIsOn = False
