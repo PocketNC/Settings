@@ -1,4 +1,6 @@
 o<measure-tool> sub
+; Note that this routine intentionally uses relative moves and G53
+; moves to avoid issues with G5x offsets shifting our commands around.
 
 ; Ensure the probe is off when tool setting
 M66 P#<_ini[PENTA]PROBE_ON_DIGITAL_IN> L0
@@ -31,9 +33,15 @@ G38.2 F20 Z[ #<_ini[TOOL_SETTER]Z> ]
 
 #<fastTrippedZ> = [ #5063 + #5223 ]
 
-G38.4 F#<feedBack> Z.2
+; Back off the tool setter
+G38.4 F#<feedBack> Z[ ABS[#<fastTrippedZ>] ]
+
+; Go a little further
 G91 G1 F#<feedBack> Z0.001
-G38.2 F#<feedSlow> Z-.201
+
+; Touch the tool setter at a slower speed to get
+; a more precise measurement
+G38.2 F#<feedSlow> Z[ -ABS[#<fastTrippedZ>]-.001 ]
 #<slowTrippedZ> = [ #5063 + #5223 ]
 
 #<toolLengthOffset> = [ #<slowTrippedZ> - #<_ini[TOOL_SETTER]TRIGGER_Z> ]
