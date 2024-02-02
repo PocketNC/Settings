@@ -11,5 +11,5 @@ setp solo-tool-changer.closed-sensor 1
 unlinkp door-sensor-debounce.0.out
 unlinkp door-sensor-debounce.1.out
 
-sets solo-door-sensor-1 1
-sets solo-door-sensor-2 1
+sets solo-door-up-sensor 0
+sets solo-door-down-sensor 1
