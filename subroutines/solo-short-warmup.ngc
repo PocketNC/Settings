@@ -1,0 +1,16 @@
+o<solo-short-warmup> sub
+; warm up after no operation between 6 and 60 hours
+M70
+
+M3 S9000
+G4 P300
+M3 S13500
+G4 P120
+M3 S16200
+G4 P180
+
+M5
+
+M72
+o<solo-short-warmup> endsub
+M2
