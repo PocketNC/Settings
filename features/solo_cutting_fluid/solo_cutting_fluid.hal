@@ -2,6 +2,17 @@
 # Cutting Fluid
 ####################################################
 
+newinst bb_gpio cutting-fluid-flow-pin pin=[SOLO_PINS]CUTTING_FLUID_FLOW_PIN direction=input
+newinst high-flow-lt cutting-fluid-flow
+addf cutting-fluid-flow.funct servo-thread
+
+net cutting-fluid-flow-signal cutting-fluid-flow-pin.in
+net cutting-fluid-flow-signal cutting-fluid-flow.signal
+
+setp cutting-fluid-flow.time-window 3
+
+net cutting-fluid-flow-rate cutting-fluid-flow.flow-rate
+
 newinst bb_gpio cutting-fluid-enable-pin pin=[SOLO_PINS]CUTTING_FLUID_ENABLE_PIN direction=output
 setp cutting-fluid-enable-pin.out 1
 
@@ -142,10 +153,20 @@ setp hpg3.stepgen.01.dirpin          [SOLO_PINS]CUTTING_FLUID_DIR_PIN
 setp hpg3.stepgen.01.control-type 1
 setp hpg3.stepgen.01.velocity-cmd -1000
 
+# limit2 used to limit the input signal to between 0 and 100 (this is set via rockhopper)
+# mult2 used to scale the 0-100 down to 0-1
+# blend used to map from 0-1 to -250 - -1000, which is fed to the stepgen velocity
+
+newinst blend cf-blend
+addf cf-blend servo-thread
+
+setp cf-blend.in2 -250
+setp cf-blend.in1 -1000
+
 newinst mult2 cf-mult2
 addf cf-mult2 servo-thread
 
-setp cf-mult2.in0 -10
+setp cf-mult2.in0 .01
 setp cf-mult2.in1 100
 
 newinst limit2 cf-limit2
@@ -156,10 +177,13 @@ setp cf-limit2.max 100
 setp cf-limit2.load 1
 setp cf-limit2.in 100
 
-net cutting-fluid-pressure-out cf-mult2.out
+net cutting-fluid-pressure-out cf-blend.out
 net cutting-fluid-pressure-out hpg3.stepgen.01.velocity-cmd
 
 net cutting-fluid-pressure cf-limit2.in
+
+net cutting-fluid-zero-to-one cf-mult2.out
+net cutting-fluid-zero-to-one cf-blend.select
 
 net cutting-fluid-pressure-limited cf-limit2.out
 net cutting-fluid-pressure-limited cf-mult2.in1
