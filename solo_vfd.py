@@ -100,7 +100,7 @@ class VFD:
       self.clamped_no_tool = clamped_sensors[1]
       self.unclamped = clamped_sensors[0]
 
-      self.speed_fb = self.instVFD.read_register(RPM_REG)
+      self.speed_fb = abs(self.instVFD.read_register(RPM_REG, signed=True))
 
       voltage = self.instVFD.read_register(OUTPUT_VOLTAGE_REG, 1)
       current = self.instVFD.read_register(OUTPUT_CURRENT_REG, 2)
@@ -110,7 +110,7 @@ class VFD:
       self.output_current = current
       self.power_angle = power_angle
       self.output_power = voltage*current*math.cos(math.radians(power_angle))
-      self.output_torque = self.instVFD.read_register(OUTPUT_TORQUE_REG, 1)
+      self.output_torque = abs(self.instVFD.read_register(OUTPUT_TORQUE_REG, 1, signed=True))
 
       code = self.instVFD.read_register(STATUS_REG)
       self.warn_code = code >> 16
