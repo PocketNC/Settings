@@ -12,7 +12,7 @@ M5
 G80
 M9
 
-M198 P0
+o<probe-off-no-sync> call
 
 G54
 

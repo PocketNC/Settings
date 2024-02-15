@@ -30,7 +30,12 @@ probe = IrDA_Probe_I2C(address, busNum)
 
 h = hal.component("solo-probe")
 
+# Probe on indicates that the probe is being used for a probing routine.
+# We originally used it to wake and sleep the probe, but we've moved toward
+# waking the probe up when it is about to be pulled from its slot and put
+# back to sleep when it goes back into the drawer.
 h.newpin("probe-on", hal.HAL_BIT, hal.HAL_IN)
+h.newpin("probe-awake", hal.HAL_BIT, hal.HAL_IO)
 h.newpin("battery.voltage", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("battery.percentage", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("battery.raw", hal.HAL_U32, hal.HAL_OUT)
@@ -67,21 +72,33 @@ except:
 
 h.ready()
 
+lastOnOrOff = time.time()
 lastProbeOn = False
+lastProbeAwake = False
 lastTripped = False
 lastBattery = time.time()
 try:
   while True:
     try:
       if h["probe-on"] != lastProbeOn:
-        if h["probe-on"]:
+        lastOnOrOff = time.time()
+
+        if h["probe-on"] and not h["probe-awake"]:
+          h["probe-awake"] = True
+
+      if time.time()-lastOnOrOff > 7200 and h["probe-awake"]:
+        # Go to sleep if last probe on or off was more than 2 hours ago
+        h["probe-awake"] = False
+
+      if h["probe-awake"] != lastProbeAwake:
+        if h["probe-awake"]:
           # Probe was commanded to turn on
           probe.wake()
         else:
           # Probe was commanded to turn off
           probe.sleep()
 
-      if not h["tripped"] and lastTripped and not h["probe-on"]:
+      if not h["tripped"] and lastTripped and not h["probe-awake"]:
         # If the probe was tripped while sleeping, it will wake up.
         # We need to put it back to sleep if the probe is off to save power.
         # When the probe is no longer tripped and the probe is supposed to be off,
@@ -109,13 +126,8 @@ try:
         except:
           logging.error("Error writing solo probe settings file", exc_info=True)
 
-# if we haven't gotten a status from the battery, then check every 2 seconds
-# otherwise, check only every minute
-      if(
-        (probe.BATTERY < 0 and time.time()-lastBattery > 2) or
-        (time.time()-lastBattery > 60)
-      ):
-        probe.updateStatus()
+      if time.time()-lastBattery > 2:
+        probe.readBattery()
 
         battery = probe.BATTERY & 0b00111111
         voltage = min(max(2.8 + battery / 45,3.3), 4.2)
@@ -125,12 +137,13 @@ try:
         h["battery.percentage"] = percentage
         h["battery.raw"] = probe.BATTERY
 
-        if probe.STATUS == PROBE_STATE_NORMAL and not h["probe-on"] and not h["tripped"]:
+        if probe.STATUS == PROBE_STATE_NORMAL and not h["probe-awake"] and not h["tripped"]:
           # The probe is reporting a normal state, but we should be off, so put the probe
           # back to sleep (this is likely due to the probe being tripped).
           probe.sleep()
 
         lastBattery = time.time()
+      lastProbeAwake = h["probe-awake"]
       lastProbeOn = h["probe-on"]
       lastTripped = h["tripped"]
     except:

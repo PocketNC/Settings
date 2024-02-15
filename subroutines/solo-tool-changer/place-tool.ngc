@@ -16,6 +16,11 @@ o<place-tool> sub
 
   o[#<toolSlot> + 7000] call
 
+  o7300 if [ #<toolSlot> EQ 14 ]
+    ; if putting away probe, turn it off
+    M198 P0
+  o7300 endif
+
   M61 Q0
 
 o<place-tool> endsub

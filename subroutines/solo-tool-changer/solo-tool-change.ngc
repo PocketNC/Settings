@@ -16,6 +16,11 @@ o<init-tool-changer-vars> call
 
 #<_newTool> = #<T>
 
+o800 if [ #<_newTool> EQ 14 ]
+  ; if we're asking for the probe, wake it up
+  M198 P1
+o800 endif
+
 M66 P#<_toolClampedInput> L0
 o200 if [ #<_oldTool> EQ #<_newTool> AND #5399 EQ 1]
   O<solo-tool-change> return

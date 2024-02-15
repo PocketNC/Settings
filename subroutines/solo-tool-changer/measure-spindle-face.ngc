@@ -1,0 +1,73 @@
+o<measure-spindle-face> sub
+; check unclamped state
+M66 P59 L0
+o100 if [ #5399 NE 0 ]
+  M66  E0 L0
+  (abort,Spindle cannot be unclamped when measuring the spindle face.)
+o100 endif
+
+; check clamped with tool state
+M66 P59 L0
+o200 if [ #5399 NE 0 ]
+  M66  E0 L0
+  (abort,Spindle cannot have a tool when measuring the spindle face.)
+o200 endif
+
+; check clamped no tool state
+M66 P61 L0
+o300 if [ #5399 NE 1 ]
+  M66  E0 L0
+  (abort,Spindle must be clamped without a tool to measure the spindle face.)
+o300 endif
+
+o400 if [ EXISTS[ #<_ini[TOOL_SETTER]X> ] AND EXISTS[ #<_ini[TOOL_SETTER]Y> ] ]
+  M70
+
+  #<feedTravel> = #<_ini[TOOL_PROBE]FEED_TRAVEL>
+  #<feedFast> = #<_ini[TOOL_PROBE]FEED_FAST>
+  #<feedBack> = #<_ini[TOOL_PROBE]FEED_BACK>
+  #<feedSlow> = #<_ini[TOOL_PROBE]FEED_SLOW>
+
+  G30.1
+  G20
+  G90 G94 G40 G17 G91.1
+  G49
+  G61.1
+  M429
+
+  G53 G0 Z0
+
+  G53 G1 F60 X[#<_ini[TOOL_SETTER]X>-0.425] Y[#<_ini[TOOL_SETTER]Y>]
+  G53 G0 B-90
+  G54 G91
+
+  G38.2 F20 Z-4.25
+
+  #<fastTrippedZ> = [ #5063 + #5223 ]
+
+  G38.4 F#<feedBack> Z[ ABS[#<fastTrippedZ>] ]
+
+  G91 G1 F#<feedBack> Z0.001
+
+  #<releasedZ> = [ #5063 + #5223 + 0.001 ]
+  
+  G38.2 F#<feedSlow> Z[ #<fastTrippedZ> - #<releasedZ> ]
+  #<slowTrippedZ> = [ #5063 + #5223 ]
+  (debug,#<slowTrippedZ>,#<_hal[spindle-temperature]>,#<_hal[frame-temperature]>)
+
+  (logappend,spindle-face.txt)
+  (log,#<slowTrippedZ>,#<_hal[spindle-temperature]>,#<_hal[frame-temperature]>)
+  (logclose)
+
+  G90
+  G53 G0 Z0
+  G53 G0 B0
+
+  M72
+o400 else
+  M66  E0 L0
+  (abort,Tool setter position not set.)
+o400 endif
+
+o<measure-spindle-face> endsub
+M2

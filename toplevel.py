@@ -21,7 +21,7 @@ logging.basicConfig(filename=os.path.join(POCKETNC_VAR_DIR, "python.log"),
 )
 logger = logging.getLogger(__name__)
 
-logger.debug("in toplevel.py 32346666")
+logger.debug("in toplevel.py 32346666d")
 
 def __init__(self):
 # handle any per-module initialisation tasks here
@@ -55,6 +55,25 @@ def read_feature_map(name):
         featureMap.setFeature(int(k), data[k])
   except:
     logger.debug("Error reading feature map %s", name, exc_info=True)
+
+def append_feature_map(name):
+  try:
+    with open(os.path.join(POCKETNC_VAR_DIR, name + ".json"), "r") as file:
+      data = metrology.convertJSONDataToFeatures(json.loads(file.read()))
+      if type(data) != list:
+        data = []
+  except:
+    data = []
+  try:
+    manager = metrology.FeatureManager.getInstance()
+    featureMap = manager.getActiveFeatureMap()
+    data.append(featureMap.features)
+    dataString = json.dumps(data, cls=metrology.FeatureEncoder)
+    with open(os.path.join(POCKETNC_VAR_DIR, name + ".json"), "w") as file:
+      file.write(dataString)
+  except:
+    logger.debug("Error appending feature map %s", name, exc_info=True)
+
 
 def reload_python():
   logger.debug("in reload_python");

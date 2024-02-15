@@ -35,6 +35,7 @@ setp tool-probe-error-oneshot.width 2
 
 net probe-on probe-on-and-error.in0
 net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
+net probe-on [PENTA]PROBE_ON_DIGITAL_OUT_PIN
 net probe-on solo-probe.probe-on
 
 net tool-probe-error-raw tool-probe-error-pin.in

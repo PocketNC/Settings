@@ -1,0 +1,4 @@
+o<probe-off-no-sync> sub
+M65 P[ #<_ini[PENTA]PROBE_ON_DIGITAL_OUT> ]
+o<probe-off-no-sync> endsub
+M2

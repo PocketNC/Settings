@@ -7,6 +7,7 @@
 # that the probe is on before proceeding, so this needs to be
 # hooked up for those routines to work.
 net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
+net probe-on [PENTA]PROBE_ON_DIGITAL_OUT_PIN
 
 # This is an error pin that the probing routines check
 # in case the probe can report an error state. In this

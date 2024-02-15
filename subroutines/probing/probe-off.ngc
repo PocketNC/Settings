@@ -1,8 +1,5 @@
 o<probe-off> sub
-M198 P0
-M66 P[ #<_ini[PENTA]PROBE_ERROR_DIGITAL_IN> ] L3 Q5
-o100 if [ #5399 EQ -1 ]
-  ;abort,Failed to turn off probe.
-o100 endif 
+M66 E0 L0
+M65 P[ #<_ini[PENTA]PROBE_ON_DIGITAL_OUT> ]
 o<probe-off> endsub
 M2
