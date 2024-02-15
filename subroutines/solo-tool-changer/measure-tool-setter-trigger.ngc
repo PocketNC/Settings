@@ -1,4 +1,4 @@
-o<measure-spindle-face> sub
+o<measure-tool-setter-trigger> sub
 ; check unclamped state
 M66 P59 L0
 o100 if [ #5399 NE 0 ]
@@ -8,16 +8,16 @@ o100 endif
 
 ; check clamped with tool state
 M66 P60 L0
-o200 if [ #5399 NE 0 ]
+o200 if [ #5399 NE 1 ]
   M66  E0 L0
-  (abort,Spindle cannot have a tool when measuring the spindle face.)
+  (abort,Spindle must have a tool when measuring the trigger position.)
 o200 endif
 
 ; check clamped no tool state
 M66 P61 L0
-o300 if [ #5399 NE 1 ]
+o300 if [ #5399 NE 0 ]
   M66  E0 L0
-  (abort,Spindle must be clamped without a tool to measure the spindle face.)
+  (abort,Cannot measure trigger position without a tool clamped.)
 o300 endif
 
 o400 if [ EXISTS[ #<_ini[TOOL_SETTER]X> ] AND EXISTS[ #<_ini[TOOL_SETTER]Y> ] ]
@@ -37,7 +37,7 @@ o400 if [ EXISTS[ #<_ini[TOOL_SETTER]X> ] AND EXISTS[ #<_ini[TOOL_SETTER]Y> ] ]
 
   G53 G0 Z0
 
-  G53 G1 F60 X[#<_ini[TOOL_SETTER]X>-0.425] Y[#<_ini[TOOL_SETTER]Y>]
+  G53 G1 F60 X[#<_ini[TOOL_SETTER]X>] Y[#<_ini[TOOL_SETTER]Y>]
   G53 G0 B-90
   G54 G91
 
@@ -55,7 +55,7 @@ o400 if [ EXISTS[ #<_ini[TOOL_SETTER]X> ] AND EXISTS[ #<_ini[TOOL_SETTER]Y> ] ]
   #<slowTrippedZ> = [ #5063 + #5223 ]
   (debug,#<slowTrippedZ>,#<_hal[spindle-temperature]>,#<_hal[frame-temperature]>)
 
-  (logappend,spindle-face.txt)
+  (logappend,tool-setter-trigger.txt)
   (log,#<slowTrippedZ>,#<_hal[spindle-temperature]>,#<_hal[frame-temperature]>)
   (logclose)
 
@@ -69,5 +69,5 @@ o400 else
   (abort,Tool setter position not set.)
 o400 endif
 
-o<measure-spindle-face> endsub
+o<measure-tool-setter-trigger> endsub
 M2
