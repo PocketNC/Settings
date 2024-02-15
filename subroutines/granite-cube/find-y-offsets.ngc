@@ -51,6 +51,8 @@ o<set_active_feature> call [1]
 
 o<probe-off> call
 
+;py,append_feature_map("y-offsets")
+
 (logappend,y-offsets.txt)
 (log, #<_penta_average_y>)
 (logclose)

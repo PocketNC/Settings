@@ -17,8 +17,7 @@ G20
 G90 G94 G40 G17 G91.1
 ;M429
 
-;G53 G0 Z0
-G0 Z3
+G53 G0 Z0
 
 F#<_ini[TOOL_PROBE]FEED_TRAVEL>
 G90 G1 X2.25 Y1.75
@@ -42,7 +41,7 @@ o<probe-off> call
 (log,YZ #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 (logclose)
 
-;py,write_feature_map("y-oos")
+;py,append_feature_map("y-oos")
 
 G0 Z2.37
 ;G53 G0 Z0
@@ -50,4 +49,4 @@ G0 Z2.37
 M72
 o<pop_feature_set> call
 
-o<find-oos-z-compensation> endsub
+o<find-oos-y-compensation> endsub

@@ -54,7 +54,7 @@ o<probe-off> call
 (log,ZY #<_penta_line_direction_x>, #<_penta_line_direction_y>, #<_penta_line_direction_z>)
 (logclose)
 
-;py,write_feature_map("z-oos")
+;py,append_feature_map("z-oos")
 
 G0 Z2.37
 ;G53 G0 Z0

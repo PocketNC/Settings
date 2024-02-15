@@ -2,7 +2,7 @@
 ; and must be active with G43 (see find-nominal-probe-length-offset).
 ; C should be mostly zeroed already
 
-o<align-c-with-x> sub
+o<find-c-offsets> sub
 
 o100 if [ #<_tool_offset> NE 1 ]
   (abort,You must have a tool length offset in place)
@@ -35,6 +35,8 @@ o<probe-on> call
 o<add-points-probe-line> call [-1] [0] [0] [0] [-1] [0] [30] [3.5] [0.25] [#<_ini[TOOL_PROBE]FEED_TRAVEL> ] [#<_ini[TOOL_PROBE]FEED_FAST> ] [#<_ini[TOOL_PROBE]FEED_BACK> ] [ #<_ini[TOOL_PROBE]FEED_SLOW> ] [1]
 o<probe-off> call
 
+;py,append_feature_map("c-offsets")
+
 G53 G0 Z0
 
 ;G91 G0 C[ -#<_penta_line_angle_about_z> ]
@@ -50,4 +52,5 @@ G53 G0 Z0
 M72
 o<pop_feature_set> call
 
-o<align-c-with-x> endsub
+o<find-c-offsets> endsub
+M2

@@ -461,7 +461,7 @@ class Feature:
       "points": self._points.tolist()
     }
     
-    if self._featureTransform:
+    if self._featureTransform is not None:
       obj["transform"] = self._featureTransform.tolist()
 
     return obj

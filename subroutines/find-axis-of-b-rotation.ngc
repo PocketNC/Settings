@@ -6,7 +6,7 @@ o100 if [ #<_tool_offset> NE 1 ]
   (abort,You must have a tool length offset in place)
 o100 endif
 
-o200 if [ ABS [ #<_b> ] GT .000001 ]
+o200 if [ ABS [ #<_b> ] GT .00001 ]
   (abort,B must be at 0)
 o200 endif
 
@@ -52,10 +52,9 @@ o300 while [ #<measurement> LT #<numMeasurements> ]
   G0 B#<angle>
   G1 Z[ #<_penta_sphere_z> + #<ballDiameter> * .5 + #<probeDiameter> * .5 + #<plungeDepth> * .25 ]
 
-  ; temporary feature 1 will hold points for currently rotated sphere
-  ; so clear the points in preparation for probing 
-  o<set_active_feature> call [1]
-  o<clear_points> call
+  ; each individual sphere feature starting at 2 and going up for each one,
+  ; will hold points for currently rotated sphere
+  o<set_active_feature> call [#<measurement>+2]
 
   o<add-points-probe-sphere> call [ #<ballDiameter> ] [ #<probeDiameter> ] [ #<plungeDepth> ] [ #<theta> ] [ #<rings> ] [ #<samplesPerRing> ] [ #<positioningFeed> ] [ #<feedFast> ] [ #<feedBack> ] [ #<feedSlow> ]
 
@@ -63,15 +62,17 @@ o300 while [ #<measurement> LT #<numMeasurements> ]
   #<centerY> = #<_penta_sphere_y>
   #<centerZ> = #<_penta_sphere_z>
 
-  ; Feature 3 is the circle we're tracing through the center of the tooling ball at each rotation
+  ; Feature 1 is the circle we're tracing through the center of the tooling ball at each rotation
   ; so record the center of the latest sampled ball
-  o<set_active_feature> call [3]
+  o<set_active_feature> call [1]
   o<add_point> call [ #<centerX> ] [ #<centerY> ] [ #<centerZ> ]
 
   #<measurement> = [ #<measurement> + 1 ]
 o300 endwhile
 
 o<probe-off> call
+
+;py,append_feature_map("b-axis")
 
 (logappend,b-axis.txt)
 (log,B Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)

@@ -50,6 +50,8 @@ o<add_point> call [#<_probedG5X_X>] [#<_probedG5X_Y>] [#<_probedG5X_Z>]
 G53 G0 Z0
 o<probe-off> call
 
+;py,append_feature_map("x-offsets")
+
 o<set_active_feature> call [0]
 
 (logappend,x-offsets.txt)
