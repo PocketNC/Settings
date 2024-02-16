@@ -295,7 +295,25 @@ def flatness(feature):
   plane = feature.plane()
   distances = []
   for pt in feature.points():
-    dist = np.linalg.norm(pt-projectPointToPlane(pt, plane))
+    dist = np.dot((pt-projectPointToPlane(pt, plane)), plane[1])
+    distances.append(dist)
+
+  return np.max(distances)-np.min(distances)
+
+def sphericity(feature):
+  """
+  `feature` is a `Feature` object.
+
+  Calculates a best fit sphere with the points in `feature`, then calculates a distance from each
+  point to the sphere. Returns the max distance minus the min distance.
+  """
+
+  sphere = feature.sphere()
+  distances = []
+  for pt in feature.points():
+    dir = (pt-sphere[1])/np.linalg.norm(pt-sphere[1])
+    onSphere = sphere[1]+dir*sphere[0]
+    dist = np.dot(pt-onSphere, dir)
     distances.append(dist)
 
   return np.max(distances)-np.min(distances)
