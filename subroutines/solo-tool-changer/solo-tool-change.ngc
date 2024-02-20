@@ -19,6 +19,12 @@ o<init-tool-changer-vars> call
 o800 if [ #<_newTool> EQ 14 ]
   ; if we're asking for the probe, wake it up
   M198 P1
+
+  M66 P#<_ini[PENTA]PROBE_ERROR_DIGITAL_IN> L4 Q4
+  o810 if [ ABS[ #5399+1 ] LT .000001 ]
+    (abort,Probe is in an error state. Ensure the probe is charged and is facing forward in the drawer.)
+  o810 endif
+
 o800 endif
 
 M66 P#<_toolClampedInput> L0
