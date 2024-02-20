@@ -92,3 +92,4 @@ net probe-beep-on solo-probe.beep.on
 
 net probe-battery-voltage solo-probe.battery.voltage
 net probe-battery-percentage solo-probe.battery.percentage
+net probe-battery-status solo-probe.battery.status

@@ -39,6 +39,7 @@ h.newpin("probe-awake", hal.HAL_BIT, hal.HAL_IO)
 h.newpin("battery.voltage", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("battery.percentage", hal.HAL_FLOAT, hal.HAL_OUT)
 h.newpin("battery.raw", hal.HAL_U32, hal.HAL_OUT)
+h.newpin("battery.status", hal.HAL_S32, hal.HAL_OUT)
 h.newpin("beep.frequency", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("beep.duty_cycle", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("beep.on", hal.HAL_BIT, hal.HAL_IN)
@@ -50,6 +51,7 @@ h['beep.on'] = state['beep.on']
 h["battery.voltage"] = -1
 h["battery.percentage"] = -1
 h['battery.raw'] = 0
+h['battery.status'] = -1
 
 try:
   probe.setBeep(state["beep.frequency"], state["beep.duty_cycle"])
@@ -63,10 +65,12 @@ try:
   battery = probe.BATTERY & 0b00111111
   voltage = min(max(2.8 + battery / 45,3.3), 4.2)
   percentage = (voltage-3.3)/(4.2-3.3)*100
+  status = (probe.BATTERY & 0b11000000) >> 6
 
   h["battery.voltage"] = voltage
   h["battery.percentage"] = percentage
   h["battery.raw"] = probe.BATTERY
+  h["battery.status"] = status
 except:
   logging.error("Error writing solo probe settings to I2C bus", exc_info=True)
 
@@ -132,10 +136,12 @@ try:
         battery = probe.BATTERY & 0b00111111
         voltage = min(max(2.8 + battery / 45,3.3), 4.2)
         percentage = (voltage-3.3)/(4.2-3.3)*100
+        status = (probe.BATTERY & 0b11000000) >> 6
 
         h["battery.voltage"] = voltage
         h["battery.percentage"] = percentage
         h["battery.raw"] = probe.BATTERY
+        h["battery.status"] = status
 
         if probe.STATUS == PROBE_STATE_NORMAL and not h["probe-awake"] and not h["tripped"]:
           # The probe is reporting a normal state, but we should be off, so put the probe
