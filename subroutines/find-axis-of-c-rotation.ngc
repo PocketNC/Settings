@@ -10,6 +10,26 @@ o200 if [ ABS [ #<_c> ] GT .00001 ]
   (abort,C must be at 0)
 o200 endif
 
+o400 if [ABS[ #[5201 + [ 20 * #5220 ]]] GT .00001 ]
+  (abort,Active X work offset must be 0.)
+o400 endif
+
+o500 if [ABS[ #[5202 + [ 20 * #5220 ]]] GT .00001 ]
+  (abort,Active Y work offset must be 0.)
+o500 endif
+
+o600 if [ABS[ #[5202 + [ 20 * #5220 ]]] GT .00001 ]
+  (abort,Active Z work offset must be 0.)
+o600 endif
+
+o700 if [ABS[ #[5204 + [ 20 * #5220 ]]] GT .00001 ]
+  (abort,Active B work offset must be 0.)
+o700 endif
+
+o800 if [ABS[ #[5205 + [ 20 * #5220 ]]] GT .00001 ]
+  (abort,Active C work offset must be 0.)
+o800 endif
+
 #<ballDiameter> = #1
 #<probeDiameter> = #2
 #<plungeDepth> = #3
@@ -77,6 +97,10 @@ o<probe-off> call
 (log,C Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
 (log,C Diameter #<_penta_circle_diameter>)
 (logclose)
+
+(debug,C Center #<_penta_circle_center_x>,#<_penta_circle_center_y>,#<_penta_circle_center_z>)
+(debug,C Normal #<_penta_circle_normal_x>,#<_penta_circle_normal_y>,#<_penta_circle_normal_z>)
+(debug,C Diameter #<_penta_circle_diameter>)
 
 G53 G0 Z0
 G0 C0
