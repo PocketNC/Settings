@@ -318,6 +318,27 @@ def sphericity(feature):
 
   return np.max(distances)-np.min(distances)
 
+def circularity(feature):
+  """
+  `feature` is a `Feature` object.
+
+  Calculates a best fit circle with the points in `feature`, then calculates a distance from each
+  point projected to the plane of the circle to the circle. Returns the max distance minus the min distance.
+  """
+
+  circle = feature.circle()
+  plane = feature.plane()
+  distances = []
+  for pt in feature.points():
+    ptOnPlane = projectPointToPlane(pt, plane)
+
+    dir = (ptOnPlane-circle[1])/np.linalg.norm(ptOnPlane-circle[1])
+    onCircle = circle[1]+dir*circle[0]
+    dist = np.dot(ptOnPlane-onCircle, dir)
+    distances.append(dist)
+
+  return np.max(distances)-np.min(distances)
+
   
 def surfaceParallelism(surfaceFeature, datumPlane):
   """
