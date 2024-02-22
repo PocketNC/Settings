@@ -18,15 +18,15 @@ o500 if [ABS[ #[5202 + [ 20 * #5220 ]]] GT .00001 ]
   (abort,Active Y work offset must be 0.)
 o500 endif
 
-o600 if [ABS[ #[5202 + [ 20 * #5220 ]]] GT .00001 ]
+o600 if [ABS[ #[5203 + [ 20 * #5220 ]]] GT .00001 ]
   (abort,Active Z work offset must be 0.)
 o600 endif
 
-o700 if [ABS[ #[5204 + [ 20 * #5220 ]]] GT .00001 ]
+o700 if [ABS[ #[5205 + [ 20 * #5220 ]]] GT .00001 ]
   (abort,Active B work offset must be 0.)
 o700 endif
 
-o800 if [ABS[ #[5205 + [ 20 * #5220 ]]] GT .00001 ]
+o800 if [ABS[ #[5206 + [ 20 * #5220 ]]] GT .00001 ]
   (abort,Active C work offset must be 0.)
 o800 endif
 
