@@ -84,7 +84,7 @@ lastBattery = time.time()
 try:
   while True:
     try:
-      if h["probe-on"] != lastProbeOn:
+      if h["probe-on"] != lastProbeOn or h["probe-awake"] != lastProbeAwake:
         lastOnOrOff = time.time()
 
         if h["probe-on"] and not h["probe-awake"]:

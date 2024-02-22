@@ -31,7 +31,7 @@ addf tool-probe-error-oneshot-or servo-thread
 
 newinst oneshot tool-probe-error-oneshot 
 addf tool-probe-error-oneshot servo-thread
-setp tool-probe-error-oneshot.width 2
+setp tool-probe-error-oneshot.width 3
 
 net probe-on probe-on-and-error.in0
 net probe-on [PENTA]PROBE_ON_DIGITAL_IN_PIN
