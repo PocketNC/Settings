@@ -4,6 +4,8 @@ net spindle-temperature spindle-check.temperature-c
 net temp-sensor-error spindle-check.sensor-error
 net temp-sensor-error spindle-d5next.error
 
+net commanded-spindle-speed spindle-check.spindle-cmd
+
 setp spindle-check.temperature-max-c 37.777
 
 net [PENTA]SOLO_SPINDLE_ABORT_SIG spindle-check.abort

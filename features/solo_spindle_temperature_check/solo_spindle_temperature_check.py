@@ -41,6 +41,7 @@ h = hal.component("spindle-check")
 h.newpin("temperature-max-c", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("temperature-c", hal.HAL_FLOAT, hal.HAL_IN)
 h.newpin("sensor-error", hal.HAL_S32, hal.HAL_IN)
+h.newpin("spindle-cmd", hal.HAL_FLOAT, hal.HAL_IN);
 
 h.newpin("ok-to-run", hal.HAL_BIT, hal.HAL_OUT);
 h.newpin("abort", hal.HAL_BIT, hal.HAL_OUT);
@@ -67,13 +68,18 @@ try:
       sensorErrors = 0
 
     if h['temperature-c'] > h['temperature-max-c'] or sensorErrors > 10:
+      if h['spindle-cmd'] > 0:
+        h['abort'] = 1
+        sentError = False
+      else:
+        h['abort'] = 0
+
       if not sentError:
         if h['temperature-c'] > h['temperature-max-c']:
           send_temperature_fault()
         else:
           send_sensor_error(h['sensor-error'])
         sentError = True
-      h['abort'] = 1
       h['ok-to-run'] = 0
       h['spindle-stop'] = 1
       h['inhibit-spindle'] = 1
